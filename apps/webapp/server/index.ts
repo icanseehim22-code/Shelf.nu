@@ -2,6 +2,9 @@
 // It is important to import it as .js for this to work, even if the file is .ts
 import "./instrument.server.js";
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { serveStatic } from "@hono/node-server/serve-static";
 import type { AppLoadContext } from "react-router";
 import type { HonoServerOptions } from "react-router-hono-server/node";
 import { createHonoServer } from "react-router-hono-server/node";
@@ -30,6 +33,11 @@ type ServerEnv = {
 
 // Server will not start if the env is not valid
 initEnv();
+
+const isProduction = process.env.NODE_ENV === "production";
+const clientBuildPath = isProduction
+  ? path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../client")
+  : "";
 
 export const getLoadContext: HonoServerOptions<ServerEnv>["getLoadContext"] = (
   c,
@@ -85,6 +93,16 @@ export default createHonoServer<ServerEnv>({
    */
   beforeAll: (app) => {
     app.use("*", securityHeaders());
+
+    if (isProduction && clientBuildPath) {
+      const relativeBuildPath = path.relative(process.cwd(), clientBuildPath);
+      app.use(
+        "*",
+        serveStatic({
+          root: relativeBuildPath,
+        })
+      );
+    }
   },
   configure: (server) => {
     // Measure total request duration (dev/staging only, skipped in production).
