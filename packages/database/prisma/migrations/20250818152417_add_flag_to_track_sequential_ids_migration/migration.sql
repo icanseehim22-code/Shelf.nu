@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "public"."Organization" ADD COLUMN     "hasSequentialIdsMigrated" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "shelf"."Organization" ADD COLUMN     "hasSequentialIdsMigrated" BOOLEAN NOT NULL DEFAULT false;

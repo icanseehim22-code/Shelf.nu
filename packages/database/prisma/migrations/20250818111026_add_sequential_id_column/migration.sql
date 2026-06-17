@@ -5,10 +5,10 @@
 
 */
 -- AlterTable
-ALTER TABLE "public"."Asset" ADD COLUMN     "sequentialId" TEXT;
+ALTER TABLE "shelf"."Asset" ADD COLUMN     "sequentialId" TEXT;
 
 -- CreateIndex
-CREATE INDEX "Asset_sequentialId_idx" ON "public"."Asset"("sequentialId");
+CREATE INDEX "Asset_sequentialId_idx" ON "shelf"."Asset"("sequentialId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Asset_organizationId_sequentialId_key" ON "public"."Asset"("organizationId", "sequentialId");
+CREATE UNIQUE INDEX "Asset_organizationId_sequentialId_key" ON "shelf"."Asset"("organizationId", "sequentialId");

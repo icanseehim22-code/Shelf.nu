@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "public"."Update" ALTER COLUMN "url" DROP NOT NULL;
+ALTER TABLE "shelf"."Update" ALTER COLUMN "url" DROP NOT NULL;

@@ -1,2 +1,2 @@
 -- AlterEnum
-ALTER TYPE "public"."CustomFieldType" ADD VALUE 'NUMBER';
+ALTER TYPE "shelf"."CustomFieldType" ADD VALUE 'NUMBER';

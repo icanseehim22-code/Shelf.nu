@@ -1,7 +1,7 @@
-UPDATE public."CustomField" AS c
+UPDATE shelf."CustomField" AS c
 SET "organizationId" = (
   SELECT o.id
-  FROM public."Organization" AS o
+  FROM shelf."Organization" AS o
   WHERE o."userId" = c."userId" AND o.type = 'PERSONAL'
 )
 WHERE c."organizationId" is NULL;

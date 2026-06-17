@@ -4,10 +4,10 @@ ALTER TABLE "Image" ADD COLUMN     "ownerOrgId" TEXT;
 ALTER TABLE "Image" ADD CONSTRAINT "Image_ownerOrgId_fkey" FOREIGN KEY ("ownerOrgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 
-UPDATE public."Image" AS q
+UPDATE shelf."Image" AS q
 SET "ownerOrgId" = (
   SELECT o.id
-  FROM public."Organization" AS o
+  FROM shelf."Organization" AS o
   WHERE o."userId" = q."userId" AND o.type = 'PERSONAL'
 );
 

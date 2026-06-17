@@ -18,7 +18,7 @@
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE INDEX IF NOT EXISTS "Barcode_value_trgm_idx"
-  ON public."Barcode" USING gin (value gin_trgm_ops);
+  ON shelf."Barcode" USING gin (value gin_trgm_ops);
 
 CREATE INDEX IF NOT EXISTS "Qr_id_trgm_idx"
-  ON public."Qr" USING gin (id gin_trgm_ops);
+  ON shelf."Qr" USING gin (id gin_trgm_ops);

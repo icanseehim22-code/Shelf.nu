@@ -1,21 +1,21 @@
 -- CreateEnum
-CREATE TYPE "public"."UpdateStatus" AS ENUM ('DRAFT', 'PUBLISHED');
+CREATE TYPE "shelf"."UpdateStatus" AS ENUM ('DRAFT', 'PUBLISHED');
 
 -- DropIndex
-DROP INDEX "public"."_AssetToBooking_Asset_idx";
+DROP INDEX "shelf"."_AssetToBooking_Asset_idx";
 
 -- DropIndex
-DROP INDEX "public"."_AssetToTag_asset_idx";
+DROP INDEX "shelf"."_AssetToTag_asset_idx";
 
 -- CreateTable
-CREATE TABLE "public"."Update" (
+CREATE TABLE "shelf"."Update" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "publishDate" TIMESTAMP(3) NOT NULL,
-    "status" "public"."UpdateStatus" NOT NULL DEFAULT 'DRAFT',
-    "targetRoles" "public"."OrganizationRoles"[],
+    "status" "shelf"."UpdateStatus" NOT NULL DEFAULT 'DRAFT',
+    "targetRoles" "shelf"."OrganizationRoles"[],
     "clickCount" INTEGER NOT NULL DEFAULT 0,
     "viewCount" INTEGER NOT NULL DEFAULT 0,
     "createdById" TEXT NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE "public"."Update" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."UserUpdateRead" (
+CREATE TABLE "shelf"."UserUpdateRead" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "updateId" TEXT NOT NULL,
@@ -36,34 +36,34 @@ CREATE TABLE "public"."UserUpdateRead" (
 );
 
 -- CreateIndex
-CREATE INDEX "Update_status_publishDate_idx" ON "public"."Update"("status", "publishDate");
+CREATE INDEX "Update_status_publishDate_idx" ON "shelf"."Update"("status", "publishDate");
 
 -- CreateIndex
-CREATE INDEX "Update_publishDate_idx" ON "public"."Update"("publishDate");
+CREATE INDEX "Update_publishDate_idx" ON "shelf"."Update"("publishDate");
 
 -- CreateIndex
-CREATE INDEX "Update_createdById_idx" ON "public"."Update"("createdById");
+CREATE INDEX "Update_createdById_idx" ON "shelf"."Update"("createdById");
 
 -- CreateIndex
-CREATE INDEX "UserUpdateRead_userId_idx" ON "public"."UserUpdateRead"("userId");
+CREATE INDEX "UserUpdateRead_userId_idx" ON "shelf"."UserUpdateRead"("userId");
 
 -- CreateIndex
-CREATE INDEX "UserUpdateRead_updateId_idx" ON "public"."UserUpdateRead"("updateId");
+CREATE INDEX "UserUpdateRead_updateId_idx" ON "shelf"."UserUpdateRead"("updateId");
 
 -- CreateIndex
-CREATE INDEX "UserUpdateRead_readAt_idx" ON "public"."UserUpdateRead"("readAt");
+CREATE INDEX "UserUpdateRead_readAt_idx" ON "shelf"."UserUpdateRead"("readAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserUpdateRead_userId_updateId_key" ON "public"."UserUpdateRead"("userId", "updateId");
+CREATE UNIQUE INDEX "UserUpdateRead_userId_updateId_key" ON "shelf"."UserUpdateRead"("userId", "updateId");
 
 -- AddForeignKey
-ALTER TABLE "public"."Update" ADD CONSTRAINT "Update_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "shelf"."Update" ADD CONSTRAINT "Update_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "shelf"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."UserUpdateRead" ADD CONSTRAINT "UserUpdateRead_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "shelf"."UserUpdateRead" ADD CONSTRAINT "UserUpdateRead_userId_fkey" FOREIGN KEY ("userId") REFERENCES "shelf"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."UserUpdateRead" ADD CONSTRAINT "UserUpdateRead_updateId_fkey" FOREIGN KEY ("updateId") REFERENCES "public"."Update"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "shelf"."UserUpdateRead" ADD CONSTRAINT "UserUpdateRead_updateId_fkey" FOREIGN KEY ("updateId") REFERENCES "shelf"."Update"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Enable RLS
 ALTER TABLE "Update" ENABLE row level security;

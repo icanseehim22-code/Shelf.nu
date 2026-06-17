@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW public."AssetSearchView" 
+CREATE OR REPLACE VIEW shelf."AssetSearchView" 
 WITH (security_barrier = false, security_invoker = true)  -- Explicitly set security
 AS
 WITH asset_base AS (
@@ -11,7 +11,7 @@ WITH asset_base AS (
     a."categoryId",
     a."locationId",
     a."organizationId"
-  FROM public."Asset" a
+  FROM shelf."Asset" a
   WHERE a.id IS NOT NULL
 )
 SELECT
@@ -28,12 +28,12 @@ SELECT
   ) as "searchVector"
 FROM
   asset_base ab
-  LEFT JOIN public."Category" c ON ab."categoryId" = c.id
-  LEFT JOIN public."Location" l ON ab."locationId" = l.id
-  LEFT JOIN public."_AssetToTag" atr ON ab.id = atr."A"
-  LEFT JOIN public."Tag" t ON atr."B" = t.id
-  LEFT JOIN public."Custody" custd ON ab.id = custd."assetId"
-  LEFT JOIN public."TeamMember" tm ON custd."teamMemberId" = tm.id
+  LEFT JOIN shelf."Category" c ON ab."categoryId" = c.id
+  LEFT JOIN shelf."Location" l ON ab."locationId" = l.id
+  LEFT JOIN shelf."_AssetToTag" atr ON ab.id = atr."A"
+  LEFT JOIN shelf."Tag" t ON atr."B" = t.id
+  LEFT JOIN shelf."Custody" custd ON ab.id = custd."assetId"
+  LEFT JOIN shelf."TeamMember" tm ON custd."teamMemberId" = tm.id
 GROUP BY
   ab.id,
   ab."createdAt",

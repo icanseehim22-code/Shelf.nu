@@ -2,7 +2,7 @@
 -- The default roles are 'USER' and 'ADMIN'
 
 INSERT INTO "Role" ("id", "name", "createdAt", "updatedAt")
-SELECT uuid_generate_v4(), 'USER', NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM "Role" WHERE "name" = 'USER');
+SELECT gen_random_uuid()::text, 'USER', NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM "Role" WHERE "name" = 'USER');
 
 INSERT INTO "Role" ("id", "name", "createdAt", "updatedAt")
-SELECT uuid_generate_v4(), 'ADMIN', NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM "Role" WHERE "name" = 'ADMIN');
+SELECT gen_random_uuid()::text, 'ADMIN', NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM "Role" WHERE "name" = 'ADMIN');

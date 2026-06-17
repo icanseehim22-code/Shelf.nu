@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "public"."UserBusinessIntel" (
+CREATE TABLE "shelf"."UserBusinessIntel" (
     "id" TEXT NOT NULL,
     "howDidYouHearAboutUs" TEXT,
     "jobTitle" TEXT,
@@ -16,22 +16,22 @@ CREATE TABLE "public"."UserBusinessIntel" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserBusinessIntel_userId_key" ON "public"."UserBusinessIntel"("userId");
+CREATE UNIQUE INDEX "UserBusinessIntel_userId_key" ON "shelf"."UserBusinessIntel"("userId");
 
 -- CreateIndex
-CREATE INDEX "UserBusinessIntel_userId_idx" ON "public"."UserBusinessIntel"("userId");
+CREATE INDEX "UserBusinessIntel_userId_idx" ON "shelf"."UserBusinessIntel"("userId");
 
 -- CreateIndex
-CREATE INDEX "UserBusinessIntel_companyName_idx" ON "public"."UserBusinessIntel"("companyName");
+CREATE INDEX "UserBusinessIntel_companyName_idx" ON "shelf"."UserBusinessIntel"("companyName");
 
 -- CreateIndex
-CREATE INDEX "UserBusinessIntel_jobTitle_idx" ON "public"."UserBusinessIntel"("jobTitle");
+CREATE INDEX "UserBusinessIntel_jobTitle_idx" ON "shelf"."UserBusinessIntel"("jobTitle");
 
 -- CreateIndex
-CREATE INDEX "UserBusinessIntel_teamSize_idx" ON "public"."UserBusinessIntel"("teamSize");
+CREATE INDEX "UserBusinessIntel_teamSize_idx" ON "shelf"."UserBusinessIntel"("teamSize");
 
 -- AddForeignKey
-ALTER TABLE "public"."UserBusinessIntel" ADD CONSTRAINT "UserBusinessIntel_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "shelf"."UserBusinessIntel" ADD CONSTRAINT "UserBusinessIntel_userId_fkey" FOREIGN KEY ("userId") REFERENCES "shelf"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Enable RLS
 ALTER TABLE "UserBusinessIntel" ENABLE row level security;

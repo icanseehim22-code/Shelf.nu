@@ -17,17 +17,17 @@ ALTER TABLE "Category" ADD CONSTRAINT "Category_organizationId_fkey" FOREIGN KEY
 ALTER TABLE "Tag" ADD CONSTRAINT "Tag_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- add organizationId to tags and cats
-UPDATE public."Category" AS c
+UPDATE shelf."Category" AS c
 SET "organizationId" = (
   SELECT o.id
-  FROM public."Organization" AS o
+  FROM shelf."Organization" AS o
   WHERE o."userId" = c."userId" AND o.type = 'PERSONAL'
 );
 
-UPDATE public."Tag" AS t
+UPDATE shelf."Tag" AS t
 SET "organizationId" = (
   SELECT o.id
-  FROM public."Organization" AS o
+  FROM shelf."Organization" AS o
   WHERE o."userId" = t."userId" AND o.type = 'PERSONAL'
 );
 

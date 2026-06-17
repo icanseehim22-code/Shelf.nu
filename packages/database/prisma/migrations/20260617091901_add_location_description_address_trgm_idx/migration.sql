@@ -16,7 +16,7 @@
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE INDEX IF NOT EXISTS "Location_description_trgm_idx"
-  ON public."Location" USING gin (description gin_trgm_ops);
+  ON shelf."Location" USING gin (description gin_trgm_ops);
 
 CREATE INDEX IF NOT EXISTS "Location_address_trgm_idx"
-  ON public."Location" USING gin (address gin_trgm_ops);
+  ON shelf."Location" USING gin (address gin_trgm_ops);
