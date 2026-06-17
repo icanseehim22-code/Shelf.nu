@@ -44,7 +44,10 @@ import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -92,7 +95,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
           },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message:
               "We can't find your user data. Please try again or contact support.",
@@ -117,7 +120,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
         organizationId,
         mode: "SIMPLE",
       });
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Not allowed",
         message:
@@ -150,7 +153,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
           settings,
         });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -308,7 +311,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

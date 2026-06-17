@@ -1,4 +1,4 @@
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { QueueNames, scheduler } from "~/utils/scheduler.server";
 import { triggerEmail } from "./email.worker.server";
@@ -9,7 +9,7 @@ export const sendEmail = (payload: EmailPayloadType) => {
   // attempt to send email, push to the queue if it fails
   triggerEmail(payload).catch((cause) => {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         additionalData: {
           payload,
@@ -36,7 +36,7 @@ const addToQueue = async (payload: EmailPayloadType) => {
     await scheduler.send(QueueNames.emailQueue, payload, options);
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         additionalData: {
           payload,

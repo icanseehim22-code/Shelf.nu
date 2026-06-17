@@ -11,7 +11,10 @@ import { createAssetsFromContentImport } from "~/modules/asset/service.server";
 import { ASSET_CSV_HEADERS } from "~/modules/asset/utils.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { csvDataFromRequest } from "~/utils/csv.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import { extractCSVDataFromContentImport } from "~/utils/import.server";
 import {
@@ -45,7 +48,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
     const csvData = await csvDataFromRequest({ request });
     if (csvData.length < 2) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "CSV file is empty",
         additionalData: { intent },
@@ -67,7 +70,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
     });
     return payload({ success: true });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 };
@@ -92,7 +95,7 @@ export const loader = async ({ context, request }: LoaderFunctionArgs) => {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 };

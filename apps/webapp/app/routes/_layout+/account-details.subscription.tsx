@@ -27,7 +27,10 @@ import { getUserTierLimit } from "~/modules/tier/service.server";
 import { getUserByID } from "~/modules/user/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { ENABLE_PREMIUM_FEATURES } from "~/utils/env";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import type { CustomerWithSubscriptions } from "~/utils/stripe.server";
 import {
@@ -164,7 +167,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
       upcomingInvoices,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -207,7 +210,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       // Prevent duplicate trials — UI hides the button but this
       // guards against double-submits and direct POST requests
       if (user.usedFreeTrial) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "You have already used your free trial.",
           label: "Subscription",
@@ -263,7 +266,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return redirect(stripeRedirectUrl);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -334,7 +337,7 @@ export default function SubscriptionPage() {
               <span className="font-semibold">CUSTOM</span> plan
             </>
           )}{" "}
-          of Shelf.
+          of EstoqueSoftSystem.
           <br />
           {isEnterprise && <>That means you have a custom plan. </>}
           To get more information about your plan, please{" "}
@@ -364,7 +367,8 @@ export default function SubscriptionPage() {
                   </div>
                   <p className="text-[14px] font-medium text-gray-700">
                     You're currently using the{" "}
-                    <span className="font-semibold">FREE</span> version of Shelf
+                    <span className="font-semibold">FREE</span> version of
+                    EstoqueSoftSystem
                   </p>
                 </div>
                 <h3 className="text-text-lg font-semibold">
@@ -385,7 +389,7 @@ export default function SubscriptionPage() {
                       </p>
                       <p className="text-[13px] text-gray-500">
                         Upgrade to a workspace plan to unlock the full potential
-                        of Shelf alongside your add-ons.
+                        of EstoqueSoftSystem alongside your add-ons.
                       </p>
                     </div>
                   </div>

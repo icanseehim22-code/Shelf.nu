@@ -1,6 +1,6 @@
 import type { AuditNote, AuditAsset, User } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label: "Audit" = "Audit";
 
@@ -47,7 +47,7 @@ export async function createAuditAssetNote({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to create asset note",
       additionalData: { userId, auditSessionId, auditAssetId },
@@ -84,7 +84,7 @@ export async function updateAuditAssetNote({
     });
 
     if (!existingNote) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Asset note not found or you don't have permission to update it",
@@ -111,10 +111,10 @@ export async function updateAuditAssetNote({
       },
     });
   } catch (cause) {
-    if (cause instanceof ShelfError) {
+    if (cause instanceof EstoqueSoftSystemError) {
       throw cause;
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update asset note",
       additionalData: { noteId, userId },
@@ -148,7 +148,7 @@ export async function deleteAuditAssetNote({
     });
 
     if (!existingNote) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Asset note not found or you don't have permission to delete it",
@@ -162,10 +162,10 @@ export async function deleteAuditAssetNote({
       where: { id: noteId },
     });
   } catch (cause) {
-    if (cause instanceof ShelfError) {
+    if (cause instanceof EstoqueSoftSystemError) {
       throw cause;
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to delete asset note",
       additionalData: { noteId, userId },
@@ -211,7 +211,7 @@ export async function getAuditAssetNotes({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch asset notes",
       additionalData: { auditSessionId, auditAssetId },
@@ -252,7 +252,7 @@ export async function getAuditAssetDetailsCounts({
 
     return { notesCount, imagesCount };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch asset details counts",
       additionalData: { auditSessionId, auditAssetId },

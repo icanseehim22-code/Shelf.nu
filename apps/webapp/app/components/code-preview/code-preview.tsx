@@ -147,7 +147,7 @@ export const CodePreview = ({
       codes.push({
         id: qrObj.qr.id,
         type: "qr",
-        label: "Shelf QR Code",
+        label: "EstoqueSoftSystem QR Code",
         qrData: {
           size: qrObj.qr.size,
           src: qrObj.qr.src,
@@ -463,7 +463,9 @@ export const QrLabel = React.forwardRef<HTMLDivElement, QrLabelProps>(
           {showShelfBranding ? (
             <div>
               Powered by{" "}
-              <span className="font-semibold text-black">shelf.nu</span>
+              <span className="font-semibold text-black">
+                estoquesoftsystem.com
+              </span>
             </div>
           ) : null}
         </div>
@@ -516,7 +518,9 @@ export const BarcodeLabel = React.forwardRef<HTMLDivElement, BarcodeLabelProps>(
           {showShelfBranding ? (
             <div>
               Powered by{" "}
-              <span className="font-semibold text-black">shelf.nu</span>
+              <span className="font-semibold text-black">
+                estoquesoftsystem.com
+              </span>
             </div>
           ) : null}
         </div>

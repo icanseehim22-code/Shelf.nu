@@ -8,7 +8,7 @@ import TextualDivider from "~/components/shared/textual-divider";
 import { useUserRoleHelper } from "~/hooks/user-user-role-helper";
 import { getAsset } from "~/modules/asset/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -60,7 +60,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     return payload({ asset, header });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }

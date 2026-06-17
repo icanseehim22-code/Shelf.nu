@@ -9,8 +9,8 @@ vi.mock("~/emails/transporter.server", () => ({
 
 // why: env vars are not available in test environment
 vi.mock("../utils/env", () => ({
-  SMTP_FROM: "test@shelf.nu",
-  SUPPORT_EMAIL: "support@shelf.nu",
+  SMTP_FROM: "test@estoquesoftsystem.com",
+  SUPPORT_EMAIL: "support@estoquesoftsystem.com",
 }));
 
 // why: scheduler is not needed for triggerEmail unit tests
@@ -31,7 +31,7 @@ describe("triggerEmail", () => {
   it("skips sending email to soft-deleted users", async () => {
     await triggerEmail({
       ...basePayload,
-      to: "deleted+abc123@deleted.shelf.nu",
+      to: "deleted+abc123@deleted.estoquesoftsystem.com",
     });
 
     expect(transporter.sendMail).not.toHaveBeenCalled();

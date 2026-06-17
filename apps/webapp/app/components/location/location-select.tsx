@@ -52,7 +52,7 @@ type LocationSelectProps = BulkProps & {
 };
 
 /**
- * LocationSelect wraps DynamicSelect with Shelf-specific behavior such as thumbnail rendering,
+ * LocationSelect wraps DynamicSelect with EstoqueSoftSystem-specific behavior such as thumbnail rendering,
  * optional "create new location" entry, and support for excluding certain ids.
  */
 export const LocationSelect = ({

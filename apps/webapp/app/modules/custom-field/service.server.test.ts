@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 // Mock the database and dependencies
 vi.mock("~/database/db.server", () => ({
@@ -95,7 +95,7 @@ describe("softDeleteCustomField", () => {
     });
   });
 
-  it("throws ShelfError when custom field does not exist or is already deleted", async () => {
+  it("throws EstoqueSoftSystemError when custom field does not exist or is already deleted", async () => {
     dbTransactionMock.mockImplementation((callback: any) => {
       const mockTx = {
         customField: {
@@ -116,7 +116,7 @@ describe("softDeleteCustomField", () => {
     });
   });
 
-  it("throws ShelfError when custom field belongs to different organization", async () => {
+  it("throws EstoqueSoftSystemError when custom field belongs to different organization", async () => {
     dbTransactionMock.mockImplementation((callback: any) => {
       const mockTx = {
         customField: {
@@ -187,7 +187,7 @@ describe("softDeleteCustomField", () => {
     expect(result.name).toMatch(/^Serial Number_\d+$/);
   });
 
-  it("wraps database errors in ShelfError", async () => {
+  it("wraps database errors in EstoqueSoftSystemError", async () => {
     dbTransactionMock.mockRejectedValueOnce(
       new Error("Database connection failed")
     );
@@ -197,7 +197,7 @@ describe("softDeleteCustomField", () => {
         id: "cf-123",
         organizationId: "org-123",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
   });
 
   it("passes transaction timeout configuration", async () => {

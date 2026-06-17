@@ -17,7 +17,7 @@
 import { Prisma } from "@prisma/client";
 
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import type { ActivityEventInput, ActorSnapshot } from "./types";
 
@@ -67,7 +67,7 @@ type PrismaLike = RecordEventTxClient;
  *
  * @param input - Event payload (see `ActivityEventInput` union)
  * @param tx - Optional Prisma transaction client
- * @throws {ShelfError} with label "Activity" on DB failure
+ * @throws {EstoqueSoftSystemError} with label "Activity" on DB failure
  */
 export async function recordEvent(
   input: ActivityEventInput,
@@ -81,7 +81,7 @@ export async function recordEvent(
       data: toPrismaData(input, actorSnapshot),
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Activity",
       message: "Failed to record activity event.",
@@ -112,7 +112,7 @@ export async function recordEvent(
  *
  * @param inputs - Array of event payloads
  * @param tx - Optional Prisma transaction client
- * @throws {ShelfError} with label "Activity" on DB failure
+ * @throws {EstoqueSoftSystemError} with label "Activity" on DB failure
  */
 export async function recordEvents(
   inputs: ActivityEventInput[],
@@ -138,7 +138,7 @@ export async function recordEvents(
 
     await client.activityEvent.createMany({ data: rows });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Activity",
       message: "Failed to record activity events.",

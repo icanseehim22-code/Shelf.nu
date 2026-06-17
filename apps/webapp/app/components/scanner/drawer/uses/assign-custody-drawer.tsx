@@ -36,7 +36,7 @@ import type {
   AssetFromQr,
   KitFromQr,
 } from "~/routes/api+/get-scanned-item.$qrId";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { objectToFormData } from "~/utils/object-to-form-data";
 import type { KitFromScanner } from "~/utils/scanner-includes.server";
 import { tw } from "~/utils/tw";
@@ -350,7 +350,7 @@ function CustodyForm({ disableSubmit }: { disableSubmit: boolean }) {
               ...state,
               assetStatus: "error",
               assetErrorMessage:
-                error instanceof ShelfError
+                error instanceof EstoqueSoftSystemError
                   ? error.message
                   : "Something went wrong while assigning custody. Please try again.",
             }));
@@ -395,7 +395,7 @@ function CustodyForm({ disableSubmit }: { disableSubmit: boolean }) {
               ...state,
               kitStatus: "error",
               kitErrorMessage:
-                error instanceof ShelfError
+                error instanceof EstoqueSoftSystemError
                   ? error.message
                   : "Something went wrong while assigning custody. Please try again.",
             }));

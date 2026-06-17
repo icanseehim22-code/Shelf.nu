@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 vi.mock("~/database/db.server", () => ({
   db: {
@@ -37,7 +37,7 @@ describe("removeCustomFieldFromAssetIndexSettings", () => {
     expect(values).toContain("org-123");
   });
 
-  it("wraps database errors in a ShelfError", async () => {
+  it("wraps database errors in a EstoqueSoftSystemError", async () => {
     executeRawMock.mockRejectedValueOnce(new Error("boom"));
 
     await expect(
@@ -45,6 +45,6 @@ describe("removeCustomFieldFromAssetIndexSettings", () => {
         customFieldName: "Condition",
         organizationId: "org-123",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
   });
 });

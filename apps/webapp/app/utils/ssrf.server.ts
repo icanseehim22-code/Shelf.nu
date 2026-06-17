@@ -1,7 +1,7 @@
 /**
  * SSRF-safe outbound HTTP fetch.
  *
- * Shelf lets authenticated users supply URLs that the *server* then fetches on
+ * EstoqueSoftSystem lets authenticated users supply URLs that the *server* then fetches on
  * their behalf — most notably the `imageUrl` column of the Asset CSV import.
  * Without restrictions this is a classic Server-Side Request Forgery (SSRF)
  * primitive: a user can point the URL at internal-only addresses the server can
@@ -35,7 +35,7 @@ import { Agent } from "undici";
 
 import { ASSET_MAX_IMAGE_UPLOAD_SIZE } from "./constants";
 import type { ErrorLabel } from "./error";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 
 const label: ErrorLabel = "File storage";
 
@@ -78,7 +78,7 @@ export function isPrivateOrReservedIp(ip: string): boolean {
  * Thrown when an outbound fetch is refused because the destination resolves to
  * a blocked address. Distinct so callers can avoid pointlessly retrying.
  */
-export class BlockedAddressError extends ShelfError {
+export class BlockedAddressError extends EstoqueSoftSystemError {
   constructor(host: string, ip?: string) {
     super({
       cause: null,
@@ -175,7 +175,7 @@ export interface SafeFetchResult {
  *
  * @param url - The URL to validate (initial request or a redirect target)
  * @returns The parsed, validated URL
- * @throws {ShelfError} If the URL is malformed or uses a disallowed protocol
+ * @throws {EstoqueSoftSystemError} If the URL is malformed or uses a disallowed protocol
  * @throws {BlockedAddressError} If the host is a private/reserved IP literal
  */
 export function assertSafeUrl(url: string): URL {
@@ -183,7 +183,7 @@ export function assertSafeUrl(url: string): URL {
   try {
     parsed = new URL(url);
   } catch {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Invalid URL",
       additionalData: { url },
@@ -193,7 +193,7 @@ export function assertSafeUrl(url: string): URL {
   }
 
   if (!["http:", "https:"].includes(parsed.protocol)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Only http and https URLs are allowed",
       additionalData: { url, protocol: parsed.protocol },
@@ -232,7 +232,7 @@ function isRedirectStatus(status: number): boolean {
  * @param url - The destination URL (typically from untrusted user input)
  * @param options - Size cap and timeout overrides
  * @returns The response body buffer and its content-type
- * @throws {ShelfError} If the protocol is disallowed, the destination is
+ * @throws {EstoqueSoftSystemError} If the protocol is disallowed, the destination is
  *   blocked, the request fails/times out, redirects too many times, or the
  *   body exceeds `maxBytes`
  */
@@ -251,7 +251,7 @@ export async function safeFetch(
 
     for (let redirects = 0; ; redirects++) {
       if (redirects > MAX_REDIRECTS) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `Too many redirects (> ${MAX_REDIRECTS})`,
           additionalData: { url, finalUrl: target.href },
@@ -285,7 +285,7 @@ export async function safeFetch(
         // Release the redirect response's socket before the next request.
         await response.body?.cancel().catch(() => {});
         if (!location) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: `Redirect (${response.status}) without a Location header`,
             additionalData: { url, from: target.href },
@@ -299,7 +299,7 @@ export async function safeFetch(
       }
 
       if (!response.ok) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `HTTP ${response.status}: ${response.statusText}`,
           additionalData: { url, status: response.status },
@@ -354,7 +354,7 @@ function findBlockedCause(err: unknown): BlockedAddressError | null {
  * @param signal - Optional abort signal (typically the request timeout); when
  *   it fires mid-read the body read is cancelled and an error is thrown
  * @returns The full body as a Buffer (guaranteed `<= maxBytes`)
- * @throws {ShelfError} If the body exceeds `maxBytes`, the read is aborted, or
+ * @throws {EstoqueSoftSystemError} If the body exceeds `maxBytes`, the read is aborted, or
  *   the body cannot be read
  */
 export async function readBodyWithLimit(
@@ -364,7 +364,7 @@ export async function readBodyWithLimit(
   signal?: AbortSignal
 ): Promise<Buffer> {
   if (!response.body) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Response has no body",
       additionalData: { url },
@@ -380,7 +380,7 @@ export async function readBodyWithLimit(
   /** Cancels the reader and throws a uniform abort error. */
   const abort = async (): Promise<never> => {
     await reader.cancel().catch(() => {});
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Timed out while reading the response body",
       additionalData: { url },
@@ -403,7 +403,7 @@ export async function readBodyWithLimit(
       total += value.byteLength;
       if (total > maxBytes) {
         await reader.cancel().catch(() => {});
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `Response exceeds maximum allowed size of ${
             maxBytes / (1024 * 1024)

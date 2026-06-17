@@ -1,5 +1,5 @@
 import type { CreateAssetFromContentImportPayload } from "~/modules/asset/types";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import { id } from "./id/id.server";
 
 /* This function receives an array of object and a key name
@@ -97,7 +97,7 @@ export function extractCSVDataFromContentImport(
   });
 
   if (defectedHeaders.length > 0) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "Invalid headers in csv file. Please fix the headers and try again.",

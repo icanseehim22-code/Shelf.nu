@@ -25,7 +25,7 @@ export const inviteEmailText = ({
 
 ${resolveUserDisplayName(
   invite.inviter
-)} invites you to join Shelf as a member of ${
+)} invites you to join EstoqueSoftSystem as a member of ${
   invite.organization.name
 }'s workspace.
 ${
@@ -51,7 +51,7 @@ ${
     : ""
 }
 Thanks,
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 
 export function splitName(fullName?: string | null): {
@@ -84,7 +84,7 @@ Your access to ${orgName} has been revoked.
 If you think this is a mistake, please contact the organization's administrator.
 ${customEmailFooter ? `\n---\n${customEmailFooter}` : ""}
 Thanks,
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 
 export const roleChangeEmailText = ({
@@ -104,5 +104,5 @@ Your role in ${orgName} has been changed from ${previousRole} to ${newRole}.
 If you think this is a mistake, please contact the workspace administrator.
 ${customEmailFooter ? `\n---\n${customEmailFooter}` : ""}
 Thanks,
-The Shelf Team
+The EstoqueSoftSystem Team
 `;

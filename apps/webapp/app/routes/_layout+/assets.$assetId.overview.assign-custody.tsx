@@ -27,7 +27,10 @@ import { getUserByID } from "~/modules/user/service.server";
 import styles from "~/styles/layout/custom-modal.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import {
   payload,
@@ -114,7 +117,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         take: searchParams.get("getAll") === "teamMember" ? undefined : 12,
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "Something went wrong while fetching team members. Please try again or contact support.",
@@ -149,7 +152,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       totalTeamMembers,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, assetId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, assetId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -214,7 +217,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
         },
       },
     }).catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         title: "Team member not found",
         message: "The selected team member could not be found.",
@@ -228,7 +231,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       custodianTeamMember.name?.trim() || custodianName.trim();
 
     if (isSelfService && custodianTeamMember.userId !== user.id) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Action not allowed",
         message: "Self user can only assign custody to themselves only.",
@@ -287,7 +290,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
         return updated;
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "Something went wrong while updating asset. Please try again or contact support.",
@@ -338,7 +341,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/assets/${assetId}`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, assetId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, assetId });
     return data(error(reason), { status: reason.status });
   }
 }

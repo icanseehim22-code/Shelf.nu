@@ -12,7 +12,7 @@ import { getAssetIndexSettings } from "~/modules/asset-index-settings/service.se
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -90,7 +90,10 @@ export const loader = async ({
       totalTeamMembers,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, organizationId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      organizationId,
+    });
     throw data(error(reason), { status: reason.status });
   }
 };
@@ -159,7 +162,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

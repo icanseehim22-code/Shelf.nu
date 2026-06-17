@@ -44,13 +44,13 @@ vi.mock("~/database/db.server", () => ({
 
 // why: error utility — we mock to control error formatting in tests so we
 // can assert on the route's status/message behaviour without coupling to
-// the real ShelfError internals.
+// the real EstoqueSoftSystemError internals.
 vi.mock("~/utils/error", () => ({
-  makeShelfError: vi.fn((cause: any) => ({
+  makeEstoqueSoftSystemError: vi.fn((cause: any) => ({
     message: cause?.message || "Unknown error",
     status: cause?.status || 500,
   })),
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     status: number;
     constructor(opts: any) {
       super(opts.message);

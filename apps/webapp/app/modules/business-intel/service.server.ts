@@ -1,6 +1,6 @@
 import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import type {
   CreateBusinessIntelPayload,
   UpdateBusinessIntelPayload,
@@ -31,7 +31,7 @@ export async function createBusinessIntel(
 
     return businessIntel;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to create business intelligence record",
       message:
@@ -65,7 +65,7 @@ export async function updateBusinessIntel(
 
     return businessIntel;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to update business intelligence record",
       message:
@@ -109,7 +109,7 @@ export async function upsertBusinessIntel(
 
     return businessIntel;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to save business intelligence record",
       message:
@@ -133,7 +133,7 @@ export async function getBusinessIntelByUserId(
 
     return businessIntel;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to fetch business intelligence record",
       message: "Unable to retrieve your onboarding information.",
@@ -156,7 +156,7 @@ export async function deleteBusinessIntel(
 
     return businessIntel;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to delete business intelligence record",
       message: "Unable to delete your onboarding information.",

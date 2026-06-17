@@ -34,7 +34,11 @@ import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { resolveShowShelfBranding } from "~/utils/branding";
 import { DEFAULT_MAX_IMAGE_UPLOAD_SIZE } from "~/utils/constants";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { isNotFoundError, makeShelfError, ShelfError } from "~/utils/error";
+import {
+  isNotFoundError,
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   assertIsPost,
   payload,
@@ -89,7 +93,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Your are not the owner of this organization.",
           additionalData: {
@@ -158,7 +162,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       premiumIsEnabled,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -211,7 +215,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Your are not the owner of this organization.",
           additionalData: {
@@ -290,7 +294,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
           });
         } catch (parseError) {
           if (parseError instanceof MaxFileSizeExceededError) {
-            const reason = new ShelfError({
+            const reason = new EstoqueSoftSystemError({
               cause: parseError,
               message: `Image size exceeds maximum allowed size of ${
                 DEFAULT_MAX_IMAGE_UPLOAD_SIZE / (1024 * 1024)
@@ -303,7 +307,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
             return data(error(reason), { status: reason.status });
           }
 
-          const reason = makeShelfError(parseError, {
+          const reason = makeEstoqueSoftSystemError(parseError, {
             userId,
             organizationId: id,
           });
@@ -366,7 +370,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       }
       case "sso": {
         if (role !== OrganizationRoles.OWNER) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             title: "Permission denied",
             message: "You are not allowed to edit SSO settings.",
@@ -376,7 +380,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
         const { enabledSso } = organization;
         if (!enabledSso) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "SSO is not enabled for this organization.",
             additionalData: { userId, id },
@@ -413,7 +417,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
         return payload({ success: true });
       }
       default: {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Invalid action",
           additionalData: { intent },
@@ -422,7 +426,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     // File size errors are now handled in the validation above
     return data(error(reason), { status: reason.status });
   }

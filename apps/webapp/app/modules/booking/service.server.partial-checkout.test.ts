@@ -3,7 +3,7 @@ import { CheckoutIntentEnum } from "~/components/booking/checkout-dialog";
 
 import { db } from "~/database/db.server";
 import * as activityEventService from "~/modules/activity-event/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import {
   getRemainingCheckoutAssetIds,
   partialCheckoutBooking,
@@ -412,7 +412,7 @@ describe("partialCheckoutBooking", () => {
         ...baseParams,
         assetIds: ["asset-1", "asset-2"],
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     // No partial record written when validation rejects.
     expect(db.partialBookingCheckout.create).not.toHaveBeenCalled();
@@ -452,7 +452,7 @@ describe("partialCheckoutBooking", () => {
         ...baseParams,
         assetIds: ["asset-1", "asset-2"],
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     // No partial record written when conflict validation rejects.
     expect(db.partialBookingCheckout.create).not.toHaveBeenCalled();
@@ -465,7 +465,7 @@ describe("partialCheckoutBooking", () => {
       db.booking.findUniqueOrThrow as ReturnType<typeof vitest.fn>
     ).mockResolvedValue(reservedBooking);
 
-    // The outer try/catch re-wraps the inner 400 ShelfError, preserving its
+    // The outer try/catch re-wraps the inner 400 EstoqueSoftSystemError, preserving its
     // user-facing message (mirrors partial check-in error handling).
     await expect(
       partialCheckoutBooking({

@@ -98,18 +98,19 @@ vi.mock("~/utils/list", async () => {
 });
 
 vi.mock("~/utils/error", () => {
-  class ShelfError extends Error {
+  class EstoqueSoftSystemError extends Error {
     constructor(config: any) {
-      super(config.message || "ShelfError");
+      super(config.message || "EstoqueSoftSystemError");
       Object.assign(this, config);
     }
   }
   return {
-    ShelfError,
-    // why: production behavior re-throws known ShelfErrors so callers see the
+    EstoqueSoftSystemError,
+    // why: production behavior re-throws known EstoqueSoftSystemErrors so callers see the
     // original status (e.g. 403 from the org-scope guard) instead of a
     // generic 500 wrap from the outer catch
-    isLikeShelfError: (cause: unknown) => cause instanceof ShelfError,
+    isLikeEstoqueSoftSystemError: (cause: unknown) =>
+      cause instanceof EstoqueSoftSystemError,
     isNotFoundError: () => false,
     maybeUniqueConstraintViolation: (
       _cause: unknown,

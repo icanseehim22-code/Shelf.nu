@@ -7,7 +7,7 @@ import {
   requireOrganizationAccess,
 } from "~/modules/api/mobile-auth.server";
 import { getPartiallyCheckedInAssetIds } from "~/modules/booking/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { getParams } from "~/utils/http.server";
 
 /**
@@ -122,7 +122,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       canCheckin,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

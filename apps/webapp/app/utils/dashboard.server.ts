@@ -5,7 +5,7 @@ import {
 } from "~/components/assets/asset-status-badge";
 import { db } from "~/database/db.server";
 import { defaultUserCategories } from "~/modules/user/service.server";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 
 // ---------------------------------------------------------------------------
 // buildAssetsByStatusChart — converts Prisma groupBy result to chart shape
@@ -290,7 +290,7 @@ export async function checklistOptions({
       hasCustomFields: customFieldsCount > 0,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while loading checklist options. Please try again or contact support.",

@@ -12,7 +12,11 @@ import { refreshAccessToken } from "~/modules/auth/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { createSSOFormData } from "~/utils/auth";
 import { mobilePkceChallengeCookie } from "~/utils/cookies.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   getActionMethod,
   logException,
@@ -85,7 +89,7 @@ export async function action({ request }: ActionFunctionArgs) {
   });
   try {
     if (disableSSO) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "SSO is disabled",
         message:
@@ -168,7 +172,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     // why: the client renders `result.error` and never re-throws, so without an
     // explicit log a genuine 5xx (refresh-token exchange, user/org provisioning,
     // or code mint failing) would never reach Sentry. `logException` mirrors

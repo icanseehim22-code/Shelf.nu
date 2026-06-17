@@ -7,7 +7,7 @@ import type {
 } from "@prisma/client";
 import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label: ErrorLabel = "Tier";
 
@@ -25,7 +25,7 @@ export async function getUserTierLimit(
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "User tier not found. This seems like a bug. Please contact support.",
@@ -43,7 +43,7 @@ export async function getUserTierLimit(
           where: { userId: id },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message:
               "Failed to get custom tier limit. This seems like a bug. Please contact support.",
@@ -57,7 +57,7 @@ export async function getUserTierLimit(
 
     return tier.tierLimit as TierLimit;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching user tier limit",
       additionalData: { userId: id },
@@ -91,7 +91,7 @@ export async function updateUserTierId(id: User["id"], tierId: TierId) {
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating user tier limit",
       additionalData: { userId: id, tierId },
@@ -125,7 +125,7 @@ export async function getOrganizationTierLimit({
     /** Get the tier limit and check if they can export */
     return await getUserTierLimit(ownerId);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching organization tier limit",
       additionalData: { organizationId },

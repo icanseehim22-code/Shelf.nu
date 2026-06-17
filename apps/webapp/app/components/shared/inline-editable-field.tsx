@@ -20,7 +20,7 @@ import Icon from "../icons/icon";
  * Shape of the data returned by the asset overview's `updateField` action,
  * as observed by the fetcher. The action returns either `payload(null)`,
  * `payload({ success: true })` on success, or an error envelope produced by
- * the route's error handler when a ShelfError is thrown.
+ * the route's error handler when a EstoqueSoftSystemError is thrown.
  */
 type InlineEditFetcherData =
   | { success?: boolean }

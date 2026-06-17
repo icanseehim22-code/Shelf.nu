@@ -2,7 +2,7 @@
 import { data } from "react-router";
 
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 
 export async function loader() {
@@ -16,7 +16,7 @@ export async function loader() {
   } catch (cause) {
     return data(
       error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause,
           message: "Healthcheck failed",
           label: "Healthcheck",

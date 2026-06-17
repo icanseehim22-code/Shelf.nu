@@ -13,7 +13,7 @@ import { createKit, updateKitImage } from "~/modules/kit/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { extractBarcodesFromFormData } from "~/utils/barcode-form-data.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   assertIsPost,
   getRefererPath,
@@ -64,7 +64,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       referer: getRefererPath(request),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -133,7 +133,7 @@ export async function action({ context, request }: LoaderFunctionArgs) {
 
     return redirect("/kits");
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

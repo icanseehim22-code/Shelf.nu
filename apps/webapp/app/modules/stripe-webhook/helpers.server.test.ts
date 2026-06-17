@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 // why: env module reads process.env at import time; we need to control
 // STRIPE_WEBHOOK_ENDPOINT_SECRET, ADMIN_EMAIL, and CUSTOM_INSTALL_CUSTOMERS
@@ -29,7 +29,7 @@ vi.mock(import("~/utils/env"), async (importOriginal) => {
     get CUSTOM_INSTALL_CUSTOMERS() {
       return mockCustomInstallCustomers.value;
     },
-    SERVER_URL: "https://app.shelf.nu",
+    SERVER_URL: "https://app.estoquesoftsystem.com",
   };
 });
 
@@ -121,14 +121,14 @@ describe("isAddonSubscription", () => {
     ).toBe(true);
   });
 
-  it("throws ShelfError when no tierId and not addon", () => {
+  it("throws EstoqueSoftSystemError when no tierId and not addon", () => {
     expect(() =>
       isAddonSubscription({
         tierId: undefined,
         productType: "something_else",
         event: baseEvent,
       })
-    ).toThrow(ShelfError);
+    ).toThrow(EstoqueSoftSystemError);
   });
 });
 
@@ -210,7 +210,7 @@ describe("constructVerifiedWebhookEvent", () => {
     body = "{}",
     headers: Record<string, string> = { "stripe-signature": "sig_test" }
   ) {
-    return new Request("https://app.shelf.nu/api/stripe-webhook", {
+    return new Request("https://app.estoquesoftsystem.com/api/stripe-webhook", {
       method: "POST",
       body,
       headers,
@@ -223,34 +223,36 @@ describe("constructVerifiedWebhookEvent", () => {
     mockCustomInstallCustomers.value = "";
   });
 
-  it("throws ShelfError (status 400) when stripe-signature header is missing", async () => {
+  it("throws EstoqueSoftSystemError (status 400) when stripe-signature header is missing", async () => {
     const req = makeRequest("{}", {});
     try {
       await constructVerifiedWebhookEvent(req);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      expect((e as ShelfError).status).toBe(400);
-      expect((e as ShelfError).message).toMatch(/stripe-signature/i);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      expect((e as EstoqueSoftSystemError).status).toBe(400);
+      expect((e as EstoqueSoftSystemError).message).toMatch(
+        /stripe-signature/i
+      );
     }
   });
 
-  it("throws ShelfError (status 500) when STRIPE_WEBHOOK_ENDPOINT_SECRET is not set", async () => {
+  it("throws EstoqueSoftSystemError (status 500) when STRIPE_WEBHOOK_ENDPOINT_SECRET is not set", async () => {
     mockStripeWebhookEndpointSecret.value = undefined;
     const req = makeRequest();
     try {
       await constructVerifiedWebhookEvent(req);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      expect((e as ShelfError).status).toBe(500);
-      expect((e as ShelfError).message).toMatch(
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      expect((e as EstoqueSoftSystemError).status).toBe(500);
+      expect((e as EstoqueSoftSystemError).message).toMatch(
         /STRIPE_WEBHOOK_ENDPOINT_SECRET/
       );
     }
   });
 
-  it("throws ShelfError (status 500) when stripe client is null", async () => {
+  it("throws EstoqueSoftSystemError (status 500) when stripe client is null", async () => {
     // Temporarily override the stripe mock to return null
     const stripeMod = await import("~/utils/stripe.server");
     const originalStripe = stripeMod.stripe;
@@ -261,15 +263,15 @@ describe("constructVerifiedWebhookEvent", () => {
       await constructVerifiedWebhookEvent(req);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      expect((e as ShelfError).status).toBe(500);
-      expect((e as ShelfError).message).toMatch(/Stripe client/i);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      expect((e as EstoqueSoftSystemError).status).toBe(500);
+      expect((e as EstoqueSoftSystemError).message).toMatch(/Stripe client/i);
     } finally {
       (stripeMod as { stripe: unknown }).stripe = originalStripe;
     }
   });
 
-  it("throws ShelfError (status 400) on StripeSignatureVerificationError", async () => {
+  it("throws EstoqueSoftSystemError (status 400) on StripeSignatureVerificationError", async () => {
     mockConstructEventAsync.mockRejectedValue(
       new FakeStripeSignatureVerificationError("bad sig")
     );
@@ -279,13 +281,15 @@ describe("constructVerifiedWebhookEvent", () => {
       await constructVerifiedWebhookEvent(req);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      expect((e as ShelfError).status).toBe(400);
-      expect((e as ShelfError).message).toMatch(/signature verification/i);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      expect((e as EstoqueSoftSystemError).status).toBe(400);
+      expect((e as EstoqueSoftSystemError).message).toMatch(
+        /signature verification/i
+      );
     }
   });
 
-  it("throws ShelfError (status 500) on other constructEventAsync errors", async () => {
+  it("throws EstoqueSoftSystemError (status 500) on other constructEventAsync errors", async () => {
     mockConstructEventAsync.mockRejectedValue(new Error("network failure"));
 
     const req = makeRequest();
@@ -293,9 +297,11 @@ describe("constructVerifiedWebhookEvent", () => {
       await constructVerifiedWebhookEvent(req);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      expect((e as ShelfError).status).toBe(500);
-      expect((e as ShelfError).message).toMatch(/Failed to construct/i);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      expect((e as EstoqueSoftSystemError).status).toBe(500);
+      expect((e as EstoqueSoftSystemError).message).toMatch(
+        /Failed to construct/i
+      );
     }
   });
 

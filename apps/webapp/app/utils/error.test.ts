@@ -1,36 +1,36 @@
 import {
-  ShelfError,
+  EstoqueSoftSystemError,
   isHandledClientError,
-  isLikeShelfError,
+  isLikeEstoqueSoftSystemError,
   isPrismaTransientError,
-  makeShelfError,
+  makeEstoqueSoftSystemError,
   notAllowedMethod,
 } from "./error";
 
 // @vitest-environment node
 // 👋 see https://vitest.dev/guide/environment.html#environments-for-specific-files
 
-describe(makeShelfError.name, () => {
-  describe("cause is like a ShelfError", () => {
+describe(makeEstoqueSoftSystemError.name, () => {
+  describe("cause is like a EstoqueSoftSystemError", () => {
     it("should return the cause", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am an error",
       });
 
-      expect(makeShelfError(cause)).toEqual(cause);
+      expect(makeEstoqueSoftSystemError(cause)).toEqual(cause);
     });
 
     it("should merge additionalData", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am an error",
         additionalData: { assetId: "asset-id" },
       });
 
-      const error = makeShelfError(cause, {
+      const error = makeEstoqueSoftSystemError(cause, {
         userId: "user-id",
       });
 
@@ -46,25 +46,25 @@ describe(makeShelfError.name, () => {
         code: "P2024",
       });
 
-      const error = makeShelfError(cause);
+      const error = makeEstoqueSoftSystemError(cause);
 
       expect(error.status).toEqual(503);
       expect(error.label).toEqual("DB");
       expect(error.message).toContain("temporary database connectivity");
     });
 
-    it("should return a 503 DB error when P2024 is wrapped in a ShelfError", () => {
+    it("should return a 503 DB error when P2024 is wrapped in a EstoqueSoftSystemError", () => {
       const prismaError = Object.assign(new Error("Connection pool timeout"), {
         code: "P2024",
       });
-      const wrappedCause = new ShelfError({
+      const wrappedCause = new EstoqueSoftSystemError({
         cause: prismaError,
         label: "User",
         message: "The user you are trying to access does not exist",
         status: 404,
       });
 
-      const error = makeShelfError(wrappedCause);
+      const error = makeEstoqueSoftSystemError(wrappedCause);
 
       expect(error.status).toEqual(503);
       expect(error.label).toEqual("DB");
@@ -72,24 +72,24 @@ describe(makeShelfError.name, () => {
       expect(error.cause).toBe(wrappedCause);
     });
 
-    it("should return a 503 DB error when P2024 is nested two ShelfError layers deep", () => {
+    it("should return a 503 DB error when P2024 is nested two EstoqueSoftSystemError layers deep", () => {
       const prismaError = Object.assign(new Error("Connection pool timeout"), {
         code: "P2024",
       });
-      const innerCause = new ShelfError({
+      const innerCause = new EstoqueSoftSystemError({
         cause: prismaError,
         label: "User",
         message: "The user you are trying to access does not exist",
         status: 404,
       });
-      const outerCause = new ShelfError({
+      const outerCause = new EstoqueSoftSystemError({
         cause: innerCause,
         label: "Booking",
         message: "Booking not found",
         status: 404,
       });
 
-      const error = makeShelfError(outerCause);
+      const error = makeEstoqueSoftSystemError(outerCause);
 
       expect(error.status).toEqual(503);
       expect(error.label).toEqual("DB");
@@ -100,14 +100,14 @@ describe(makeShelfError.name, () => {
       const prismaError = Object.assign(new Error("Record not found"), {
         code: "P2025",
       });
-      const wrappedCause = new ShelfError({
+      const wrappedCause = new EstoqueSoftSystemError({
         cause: prismaError,
         label: "User",
         message: "The user you are trying to access does not exist",
         status: 404,
       });
 
-      const error = makeShelfError(wrappedCause);
+      const error = makeEstoqueSoftSystemError(wrappedCause);
 
       expect(error.status).toEqual(404);
       expect(error.label).toEqual("User");
@@ -120,11 +120,11 @@ describe(makeShelfError.name, () => {
       const cause = new Error("I am an error");
 
       expect(
-        makeShelfError(cause, {
+        makeEstoqueSoftSystemError(cause, {
           userId: "user-id",
         })
       ).toEqual(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause,
           message: "Sorry, something went wrong.",
           label: "Unknown",
@@ -135,11 +135,11 @@ describe(makeShelfError.name, () => {
       );
     });
 
-    it("should return a default ShelfError if cause is an instance of Error", () => {
+    it("should return a default EstoqueSoftSystemError if cause is an instance of Error", () => {
       const cause = new Error("I am an error");
 
-      expect(makeShelfError(cause)).toEqual(
-        new ShelfError({
+      expect(makeEstoqueSoftSystemError(cause)).toEqual(
+        new EstoqueSoftSystemError({
           cause,
           message: "Sorry, something went wrong.",
           label: "Unknown",
@@ -147,11 +147,11 @@ describe(makeShelfError.name, () => {
       );
     });
 
-    it("should return a default ShelfError if cause is really unknown", () => {
+    it("should return a default EstoqueSoftSystemError if cause is really unknown", () => {
       const cause = "I am an error";
 
-      expect(makeShelfError(cause)).toEqual(
-        new ShelfError({
+      expect(makeEstoqueSoftSystemError(cause)).toEqual(
+        new EstoqueSoftSystemError({
           cause,
           message: "Sorry, something went wrong.",
           label: "Unknown",
@@ -161,11 +161,11 @@ describe(makeShelfError.name, () => {
   });
 });
 
-describe(isLikeShelfError.name, () => {
-  it("should return true for a ShelfError instance", () => {
+describe(isLikeEstoqueSoftSystemError.name, () => {
+  it("should return true for a EstoqueSoftSystemError instance", () => {
     expect(
-      isLikeShelfError(
-        new ShelfError({
+      isLikeEstoqueSoftSystemError(
+        new EstoqueSoftSystemError({
           cause: null,
           label: "Unknown",
           message: "I am an error",
@@ -174,9 +174,9 @@ describe(isLikeShelfError.name, () => {
     ).toBeTruthy();
   });
 
-  it("should return true for an object that looks like a ShelfError", () => {
+  it("should return true for an object that looks like a EstoqueSoftSystemError", () => {
     expect(
-      isLikeShelfError({
+      isLikeEstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am an error",
@@ -185,12 +185,14 @@ describe(isLikeShelfError.name, () => {
   });
 
   it("should return false for an Error instance", () => {
-    expect(isLikeShelfError(new Error("I am an error"))).toBeFalsy();
+    expect(
+      isLikeEstoqueSoftSystemError(new Error("I am an error"))
+    ).toBeFalsy();
   });
 
-  it("should return false for an object that doesn't look like a ShelfError", () => {
+  it("should return false for an object that doesn't look like a EstoqueSoftSystemError", () => {
     expect(
-      isLikeShelfError({
+      isLikeEstoqueSoftSystemError({
         cause: null,
         message: "I am an error",
       })
@@ -198,16 +200,16 @@ describe(isLikeShelfError.name, () => {
   });
 });
 
-describe(ShelfError.name, () => {
-  describe("cause is like a ShelfError", () => {
+describe(EstoqueSoftSystemError.name, () => {
+  describe("cause is like a EstoqueSoftSystemError", () => {
     it("should use the cause's status", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am the root cause",
         status: 404,
       });
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -217,12 +219,12 @@ describe(ShelfError.name, () => {
     });
 
     it("should use the provided status if the cause has no status", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am the root cause",
       });
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -233,12 +235,12 @@ describe(ShelfError.name, () => {
     });
 
     it("should status default to 500", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am the root cause",
       });
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -248,13 +250,13 @@ describe(ShelfError.name, () => {
     });
 
     it("should use the cause's title", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         title: "Root cause",
         message: "I am the root cause",
       });
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -264,12 +266,12 @@ describe(ShelfError.name, () => {
     });
 
     it("should use the provided title if the cause has no title", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am the root cause",
       });
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -280,12 +282,12 @@ describe(ShelfError.name, () => {
     });
 
     it("should title default to undefined", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am the root cause",
       });
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -295,14 +297,14 @@ describe(ShelfError.name, () => {
     });
 
     it("should use the cause's shouldBeCaptured", () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         title: "Root cause",
         message: "I am the root cause",
         shouldBeCaptured: false,
       });
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -312,13 +314,13 @@ describe(ShelfError.name, () => {
     });
 
     it(`should use the provided shouldBeCaptured if the cause has no shouldBeCaptured`, () => {
-      const cause = new ShelfError({
+      const cause = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         title: "Root cause",
         message: "I am the root cause",
       });
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -329,7 +331,7 @@ describe(ShelfError.name, () => {
     });
 
     it(`should shouldBeCaptured default to true`, () => {
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause: null,
         label: "Unknown",
         message: "I am an error",
@@ -342,7 +344,7 @@ describe(ShelfError.name, () => {
   describe("cause is an Error", () => {
     it("should use the provided status if the cause has no status", () => {
       const cause = new Error("I am the root cause");
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -354,7 +356,7 @@ describe(ShelfError.name, () => {
 
     it("should status default to 500", () => {
       const cause = new Error("I am the root cause");
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -365,7 +367,7 @@ describe(ShelfError.name, () => {
 
     it("should use the provided title if the cause has no title", () => {
       const cause = new Error("I am the root cause");
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -377,7 +379,7 @@ describe(ShelfError.name, () => {
 
     it("should shouldBeCaptured default to true", () => {
       const cause = new Error("I am the root cause");
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -388,7 +390,7 @@ describe(ShelfError.name, () => {
 
     it("should title default to undefined", () => {
       const cause = new Error("I am the root cause");
-      const error = new ShelfError({
+      const error = new EstoqueSoftSystemError({
         cause,
         label: "Unknown",
         message: "I am an error",
@@ -433,10 +435,10 @@ describe(isPrismaTransientError.name, () => {
   });
 
   it("should return false for an Error whose message has been overwritten to undefined", () => {
-    // Guards against a regression where a ShelfError built with
+    // Guards against a regression where a EstoqueSoftSystemError built with
     // `message: undefined` would crash `cause.message.toLowerCase()`.
     const error = new Error("original");
-    // @ts-expect-error — simulate the bad ShelfError construction path
+    // @ts-expect-error — simulate the bad EstoqueSoftSystemError construction path
     error.message = undefined;
     expect(() => isPrismaTransientError(error)).not.toThrow();
     expect(isPrismaTransientError(error)).toBe(false);
@@ -454,7 +456,7 @@ describe(notAllowedMethod.name, () => {
     // Reproduces the historical bug where `assertIsPost(request)` (no message
     // argument) called `notAllowedMethod("POST", { message: undefined })` and
     // clobbered the default via spread semantics, producing a message-less
-    // ShelfError that later crashed `isPrismaTransientError`.
+    // EstoqueSoftSystemError that later crashed `isPrismaTransientError`.
     const error = notAllowedMethod("POST", { message: undefined });
     expect(error.message).toBe(`"POST" method is not allowed.`);
   });
@@ -466,27 +468,32 @@ describe(notAllowedMethod.name, () => {
     expect(error.message).toBe("Only POST is accepted here.");
   });
 
-  it("produces an error that flows through makeShelfError without throwing", () => {
+  it("produces an error that flows through makeEstoqueSoftSystemError without throwing", () => {
     const error = notAllowedMethod("POST");
-    expect(() => makeShelfError(error)).not.toThrow();
+    expect(() => makeEstoqueSoftSystemError(error)).not.toThrow();
   });
 });
 
 describe(isHandledClientError.name, () => {
-  it("is true for a 4xx ShelfError", () => {
+  it("is true for a 4xx EstoqueSoftSystemError", () => {
     for (const status of [400, 401, 403, 404, 405, 409, 429, 499] as const) {
       expect(
         isHandledClientError(
-          new ShelfError({ cause: null, message: "x", label: "Assets", status })
+          new EstoqueSoftSystemError({
+            cause: null,
+            message: "x",
+            label: "Assets",
+            status,
+          })
         )
       ).toBe(true);
     }
   });
 
-  it("is false for a 5xx ShelfError and for the default (500) status", () => {
+  it("is false for a 5xx EstoqueSoftSystemError and for the default (500) status", () => {
     expect(
       isHandledClientError(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: "x",
           label: "Assets",
@@ -494,15 +501,19 @@ describe(isHandledClientError.name, () => {
         })
       )
     ).toBe(false);
-    // No explicit status → ShelfError defaults to 500 → treated as a server error.
+    // No explicit status → EstoqueSoftSystemError defaults to 500 → treated as a server error.
     expect(
       isHandledClientError(
-        new ShelfError({ cause: null, message: "x", label: "Assets" })
+        new EstoqueSoftSystemError({
+          cause: null,
+          message: "x",
+          label: "Assets",
+        })
       )
     ).toBe(false);
   });
 
-  it("is false for non-ShelfError values", () => {
+  it("is false for non-EstoqueSoftSystemError values", () => {
     expect(isHandledClientError(new Error("boom"))).toBe(false);
     expect(isHandledClientError(null)).toBe(false);
     expect(isHandledClientError({ status: 400 })).toBe(false);

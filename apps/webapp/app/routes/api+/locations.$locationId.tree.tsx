@@ -5,7 +5,7 @@ import {
   getLocationDescendantsTree,
   getLocationHierarchy,
 } from "~/modules/location/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getParams, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -72,7 +72,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, locationId });
     return data(error(reason), { status: reason.status });
   }
 }

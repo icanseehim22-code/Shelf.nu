@@ -1,7 +1,7 @@
 import { supabase } from "../supabase";
 
 /**
- * Base URL for the Shelf webapp API.
+ * Base URL for the EstoqueSoftSystem webapp API.
  * In development, this is your local dev server.
  * In production, this would be the deployed webapp URL.
  */
@@ -64,7 +64,7 @@ export async function getAccessToken(): Promise<string | null> {
 }
 
 /**
- * Makes an authenticated API call to the Shelf webapp.
+ * Makes an authenticated API call to the EstoqueSoftSystem webapp.
  * Automatically attaches the current Supabase session JWT.
  * - Returns structured { data, error } -- never throws.
  * - Detects 401/session-expired and notifies global auth listeners.
@@ -184,7 +184,7 @@ export async function apiFetch<T>(
 }
 
 /**
- * Makes an authenticated multipart upload to the Shelf webapp.
+ * Makes an authenticated multipart upload to the EstoqueSoftSystem webapp.
  * Used for image uploads where we send FormData instead of JSON.
  */
 export async function apiUpload<T>(

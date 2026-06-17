@@ -3,7 +3,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import { data } from "react-router";
 import { z } from "zod";
 import { db } from "~/database/db.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -63,7 +63,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       }))
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

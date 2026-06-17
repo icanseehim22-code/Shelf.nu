@@ -6,7 +6,10 @@ import { createAuditAssetImagesAddedNote } from "~/modules/audit/helpers.server"
 import { uploadAuditImage } from "~/modules/audit/image.service.server";
 import { requireAuditAssigneeForBaseSelfService } from "~/modules/audit/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { getParams, payload, error } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -45,7 +48,7 @@ export async function action({ request, params, context }: ActionFunctionArgs) {
     });
 
     if (!audit || audit.organizationId !== organizationId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit not found or access denied",
         additionalData: { userId, auditId },
@@ -95,7 +98,7 @@ export async function action({ request, params, context }: ActionFunctionArgs) {
 
     return data(payload({ success: true, image: result }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

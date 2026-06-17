@@ -531,7 +531,7 @@ export default function DynamicSelect({
  * Uses React's native `<style>{css}</style>` child form (safe text child)
  * instead of an injected-HTML approach, so there is no XSS concern and the
  * `react/no-danger` rule stays clean.
- * PR history: https://github.com/Shelf-nu/shelf.nu/pull/304
+ * PR history: https://github.com/EstoqueSoftSystem-nu/estoquesoftsystem.com/pull/304
  */
 const MOBILE_POPPER_CSS = `@media (max-width: 640px) {
   body {

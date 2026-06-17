@@ -26,8 +26,8 @@ function DevicesPermissionContent({
     return (
       <>
         <p>
-          Permissions have been denied. You need to allow shelf to use your
-          device's camera to scan QR codes.
+          Permissions have been denied. You need to allow EstoqueSoftSystem to
+          use your device's camera to scan QR codes.
         </p>
         <Button
           type="button"

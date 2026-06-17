@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import type { PriceWithProduct } from "~/components/subscription/prices";
 import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { premiumIsEnabled, stripe } from "~/utils/stripe.server";
 
 const label: ErrorLabel = "Stripe";
@@ -24,7 +24,7 @@ export async function createAuditAddonCheckoutSession({
 }): Promise<string> {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { priceId, userId, domainUrl, customerId },
@@ -46,7 +46,7 @@ export async function createAuditAddonCheckoutSession({
     });
 
     if (!url) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No url found in stripe checkout session response",
         additionalData: { priceId, userId, domainUrl, customerId },
@@ -55,7 +55,7 @@ export async function createAuditAddonCheckoutSession({
     }
     return url;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating audit add-on checkout session. Please try again later or contact support.",
@@ -79,7 +79,7 @@ export async function createAuditAddonTrialSubscription({
 }) {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { customerId, priceId, userId },
@@ -115,7 +115,7 @@ export async function createAuditAddonTrialSubscription({
 
     return { subscription, hasPaymentMethod: !!defaultPaymentMethod };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating audit add-on trial. Please try again later or contact support.",
@@ -154,7 +154,7 @@ export async function getAuditAddonPrices() {
 
     return { month: monthlyPrice, year: yearlyPrice };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching audit add-on prices.",
       label,
@@ -178,7 +178,7 @@ export async function linkAuditAddonToOrganization({
 }) {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { customerId, organizationId },
@@ -227,7 +227,7 @@ export async function linkAuditAddonToOrganization({
     }
 
     if (!auditSubscription) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "No active subscription with audit addon found for this customer",
@@ -257,7 +257,7 @@ export async function linkAuditAddonToOrganization({
       select: { id: true },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while linking audit add-on to organization.",

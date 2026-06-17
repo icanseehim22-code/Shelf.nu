@@ -13,9 +13,9 @@ vi.mock("~/database/db.server", () => ({
   },
 }));
 
-// why: avoid ShelfError implementation details leaking into assertions
+// why: avoid EstoqueSoftSystemError implementation details leaking into assertions
 vi.mock("~/utils/error", () => ({
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     constructor(config: any) {
       super(config.message);
       Object.assign(this, config);
@@ -158,7 +158,7 @@ describe("activity event service", () => {
       expect(activityEventCreateMock).not.toHaveBeenCalled();
     });
 
-    it("wraps DB errors in a ShelfError labelled 'Activity'", async () => {
+    it("wraps DB errors in a EstoqueSoftSystemError labelled 'Activity'", async () => {
       activityEventCreateMock.mockRejectedValueOnce(new Error("boom"));
 
       await expect(
@@ -267,7 +267,7 @@ describe("activity event service", () => {
       });
     });
 
-    it("wraps createMany failures in a ShelfError labelled 'Activity'", async () => {
+    it("wraps createMany failures in a EstoqueSoftSystemError labelled 'Activity'", async () => {
       activityEventCreateManyMock.mockRejectedValueOnce(new Error("boom"));
 
       await expect(

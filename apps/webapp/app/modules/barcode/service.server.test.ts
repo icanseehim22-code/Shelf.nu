@@ -1,7 +1,7 @@
 import { BarcodeType } from "@prisma/client";
 
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import {
   createBarcode,
@@ -107,7 +107,7 @@ describe("createBarcode", () => {
         ...mockCreateParams,
         value: "AB", // Too short for Code128
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should validate DataMatrix barcode length range", async () => {
@@ -132,7 +132,7 @@ describe("createBarcode", () => {
         type: BarcodeType.DataMatrix,
         value: "AB", // Too short for DataMatrix
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     // Test too long DataMatrix barcode
     await expect(
@@ -141,7 +141,7 @@ describe("createBarcode", () => {
         type: BarcodeType.DataMatrix,
         value: "A".repeat(101), // Too long for DataMatrix (max 100)
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should create barcode for kit when kitId provided", async () => {
@@ -275,7 +275,7 @@ describe("createBarcodes", () => {
         userId: "user-1",
         assetId: "asset-1",
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should handle constraint violations with detailed validation", async () => {
@@ -702,7 +702,7 @@ describe("updateBarcodes", () => {
         organizationId: "org-1",
         userId: "user-1",
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should handle constraint violations with detailed validation", async () => {
@@ -957,7 +957,7 @@ describe("validateBarcodeUniqueness", () => {
       (e) => e
     );
 
-    expect(error).toBeInstanceOf(ShelfError);
+    expect(error).toBeInstanceOf(EstoqueSoftSystemError);
     expect(error.additionalData.validationErrors).toEqual({
       "barcodes[0].value": {
         message: 'This barcode value is already used by "Existing Asset"',
@@ -1002,7 +1002,7 @@ describe("validateBarcodeUniqueness", () => {
       (e) => e
     );
 
-    expect(error).toBeInstanceOf(ShelfError);
+    expect(error).toBeInstanceOf(EstoqueSoftSystemError);
     expect(error.additionalData.validationErrors).toEqual({
       "barcodes[0].value": {
         message: "This barcode value is duplicated in the form",
@@ -1180,10 +1180,10 @@ describe("parseBarcodesFromImportData", () => {
         organizationId: "org-1",
       });
     } catch (error) {
-      expect((error as ShelfError).message).toBe(
+      expect((error as EstoqueSoftSystemError).message).toBe(
         "Some barcodes appear multiple times in the import data. Each barcode must be unique."
       );
-      expect((error as ShelfError).additionalData).toMatchObject({
+      expect((error as EstoqueSoftSystemError).additionalData).toMatchObject({
         duplicateBarcodes: [
           {
             value: "DUPLICATE123",
@@ -1219,7 +1219,7 @@ describe("parseBarcodesFromImportData", () => {
         organizationId: "org-1",
       });
     } catch (error) {
-      expect((error as ShelfError).additionalData).toMatchObject({
+      expect((error as EstoqueSoftSystemError).additionalData).toMatchObject({
         duplicateBarcodes: [
           {
             value: "SHARED123",

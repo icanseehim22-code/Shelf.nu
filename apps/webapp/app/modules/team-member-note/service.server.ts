@@ -19,7 +19,7 @@ import type { Prisma, TeamMemberNote, User } from "@prisma/client";
 
 import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label: ErrorLabel = "Team Member Note";
 
@@ -39,7 +39,7 @@ type CreateTeamMemberNoteArgs = Pick<
  *
  * @param args - The note content, target team member, organization, and optional author
  * @returns The created TeamMemberNote record
- * @throws {ShelfError} If the database operation fails
+ * @throws {EstoqueSoftSystemError} If the database operation fails
  */
 export async function createTeamMemberNote({
   content,
@@ -69,7 +69,7 @@ export async function createTeamMemberNote({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating the team member note.",
       additionalData: { teamMemberId, organizationId, userId },
@@ -88,7 +88,7 @@ export async function createTeamMemberNote({
  * @param args.teamMemberId - The team member whose notes to fetch
  * @param args.organizationId - The workspace to scope notes to
  * @returns Notes ordered by createdAt desc, with author firstName/lastName included
- * @throws {ShelfError} 404 if the team member is not found in the organization
+ * @throws {EstoqueSoftSystemError} 404 if the team member is not found in the organization
  */
 export async function getTeamMemberNotes({
   teamMemberId,
@@ -105,7 +105,7 @@ export async function getTeamMemberNotes({
     });
 
     if (!teamMember) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Team member not found in this workspace",
         additionalData: { teamMemberId, organizationId },
@@ -128,11 +128,11 @@ export async function getTeamMemberNotes({
       },
     });
   } catch (cause) {
-    if (cause instanceof ShelfError) {
+    if (cause instanceof EstoqueSoftSystemError) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the team member notes.",
       additionalData: { teamMemberId, organizationId },
@@ -157,8 +157,8 @@ export async function getTeamMemberNotes({
  * @param args.userId - The requesting user's ID (must be the note author)
  * @param args.organizationId - The current workspace (enforces workspace isolation)
  * @returns Prisma BatchPayload with the count of deleted records
- * @throws {ShelfError} 403 if no note matched (wrong author or workspace)
- * @throws {ShelfError} If the database operation fails
+ * @throws {EstoqueSoftSystemError} 403 if no note matched (wrong author or workspace)
+ * @throws {EstoqueSoftSystemError} If the database operation fails
  */
 export async function deleteTeamMemberNote({
   id,
@@ -171,7 +171,7 @@ export async function deleteTeamMemberNote({
     });
 
     if (result.count === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Note not found or you don't have permission to delete it.",
         additionalData: { id, userId, organizationId },
@@ -182,11 +182,11 @@ export async function deleteTeamMemberNote({
 
     return result;
   } catch (cause) {
-    if (cause instanceof ShelfError) {
+    if (cause instanceof EstoqueSoftSystemError) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while deleting the team member note.",
       additionalData: { id, userId, organizationId },

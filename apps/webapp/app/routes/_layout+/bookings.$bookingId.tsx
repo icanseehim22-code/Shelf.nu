@@ -32,7 +32,7 @@ import type { RouteHandleWithName } from "~/modules/types";
 
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   error,
   getParams,
@@ -99,7 +99,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       header,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason));
   }
 }

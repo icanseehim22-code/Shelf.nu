@@ -30,7 +30,7 @@ import {
   mergedSchema,
 } from "~/utils/custom-fields";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   assertIsPost,
   payload,
@@ -127,7 +127,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       referer: getRefererPath(request),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -254,7 +254,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return payload({ success: true });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     return data(error(reason), { status: reason.status });
   }
 }

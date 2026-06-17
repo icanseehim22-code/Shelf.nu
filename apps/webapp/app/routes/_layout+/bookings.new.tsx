@@ -36,7 +36,10 @@ import { getClientHint, getHints } from "~/utils/client-hints";
 import { DATE_TIME_FORMAT } from "~/utils/constants";
 import { setCookie } from "~/utils/cookies.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -68,7 +71,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       });
 
     if (isPersonalOrg(currentOrganization)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Not allowed",
         message:
@@ -118,7 +121,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       }
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -146,7 +149,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     // created in personal workspaces; without this check a crafted POST could
     // bypass the (loader-only) UI restriction.
     if (isPersonalOrg(currentOrganization)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Not allowed",
         message:
@@ -199,7 +202,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       organizationId,
       select: { id: true, userId: true },
     }).catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         title: "Team member not found",
         message: "The selected team member could not be found.",
@@ -214,7 +217,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
      * him/herself only.
      */
     if (isSelfServiceOrBase && custodianFromDb.userId !== userId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Self user can assign booking to themselves only.",
         label: "Booking",
@@ -303,7 +306,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       return redirect(manageAssetsUrl);
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -1,6 +1,6 @@
 import { data, redirect, type LoaderFunctionArgs } from "react-router";
 import { ErrorContent } from "~/components/errors";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -27,7 +27,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
       isPersonalOrg ? "/settings/team/nrm" : "/settings/team/users"
     );
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 };

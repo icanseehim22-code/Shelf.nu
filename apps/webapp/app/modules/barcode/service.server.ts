@@ -3,10 +3,10 @@ import { BarcodeType } from "@prisma/client";
 import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
 import {
-  ShelfError,
+  EstoqueSoftSystemError,
   maybeUniqueConstraintViolation,
   VALIDATION_ERROR,
-  isLikeShelfError,
+  isLikeEstoqueSoftSystemError,
 } from "~/utils/error";
 import type { ValidationError } from "~/utils/http";
 import { validateBarcodeValue, normalizeBarcodeValue } from "./validation";
@@ -48,7 +48,7 @@ export async function createBarcode({
     const normalizedValue = normalizeBarcodeValue(type, value);
     const validationError = validateBarcodeValue(type, normalizedValue);
     if (validationError) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: validationError,
         status: 400,
@@ -124,7 +124,7 @@ export async function createBarcodes({
         normalizedValue
       );
       if (validationError) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `Invalid barcode "${barcode.value}": ${validationError}`,
           status: 400,
@@ -198,7 +198,7 @@ export async function updateBarcode({
       const normalizedValue = normalizeBarcodeValue(type, value);
       const validationError = validateBarcodeValue(type, normalizedValue);
       if (validationError) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: validationError,
           status: 400,
@@ -254,7 +254,7 @@ export async function deleteBarcode({
       where: { id, organizationId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to delete barcode",
       additionalData: { id, organizationId },
@@ -284,7 +284,7 @@ export async function deleteBarcodes({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to delete barcodes",
       additionalData: { assetId, kitId, organizationId },
@@ -327,7 +327,7 @@ export async function getBarcodeByValue<
     });
     return barcode;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to find barcode",
       additionalData: { value, organizationId },
@@ -358,7 +358,7 @@ export async function getAssetBarcodes({
     });
     return barcodes;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get asset barcodes",
       additionalData: { assetId, organizationId },
@@ -389,7 +389,7 @@ export async function getKitBarcodes({
     });
     return barcodes;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get kit barcodes",
       additionalData: { kitId, organizationId },
@@ -429,15 +429,15 @@ export async function replaceBarcodes({
       });
     }
   } catch (cause) {
-    // If it's already a ShelfError with validation errors, re-throw as is
+    // If it's already a EstoqueSoftSystemError with validation errors, re-throw as is
     if (
-      cause instanceof ShelfError &&
+      cause instanceof EstoqueSoftSystemError &&
       cause.additionalData?.[VALIDATION_ERROR]
     ) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to replace barcodes",
       additionalData: { barcodes, assetId, kitId, organizationId, userId },
@@ -448,7 +448,7 @@ export async function replaceBarcodes({
 
 /**
  * Validates that all barcode values are unique within the organization
- * Throws ShelfError with validation errors if duplicates are found
+ * Throws EstoqueSoftSystemError with validation errors if duplicates are found
  */
 export async function validateBarcodeUniqueness(
   barcodes: { type: BarcodeType; value: string }[],
@@ -537,7 +537,7 @@ export async function validateBarcodeUniqueness(
   }
 
   if (Object.keys(validationErrors).length > 0) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "Some barcode values are already in use. Please use unique values.",
@@ -577,7 +577,7 @@ export async function updateBarcodes({
         normalizedValue
       );
       if (validationError) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `Invalid barcode "${barcode.value}": ${validationError}`,
           status: 400,
@@ -752,7 +752,7 @@ export async function parseBarcodesFromImportData({
             const normalizedValue = normalizeBarcodeValue(type, value);
             const validationError = validateBarcodeValue(type, normalizedValue);
             if (validationError) {
-              throw new ShelfError({
+              throw new EstoqueSoftSystemError({
                 cause: null,
                 message: `Invalid ${type} barcode "${value}" for asset "${asset.title}": ${validationError}`,
                 additionalData: { asset: asset.title, type, value },
@@ -816,7 +816,7 @@ export async function parseBarcodesFromImportData({
     }
 
     if (duplicateBarcodes.length > 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Duplicate barcodes in import data",
         message:
@@ -852,7 +852,7 @@ export async function parseBarcodesFromImportData({
         return `${barcode.value} (${sources?.[0]?.type}) - already linked to "${linkedTo}"`;
       });
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Some barcodes are already linked to other assets or kits in your organization. Please use unlinked barcodes: ${linkedDetails.join(
           ", "
@@ -880,17 +880,17 @@ export async function parseBarcodesFromImportData({
       })),
     }));
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
-    throw new ShelfError({
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Failed to process barcodes from import data",
       additionalData: {
         data: data.length,
         userId,
         organizationId,
-        ...(isShelfError && cause.additionalData),
+        ...(isEstoqueSoftSystemError && cause.additionalData),
       },
       label,
     });

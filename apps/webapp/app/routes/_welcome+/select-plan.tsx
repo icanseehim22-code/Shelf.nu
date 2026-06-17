@@ -16,7 +16,7 @@ import { getBarcodeAddonPrices } from "~/modules/barcode/addon.server";
 import { getUserByID } from "~/modules/user/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { formatCurrency } from "~/utils/currency";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error } from "~/utils/http.server";
 import {
@@ -32,7 +32,7 @@ import {
 import { tw } from "~/utils/tw";
 
 export const meta: MetaFunction = () => [
-  { title: appendToMetaTitle("Welcome to shelf.nu") },
+  { title: appendToMetaTitle("Welcome to estoquesoftsystem.com") },
 ];
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
@@ -77,7 +77,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }

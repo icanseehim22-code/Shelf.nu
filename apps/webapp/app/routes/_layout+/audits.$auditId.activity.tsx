@@ -13,7 +13,7 @@ import {
   requireAuditAssigneeForBaseSelfService,
 } from "~/modules/audit/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getParams, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -75,7 +75,11 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, auditId, label: "Audit" });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      auditId,
+      label: "Audit",
+    });
     throw data(error(reason), { status: reason.status });
   }
 }

@@ -10,7 +10,10 @@ import {
 } from "~/modules/barcode/addon.server";
 import { getSelectedOrganization } from "~/modules/organization/context.server";
 import { getUserByID } from "~/modules/user/service.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { assertIsPost, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -70,7 +73,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     if (intent === "trial") {
       // Validate organization hasn't already used trial
       if (currentOrganization.usedBarcodeTrial) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "This workspace has already used the free barcode trial.",
           status: 400,
@@ -82,7 +85,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       // Server-side consent validation when payment method exists
       const hasPaymentMethodOnFile = await customerHasPaymentMethod(customerId);
       if (hasPaymentMethodOnFile && !consentAcknowledged) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "You must acknowledge the auto-charge terms before starting a trial.",
@@ -142,7 +145,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return redirect(stripeRedirectUrl);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

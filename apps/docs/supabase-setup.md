@@ -1,11 +1,11 @@
 # Supabase Setup Guide 🗄️
 
-This guide will walk you through setting up Supabase for your Shelf.nu application. Supabase provides our database, authentication, and file storage.
+This guide will walk you through setting up Supabase for your EstoqueSoftSystem application. Supabase provides our database, authentication, and file storage.
 
 ## Prerequisites ✅
 
 - A [Supabase account](https://supabase.com/) (free tier available)
-- Access to your `.env` file at the **monorepo root** of your local Shelf.nu project
+- Access to your `.env` file at the **monorepo root** of your local EstoqueSoftSystem project
 
 ---
 
@@ -84,7 +84,7 @@ SUPABASE_SERVICE_ROLE="your-service-role-key"
 
 ### Configure OTP Length
 
-⚠️ **IMPORTANT**: Shelf.nu expects 6-digit OTP codes. Supabase's default has changed to 8 digits, which will cause authentication to fail.
+⚠️ **IMPORTANT**: EstoqueSoftSystem expects 6-digit OTP codes. Supabase's default has changed to 8 digits, which will cause authentication to fail.
 
 1. **Go to Authentication** → **Sign In / Providers** → **Email**
 2. **Scroll down to "OTP Settings"**
@@ -95,7 +95,7 @@ SUPABASE_SERVICE_ROLE="your-service-role-key"
 
 ### Setup Email Templates for OTP
 
-Shelf uses One-Time Passwords (OTP) instead of magic links. Update the email templates:
+EstoqueSoftSystem uses One-Time Passwords (OTP) instead of magic links. Update the email templates:
 
 1. **Go to Authentication** → **Email Templates**
 2. **Update each template** with the content below:
@@ -160,7 +160,7 @@ Replace the entire email content with:
 
 ## Step 5: Create Storage Buckets 🪣
 
-Shelf needs several storage buckets for file uploads. For each bucket below:
+EstoqueSoftSystem needs several storage buckets for file uploads. For each bucket below:
 
 ### Profile Pictures
 
@@ -227,7 +227,7 @@ SMTP_HOST="smtp.yourhost.com"
 SMTP_PORT=465
 SMTP_USER="you@example.com"
 SMTP_PWD="yourSMTPpassword"
-SMTP_FROM="You from Shelf.nu <you@example.com>"
+SMTP_FROM="You from EstoqueSoftSystem <you@example.com>"
 
 # Map integration (optional)
 MAPTILER_TOKEN="your-maptiler-token"
@@ -263,7 +263,7 @@ Copy these values to your `.env` file.
 
 ## Step 8: Setup Email (Required) 📧
 
-Shelf requires email configuration for user authentication. You can use:
+EstoqueSoftSystem requires email configuration for user authentication. You can use:
 
 - **Gmail**: Use app passwords
 - **SendGrid**: Free tier available

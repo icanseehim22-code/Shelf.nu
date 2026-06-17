@@ -277,7 +277,7 @@ export default function LoginScreen() {
           </View>
 
           <Text style={styles.footer}>
-            Use the same credentials as your Shelf web account.
+            Use the same credentials as your EstoqueSoftSystem web account.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>

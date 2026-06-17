@@ -24,7 +24,7 @@ import {
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { extractBarcodesFromFormData } from "~/utils/barcode-form-data.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   assertIsPost,
   payload,
@@ -103,7 +103,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       referer: getRefererPath(request),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -199,7 +199,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return payload({ success: true });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     return data(error(reason), { status: reason.status });
   }
 }

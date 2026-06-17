@@ -71,7 +71,10 @@ import { getUserByID } from "~/modules/user/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { isKitPartiallyCheckedIn } from "~/utils/booking-assets";
 import { getClientHint } from "~/utils/client-hints";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import {
@@ -153,7 +156,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
     ];
 
     if (cantManageAssetsAsBase || notAllowedStatus.includes(booking.status)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Booking",
         message: isSelfServiceOrBase
@@ -240,7 +243,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       bookingKitIds,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -282,7 +285,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           label: "Booking",
           message:
@@ -302,7 +305,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     ];
 
     if (cantManageAssetsAsBase || notAllowedStatus.includes(booking.status)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Booking",
         message: isSelfServiceOrBase
@@ -375,7 +378,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       checkedOutKits.length > 0 &&
       ["ONGOING", "OVERDUE"].includes(booking.status)
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Kit",
         title: "Not allowed. Assets already checked out",
@@ -473,7 +476,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/bookings/${bookingId}`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -8,7 +8,11 @@ import {
   deleteLocationNote,
 } from "~/modules/location-note/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -117,7 +121,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { locationId, userId });
+    const reason = makeEstoqueSoftSystemError(cause, { locationId, userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -135,7 +139,7 @@ async function assertLocationBelongsToOrganization({
   });
 
   if (!location || location.organizationId !== organizationId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Location not found or access denied",
       status: 404,

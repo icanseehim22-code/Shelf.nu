@@ -15,7 +15,7 @@ import {
   updateUserFromSSO,
 } from "~/modules/user/service.server";
 import { DISABLE_SSO } from "./env";
-import { isLikeShelfError, ShelfError } from "./error";
+import { isLikeEstoqueSoftSystemError, EstoqueSoftSystemError } from "./error";
 import { isValidDomain } from "./misc";
 
 /**
@@ -75,11 +75,11 @@ export async function resolveUserAndOrgForSsoCallback({
     if (user) {
       const authUser = await getAuthUserById(user.id);
       if (authUser?.app_metadata?.provider === "email") {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "User already exists",
           message:
-            "It looks like the email you're using is linked to a personal account in Shelf. Please contact our support team to update your personal workspace to a different email account.",
+            "It looks like the email you're using is linked to a personal account in EstoqueSoftSystem. Please contact our support team to update your personal workspace to a different email account.",
           label: "Auth",
           shouldBeCaptured: false,
         });
@@ -110,7 +110,7 @@ export async function resolveUserAndOrgForSsoCallback({
       throw createError;
     }
   } catch (cause: any) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: cause.title || "Authentication failed",
       message: cause.message || "Failed to authenticate user",
@@ -119,7 +119,9 @@ export async function resolveUserAndOrgForSsoCallback({
         domain: authSession.email.split("@")[1],
       },
       label: "Auth",
-      shouldBeCaptured: isLikeShelfError(cause) ? cause.shouldBeCaptured : true,
+      shouldBeCaptured: isLikeEstoqueSoftSystemError(cause)
+        ? cause.shouldBeCaptured
+        : true,
     });
   }
 }
@@ -155,7 +157,7 @@ export async function getConfiguredSSODomains(): Promise<SSODomainConfig[]> {
 
     return domains;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch SSO domain configurations",
       label: "SSO",
@@ -219,7 +221,7 @@ export async function checkDomainSSOStatus(
       ssoProviderId: ssoProviderIds[0] || null,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to check domain SSO status",
       additionalData: { email },
@@ -241,7 +243,7 @@ export async function doesSSOUserExist(email: string): Promise<boolean> {
 
     return user?.sso || false;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to check SSO user existence",
       additionalData: { email },
@@ -252,7 +254,7 @@ export async function doesSSOUserExist(email: string): Promise<boolean> {
 
 /**
  * Validates if signup is allowed for an email based on SSO configuration
- * @throws ShelfError if signup is not allowed due to SSO configuration
+ * @throws EstoqueSoftSystemError if signup is not allowed due to SSO configuration
  */
 export async function validateNonSSOSignup(email: string): Promise<void> {
   /** Quick return if SSO is disabled as this check is then unnecessary */
@@ -260,7 +262,7 @@ export async function validateNonSSOSignup(email: string): Promise<void> {
   const domainStatus = await checkDomainSSOStatus(email);
 
   if (domainStatus.isConfiguredForSSO) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "This email domain uses SSO authentication. Please sign in using your organization's SSO provider.",

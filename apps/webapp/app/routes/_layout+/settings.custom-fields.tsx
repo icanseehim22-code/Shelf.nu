@@ -8,7 +8,10 @@ import {
 } from "~/modules/custom-field/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 
 import {
@@ -35,7 +38,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
     return payload(null);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -68,7 +71,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     // Case-insensitive comparison
     if (customField.name.toLowerCase() !== confirmation.toLowerCase()) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Confirmation text does not match the custom field name (case-insensitive).",
@@ -95,7 +98,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return payload({ success: true });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

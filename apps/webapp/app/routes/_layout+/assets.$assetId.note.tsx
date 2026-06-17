@@ -6,7 +6,11 @@ import { db } from "~/database/db.server";
 import { createNote, deleteNote } from "~/modules/note/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -50,7 +54,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     });
 
     if (!asset) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Asset not found or access denied",
         additionalData: { userId, assetId },
@@ -117,7 +121,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, assetId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, assetId });
     return data(error(reason), { status: reason.status });
   }
 }

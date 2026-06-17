@@ -2,7 +2,7 @@
 import { AuditStatus } from "@prisma/client";
 import type PgBoss from "pg-boss";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { QueueNames, scheduler } from "~/utils/scheduler.server";
 import {
@@ -25,7 +25,7 @@ const reminder24h = async ({ data }: PgBoss.Job<AuditSchedulerData>) => {
       include: AUDIT_INCLUDE_FOR_EMAIL,
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Audit not found",
         additionalData: { data, work: data.eventType },
@@ -71,7 +71,7 @@ const reminder4h = async ({ data }: PgBoss.Job<AuditSchedulerData>) => {
       include: AUDIT_INCLUDE_FOR_EMAIL,
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Audit not found",
         additionalData: { data, work: data.eventType },
@@ -117,7 +117,7 @@ const reminder1h = async ({ data }: PgBoss.Job<AuditSchedulerData>) => {
       include: AUDIT_INCLUDE_FOR_EMAIL,
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Audit not found",
         additionalData: { data, work: data.eventType },
@@ -163,7 +163,7 @@ const overdueNotice = async ({ data }: PgBoss.Job<AuditSchedulerData>) => {
       include: AUDIT_INCLUDE_FOR_EMAIL,
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Audit not found",
         additionalData: { data, work: data.eventType },
@@ -227,7 +227,7 @@ export const registerAuditWorkers = async () => {
       const handler = event2HandlerMap[job.data.eventType];
       if (typeof handler !== "function") {
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause: null,
             message: "Wrong event type received for the scheduled worker",
             additionalData: { job },
@@ -240,7 +240,7 @@ export const registerAuditWorkers = async () => {
         await handler(job);
       } catch (cause) {
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause,
             message: "Something went wrong while executing scheduled work.",
             additionalData: { data: job.data, work: job.data.eventType },

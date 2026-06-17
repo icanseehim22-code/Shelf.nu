@@ -2,7 +2,7 @@ import type { ActionFunctionArgs } from "react-router";
 import { data } from "react-router";
 import { z } from "zod";
 import { sendOTP } from "~/modules/auth/service.server";
-import { makeShelfError, notAllowedMethod } from "~/utils/error";
+import { makeEstoqueSoftSystemError, notAllowedMethod } from "~/utils/error";
 
 import {
   payload,
@@ -25,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
               .string()
               .transform((email) => email.toLowerCase())
               .refine(validEmail, () => ({
-                message: "Please enter a valid email",
+                message: "Insira um e-mail válido",
               })),
           }),
           { shouldBeCaptured: false }
@@ -41,7 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
     //@ts-expect-error
     const isRateLimitError = cause.code === "over_email_send_rate_limit";
 
-    const reason = makeShelfError(cause, {}, !isRateLimitError);
+    const reason = makeEstoqueSoftSystemError(cause, {}, !isRateLimitError);
     return data(error(reason), { status: reason.status });
   }
 }

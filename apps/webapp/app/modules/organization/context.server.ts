@@ -7,7 +7,7 @@ import {
 } from "~/utils/cookies.server";
 import { NODE_ENV, SESSION_SECRET } from "~/utils/env";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import type { OrganizationFromUser } from "./service.server";
 import { getUserOrganizations } from "./service.server";
@@ -144,7 +144,7 @@ async function getSelectedOrganizationUncached({
 
   // (should not happen but just in case)
   if (!currentOrganization) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "No organization",
       message:

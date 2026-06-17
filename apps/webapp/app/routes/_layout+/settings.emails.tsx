@@ -18,7 +18,10 @@ import { processEmailFooter } from "~/modules/email-footer/email-footer-validato
 import { updateOrganization } from "~/modules/organization/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { getValidationErrors } from "~/utils/http";
 import { payload, error, parseData } from "~/utils/http.server";
 import type { DataOrErrorResponse } from "~/utils/http.server";
@@ -45,7 +48,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     });
 
     if (currentOrganization.type === OrganizationType.PERSONAL) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Not allowed",
         message: "Email settings are not available for personal workspaces.",
@@ -64,7 +67,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       organization: currentOrganization,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -102,7 +105,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     if (!result.success) {
       return data(
         error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause: null,
             message: result.error || "Invalid email footer",
             label: "Settings",
@@ -133,7 +136,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return data(payload({ success: true }), { status: 200 });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -325,7 +328,7 @@ function EmailPreview({
         <p>
           <span className="text-gray-400">From:</span>{" "}
           <span className="text-gray-700">
-            Shelf &lt;notifications@shelf.nu&gt;
+            EstoqueSoftSystem &lt;notifications@estoquesoftsystem.com&gt;
           </span>
         </p>
         <p>
@@ -335,7 +338,8 @@ function EmailPreview({
         <p>
           <span className="text-gray-400">Subject:</span>{" "}
           <span className="text-gray-700">
-            ✅ Booking reserved (Office Equipment Booking) - shelf.nu
+            ✅ Booking reserved (Office Equipment Booking) -
+            estoquesoftsystem.com
           </span>
         </p>
       </div>
@@ -370,7 +374,7 @@ function EmailPreview({
             >
               <img
                 src="/static/images/logo-full-color(x2).png"
-                alt="Shelf logo"
+                alt="EstoqueSoftSystem logo"
                 style={{ height: "32px", width: "auto" }}
               />
             </div>
@@ -460,7 +464,7 @@ function EmailPreview({
                 marginBottom: "32px",
               }}
             >
-              &copy; 2026 Shelf.nu
+              &copy; 2026 EstoqueSoftSystem
             </p>
           </div>
         </div>

@@ -48,7 +48,7 @@ import {
   buildValuationChangeNote,
   resolveUserLink,
 } from "~/modules/note/helpers.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import {
   createAssetCategoryChangeNote,
@@ -159,7 +159,7 @@ describe("note service", () => {
       );
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       vi.mocked(db.note.create).mockRejectedValue(
         new Error("Database connection failed")
       );
@@ -171,7 +171,7 @@ describe("note service", () => {
           assetId: "asset-1",
           organizationId: "org-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         createNote({
@@ -257,7 +257,7 @@ describe("note service", () => {
       expect(result.count).toBe(0);
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       vi.mocked(db.note.createMany).mockRejectedValue(
         new Error("Database timeout")
       );
@@ -269,7 +269,7 @@ describe("note service", () => {
           assetIds: ["asset-1"],
           organizationId: "org-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         createNotes({
@@ -312,7 +312,7 @@ describe("note service", () => {
       expect(result.count).toBe(0);
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       vi.mocked(db.note.deleteMany).mockRejectedValue(
         new Error("Database error")
       );
@@ -322,7 +322,7 @@ describe("note service", () => {
           id: "note-1",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         deleteNote({
@@ -829,7 +829,7 @@ describe("note service", () => {
       expect(db.note.createMany).not.toHaveBeenCalled();
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       vi.mocked(db.user.findUnique).mockRejectedValue(
         new Error("Database error")
       );
@@ -846,7 +846,7 @@ describe("note service", () => {
           organizationId: "org-1",
           audit,
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         createAssetNotesForAuditAddition({
@@ -952,7 +952,7 @@ describe("note service", () => {
       expect(db.note.createMany).not.toHaveBeenCalled();
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       vi.mocked(db.user.findUnique).mockRejectedValue(
         new Error("Database error")
       );
@@ -969,7 +969,7 @@ describe("note service", () => {
           organizationId: "org-1",
           audit,
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         createAssetNotesForAuditRemoval({

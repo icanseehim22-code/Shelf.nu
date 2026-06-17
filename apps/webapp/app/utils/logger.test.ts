@@ -1,7 +1,7 @@
 // @vitest-environment node
 import * as Sentry from "@sentry/react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import { Logger } from "./logger";
 
 // why: handledClientError emits to Sentry's structured-log API; capture the
@@ -20,7 +20,7 @@ vi.mock("./env", () => ({
 }));
 
 const make4xx = (overrides: Record<string, unknown> = {}) =>
-  new ShelfError({
+  new EstoqueSoftSystemError({
     cause: null,
     message: "Please select a date in the future",
     label: "Request validation",
@@ -33,7 +33,7 @@ describe("Logger.handledClientError", () => {
     vi.clearAllMocks();
   });
 
-  it("emits a low-severity Sentry log for a 4xx ShelfError", () => {
+  it("emits a low-severity Sentry log for a 4xx EstoqueSoftSystemError", () => {
     Logger.handledClientError(make4xx());
 
     expect(Sentry.logger.info).toHaveBeenCalledWith(
@@ -42,7 +42,7 @@ describe("Logger.handledClientError", () => {
     );
   });
 
-  it("does not emit for a 5xx ShelfError (server fault stays an error event)", () => {
+  it("does not emit for a 5xx EstoqueSoftSystemError (server fault stays an error event)", () => {
     Logger.handledClientError(make4xx({ status: 500 }));
     expect(Sentry.logger.info).not.toHaveBeenCalled();
   });

@@ -4,7 +4,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import { db } from "~/database/db.server";
 import { updateCookieWithPerPage } from "~/utils/cookies.server";
 import type { ErrorLabel } from "~/utils/error";
-import { isNotFoundError, ShelfError } from "~/utils/error";
+import { isNotFoundError, EstoqueSoftSystemError } from "~/utils/error";
 import { getCurrentSearchParams } from "~/utils/http.server";
 import { ALL_SELECTED_KEY, getParamsValues } from "~/utils/list";
 import { Logger } from "~/utils/logger";
@@ -63,7 +63,7 @@ export async function createTeamMember({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating the team member",
       additionalData: { name, organizationId },
@@ -129,7 +129,7 @@ export async function createTeamMemberIfNotExists({
 
     return Object.fromEntries(Array.from(teamMembers));
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating the team member. Seems like some of the team member data in your import file is invalid. Please check and try again.",
@@ -189,7 +189,7 @@ export async function getTeamMembers(params: {
 
     return { teamMembers, totalTeamMembers };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the team members",
       additionalData: { ...params },
@@ -233,7 +233,7 @@ export const getPaginatedAndFilterableTeamMembers = async ({
       cookie,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the team members",
       additionalData: { organizationId, page, perPageParam, search },
@@ -337,7 +337,7 @@ export async function getTeamMemberForCustodianFilter({
       totalTeamMembers,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch team members",
       additionalData: { organizationId },
@@ -509,7 +509,7 @@ export async function getTeamMemberForForm({
       usersOnly,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch team member for form",
       additionalData: { organizationId, userId, isSelfServiceOrBase },
@@ -529,7 +529,7 @@ type GetTeamMemberArgsBase = {
  *
  * @param args - Base arguments containing team member ID and organization ID
  * @returns Promise resolving to the complete TeamMember object
- * @throws ShelfError if team member not found or doesn't belong to organization
+ * @throws EstoqueSoftSystemError if team member not found or doesn't belong to organization
  *
  * @example
  * ```typescript
@@ -548,7 +548,7 @@ export async function getTeamMember(
  *
  * @param args - Arguments with select object to specify which fields to return
  * @returns Promise resolving to TeamMember with only selected fields
- * @throws ShelfError if team member not found or doesn't belong to organization
+ * @throws EstoqueSoftSystemError if team member not found or doesn't belong to organization
  *
  * @example
  * ```typescript
@@ -568,7 +568,7 @@ export async function getTeamMember<T extends Prisma.TeamMemberSelect>(
  *
  * @param args - Arguments with include object to specify which relations to include
  * @returns Promise resolving to TeamMember with included relations
- * @throws ShelfError if team member not found or doesn't belong to organization
+ * @throws EstoqueSoftSystemError if team member not found or doesn't belong to organization
  *
  * @example
  * ```typescript
@@ -593,7 +593,7 @@ export async function getTeamMember({
 }) {
   try {
     if (select && include) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Cannot use both select and include when fetching a team member.",
@@ -623,11 +623,11 @@ export async function getTeamMember({
 
     return teamMember as TeamMember;
   } catch (cause) {
-    if (cause instanceof ShelfError) {
+    if (cause instanceof EstoqueSoftSystemError) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Team member not found",
       message: "The selected team member could not be found.",
@@ -664,7 +664,7 @@ export async function bulkDeleteNRMs({
     );
 
     if (someTeamMemberHasCustodies) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Some team members has custody over some assets. Please release custody or check-in those assets before deleting the user.",
@@ -681,11 +681,11 @@ export async function bulkDeleteNRMs({
     });
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk deleting non-registered members";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       label,
@@ -758,7 +758,7 @@ async function fixTeamMembersNames(teamMembers: TeamMemberWithUserData[]) {
     /** Log auto-fixed empty names as a warning (not error) since the fix is
      * applied successfully. Using Logger.warn avoids sending to Sentry. */
     Logger.warn(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: null,
         message: "Team members with empty names found and auto-fixed",
         additionalData: { teamMembersWithEmptyNames },
@@ -767,7 +767,7 @@ async function fixTeamMembersNames(teamMembers: TeamMemberWithUserData[]) {
       })
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fix team members names",
       label,
@@ -834,7 +834,7 @@ export async function getTeamMembersForNotify({
       totalTeamMembersForNotify: teamMembersForNotify.length,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch team members for notification picker",
       additionalData: { organizationId },

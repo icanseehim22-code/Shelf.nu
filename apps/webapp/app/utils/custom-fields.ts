@@ -9,7 +9,7 @@ import {
   formatDateBasedOnLocaleOnly,
   parseDateOnlyString,
 } from "./client-hints";
-import { ShelfError, isLikeShelfError } from "./error";
+import { EstoqueSoftSystemError, isLikeEstoqueSoftSystemError } from "./error";
 import { parseMarkdownToReact } from "./md";
 /** Returns the schema depending on the field type.
  * Also handles the required field error message.
@@ -209,7 +209,7 @@ function formatInvalidNumericMessage(
  * @param raw - The raw input value (string or number)
  * @param def - The custom field definition
  * @returns Object with numericValue (number) and normalizedText (string representation)
- * @throws {ShelfError} If the value cannot be parsed as a valid finite number
+ * @throws {EstoqueSoftSystemError} If the value cannot be parsed as a valid finite number
  */
 function sanitizeNumericInput(
   raw: unknown,
@@ -221,7 +221,7 @@ function sanitizeNumericInput(
       ? `${baseMessage} ${reason} ${NUMERIC_VALUE_GUIDANCE}`
       : `${baseMessage} ${NUMERIC_VALUE_GUIDANCE}`;
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       label: "Custom fields",
       message,
@@ -396,11 +396,11 @@ export const buildCustomFieldValue = (
 
     return { raw, valueText: String(raw) };
   } catch (cause) {
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: cause,
       title:
         cause instanceof RangeError

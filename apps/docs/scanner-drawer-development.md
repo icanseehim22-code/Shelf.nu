@@ -1,6 +1,6 @@
 # Scanner Drawer Development Guide
 
-This guide explains how to create and maintain scanner drawers in Shelf.nu, ensuring consistency and proper use of existing patterns and atoms.
+This guide explains how to create and maintain scanner drawers in EstoqueSoftSystem, ensuring consistency and proper use of existing patterns and atoms.
 
 ## Overview
 

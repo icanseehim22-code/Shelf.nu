@@ -50,7 +50,7 @@ import dropdownCss from "~/styles/actions-dropdown.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import { wrapLinkForNote, wrapUserLinkForNote } from "~/utils/markdoc-wrappers";
 import { userCanViewSpecificCustody } from "~/utils/permissions/custody-and-bookings-permissions.validator.client";
@@ -187,7 +187,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       userId,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { kitId, userId });
+    const reason = makeEstoqueSoftSystemError(cause, { kitId, userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -371,7 +371,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
           return payload({ success: true });
         } catch (cause) {
           // Handle constraint violations and other barcode creation errors
-          const reason = makeShelfError(cause);
+          const reason = makeEstoqueSoftSystemError(cause);
 
           // Extract specific validation errors if they exist
           const validationErrors = reason.additionalData
@@ -420,7 +420,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     return data(error(reason), { status: reason.status });
   }
 }

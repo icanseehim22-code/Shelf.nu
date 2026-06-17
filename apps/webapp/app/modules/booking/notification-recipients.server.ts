@@ -19,7 +19,7 @@
 import type { BookingForEmail } from "~/emails/types";
 import { getBookingNotificationSettingsForOrg } from "~/modules/booking-settings/service.server";
 import { getOrganizationAdminsForNotification } from "~/modules/organization/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 
 /**
@@ -225,7 +225,7 @@ export async function getBookingNotificationRecipients({
     );
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message:
           "Failed to resolve booking notification recipients. Returning empty list to avoid blocking the booking flow.",

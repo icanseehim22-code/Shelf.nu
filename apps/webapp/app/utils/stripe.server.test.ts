@@ -293,7 +293,7 @@ describe("getInvoiceNotificationData", () => {
       user: baseUser,
     });
 
-    expect(result.subscriptionName).toBe("Shelf Subscription");
+    expect(result.subscriptionName).toBe("EstoqueSoftSystem Subscription");
   });
 
   it("should use fallback subscription name when lines data is empty", async () => {
@@ -315,7 +315,7 @@ describe("getInvoiceNotificationData", () => {
       user: baseUser,
     });
 
-    expect(result.subscriptionName).toBe("Shelf Subscription");
+    expect(result.subscriptionName).toBe("EstoqueSoftSystem Subscription");
   });
 
   it("should include customer notification data", async () => {

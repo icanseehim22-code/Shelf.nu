@@ -6,7 +6,7 @@ import { Table, Td, Tr } from "~/components/table";
 import { SSOUserBadge } from "~/components/user/sso-user-badge";
 import { db } from "~/database/db.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import { requireAdmin } from "~/utils/roles.server";
 
@@ -51,7 +51,10 @@ export const loader = async ({ context, params }: LoaderFunctionArgs) => {
 
     return payload({ members });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, organizationId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      organizationId,
+    });
     throw data(error(reason), { status: reason.status });
   }
 };

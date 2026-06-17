@@ -18,8 +18,8 @@ vi.mock("~/utils/logger", () => ({
 
 // why: env vars are read at import time; shelf.config.ts also imports from this module
 vi.mock("~/utils/env", () => ({
-  SERVER_URL: "https://app.shelf.nu",
-  SUPPORT_EMAIL: "support@shelf.nu",
+  SERVER_URL: "https://app.estoquesoftsystem.com",
+  SUPPORT_EMAIL: "support@estoquesoftsystem.com",
   SEND_ONBOARDING_EMAIL: false,
   ENABLE_PREMIUM_FEATURES: false,
   FREE_TRIAL_DAYS: "7",
@@ -49,7 +49,7 @@ describe("trialEndsSoonEmailText", () => {
     expect(text).toContain(
       "automatically charged at the regular subscription rate"
     );
-    expect(text).toContain("Shelf Team");
+    expect(text).toContain("EstoqueSoftSystem Team");
   });
 
   it("shows upgrade message when hasPaymentMethod is false", () => {
@@ -60,7 +60,7 @@ describe("trialEndsSoonEmailText", () => {
       trialEndDate,
     });
     expect(text).not.toContain("ACTION REQUIRED");
-    expect(text).toContain("Shelf Team trial");
+    expect(text).toContain("EstoqueSoftSystem Team trial");
     expect(text).toContain("upgrade to a paid plan");
   });
 
@@ -71,7 +71,7 @@ describe("trialEndsSoonEmailText", () => {
       planName: "Plus",
       trialEndDate,
     });
-    expect(text).toContain("Shelf Plus trial");
+    expect(text).toContain("EstoqueSoftSystem Plus trial");
   });
 
   it("formats trialEndDate correctly", () => {
@@ -113,7 +113,8 @@ describe("sendTrialEndsSoonEmail", () => {
     expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "alice@example.com",
-        subject: "Your Shelf Team trial ends in 3 days — auto-charge reminder",
+        subject:
+          "Your EstoqueSoftSystem Team trial ends in 3 days — auto-charge reminder",
       })
     );
   });
@@ -130,7 +131,7 @@ describe("sendTrialEndsSoonEmail", () => {
     expect(mockSendEmail).toHaveBeenCalledOnce();
     expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject: "Your Shelf Plus trial is ending soon",
+        subject: "Your EstoqueSoftSystem Plus trial is ending soon",
       })
     );
   });

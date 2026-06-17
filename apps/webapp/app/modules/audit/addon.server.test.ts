@@ -36,7 +36,7 @@ vi.mock("~/database/db.server", () => ({
   },
 }));
 
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import {
   createAuditAddonCheckoutSession,
   createAuditAddonTrialSubscription,
@@ -49,7 +49,7 @@ import {
 const baseParams = {
   priceId: "price_123",
   userId: "user_abc",
-  domainUrl: "https://app.shelf.nu",
+  domainUrl: "https://app.estoquesoftsystem.com",
   customerId: "cus_xyz",
   organizationId: "org_456",
 };
@@ -72,8 +72,8 @@ describe("createAuditAddonCheckoutSession", () => {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: "price_123", quantity: 1 }],
-      success_url: "https://app.shelf.nu/audits?success=true",
-      cancel_url: "https://app.shelf.nu/audits?canceled=true",
+      success_url: "https://app.estoquesoftsystem.com/audits?success=true",
+      cancel_url: "https://app.estoquesoftsystem.com/audits?canceled=true",
       client_reference_id: "user_abc",
       customer: "cus_xyz",
       subscription_data: {
@@ -82,7 +82,7 @@ describe("createAuditAddonCheckoutSession", () => {
     });
   });
 
-  it("throws ShelfError when stripe is not initialized", async () => {
+  it("throws EstoqueSoftSystemError when stripe is not initialized", async () => {
     const stripeMod = await import("~/utils/stripe.server");
     const original = stripeMod.stripe;
     (stripeMod as any).stripe = null;
@@ -90,21 +90,21 @@ describe("createAuditAddonCheckoutSession", () => {
       await createAuditAddonCheckoutSession(baseParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
     } finally {
       (stripeMod as any).stripe = original;
     }
   });
 
-  it("throws ShelfError when session URL is null", async () => {
+  it("throws EstoqueSoftSystemError when session URL is null", async () => {
     mockStripe.checkout.sessions.create.mockResolvedValue({ url: null });
 
     try {
       await createAuditAddonCheckoutSession(baseParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      expect((e as ShelfError).message).toContain(
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      expect((e as EstoqueSoftSystemError).message).toContain(
         "Something went wrong while creating audit add-on checkout session"
       );
     }
@@ -185,7 +185,7 @@ describe("createAuditAddonTrialSubscription", () => {
     expect(result).toEqual({ subscription: mockSub, hasPaymentMethod: false });
   });
 
-  it("throws ShelfError when stripe is not initialized", async () => {
+  it("throws EstoqueSoftSystemError when stripe is not initialized", async () => {
     const stripeMod = await import("~/utils/stripe.server");
     const original = stripeMod.stripe;
     (stripeMod as any).stripe = null;
@@ -193,7 +193,7 @@ describe("createAuditAddonTrialSubscription", () => {
       await createAuditAddonTrialSubscription(trialParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
     } finally {
       (stripeMod as any).stripe = original;
     }
@@ -432,14 +432,14 @@ describe("linkAuditAddonToOrganization", () => {
       await linkAuditAddonToOrganization(linkParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      expect((e as ShelfError).message).toContain(
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      expect((e as EstoqueSoftSystemError).message).toContain(
         "Something went wrong while linking audit add-on"
       );
     }
   });
 
-  it("throws ShelfError when stripe is not initialized", async () => {
+  it("throws EstoqueSoftSystemError when stripe is not initialized", async () => {
     const stripeMod = await import("~/utils/stripe.server");
     const original = stripeMod.stripe;
     (stripeMod as any).stripe = null;
@@ -447,7 +447,7 @@ describe("linkAuditAddonToOrganization", () => {
       await linkAuditAddonToOrganization(linkParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
     } finally {
       (stripeMod as any).stripe = original;
     }

@@ -27,7 +27,10 @@ import styles from "~/styles/layout/custom-modal.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import { wrapLinkForNote, wrapUserLinkForNote } from "~/utils/markdoc-wrappers";
@@ -84,7 +87,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       ],
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -113,7 +116,7 @@ const processBooking = async (
       finalAssetIds = assets as string[];
       booking = bookingDetails;
     } else {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Invalid operation.",
         label: "Booking",
@@ -121,7 +124,7 @@ const processBooking = async (
     }
 
     if (finalAssetIds.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No assets available.",
         status: 400,
@@ -135,7 +138,7 @@ const processBooking = async (
       bookingInfo: booking,
     };
   } catch (cause: any) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: cause,
       message:
         cause?.message || "Something went wrong while processing the booking.",
@@ -163,7 +166,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     });
 
     if (!kitIds?.length && !bookingId?.length) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `No kitIds found or booking not found.`,
         status: 400,
@@ -183,7 +186,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     ).map((asset) => asset.id);
 
     if (bookingAssets.length > 0 && intersected(bookingAssets, finalAssetIds)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `The booking you have selected already contains the kit you are trying to add. Please select a different booking.`,
         label: "Booking",
@@ -232,7 +235,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/kits/${params.kitId}/assets`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -21,7 +21,10 @@ import { useUserData } from "~/hooks/use-user-data";
 import { getSelectedOrganization } from "~/modules/organization/context.server";
 import { getUserTierLimit } from "~/modules/tier/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import { isPersonalOrg } from "~/utils/organization";
 import { canCreateMoreOrganizations } from "~/utils/subscription.server";
@@ -76,7 +79,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           title: "User not found",
           message:
@@ -116,7 +119,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       title: "Workspace",
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }

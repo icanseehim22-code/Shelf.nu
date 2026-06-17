@@ -13,7 +13,10 @@ import {
   PUBLIC_BUCKET,
 } from "~/utils/constants";
 import type { ErrorLabel } from "~/utils/error";
-import { isLikeShelfError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   getFileUploadPath,
   parseFileFormData,
@@ -111,7 +114,7 @@ export async function uploadAuditImage({
 
     const image = fileData.get("image") as string | null;
     if (!image) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No image file found in the request",
         additionalData: { auditSessionId, auditAssetId },
@@ -167,10 +170,12 @@ export async function uploadAuditImage({
       ? { image: auditImage, formData: fileData }
       : auditImage;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
-    throw new ShelfError({
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError ? cause.message : "Failed to upload audit image",
+      message: isEstoqueSoftSystemError
+        ? cause.message
+        : "Failed to upload audit image",
       additionalData: { auditSessionId, auditAssetId },
       label,
     });
@@ -192,7 +197,7 @@ async function validateImageLimits({
 }) {
   // Safety check - ensure the AuditImage model exists
   if (!db.auditImage) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "AuditImage model not available. Please restart the server after running migrations.",
@@ -212,7 +217,7 @@ async function validateImageLimits({
     });
 
     if (assetImageCount >= MAX_IMAGES_PER_ASSET) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Maximum of ${MAX_IMAGES_PER_ASSET} images per asset exceeded`,
         title: "Image Limit Exceeded",
@@ -239,7 +244,7 @@ async function validateImageLimits({
     });
 
     if (generalImageCount >= MAX_GENERAL_IMAGES_PER_AUDIT) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Maximum of ${MAX_GENERAL_IMAGES_PER_AUDIT} general images per audit exceeded`,
         additionalData: { auditSessionId, currentCount: generalImageCount },
@@ -277,7 +282,7 @@ export async function deleteAuditImage({
     });
 
     if (!image) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Image not found or you don't have permission to delete it",
         additionalData: { imageId, organizationId },
@@ -301,7 +306,7 @@ export async function deleteAuditImage({
 
     return true;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to delete audit image",
       additionalData: { imageId, organizationId },
@@ -396,7 +401,7 @@ export async function getAuditImages({
 
     return images;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get audit images",
       additionalData: { auditSessionId, organizationId, auditAssetId },
@@ -438,7 +443,7 @@ export async function getAuditImageCount({
 
     return await db.auditImage.count({ where });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get audit image count",
       additionalData: { auditSessionId, organizationId, auditAssetId },

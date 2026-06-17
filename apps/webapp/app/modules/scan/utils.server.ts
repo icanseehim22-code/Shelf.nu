@@ -1,6 +1,6 @@
 import type { Qr, Scan, User, UserOrganization } from "@prisma/client";
 import parser from "ua-parser-js";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { resolveUserDisplayName } from "~/utils/user";
 
 function isValidUser(
@@ -56,7 +56,7 @@ export function parseScanData({
     /** If there are no scans, return null */
     return null;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while parsing the scan data. Please try again.",

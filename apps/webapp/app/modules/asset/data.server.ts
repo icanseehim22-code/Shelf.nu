@@ -14,7 +14,7 @@ import {
   setCookie,
   userPrefs,
 } from "~/utils/cookies.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { computeHasActiveFilters } from "~/utils/filter-params";
 import { payload, getCurrentSearchParams } from "~/utils/http.server";
 import { getParamsValues } from "~/utils/list";
@@ -241,7 +241,7 @@ export async function simpleModeLoader({
     assets = await refreshExpiredAssetImages(assets);
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to batch refresh expired asset images",
         label: "Assets",
@@ -515,7 +515,7 @@ export async function advancedModeLoader({
     refreshedAssets = await refreshExpiredAssetImages(assets);
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to batch refresh expired asset images",
         label: "Assets",

@@ -5,7 +5,7 @@ import {
   requireMobileAuth,
   requireOrganizationAccess,
 } from "~/modules/api/mobile-auth.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 
 /**
  * GET /api/mobile/bookings
@@ -116,7 +116,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       totalPages: Math.ceil(totalCount / perPage),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

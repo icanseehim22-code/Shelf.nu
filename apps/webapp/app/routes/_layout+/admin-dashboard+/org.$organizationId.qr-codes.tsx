@@ -8,7 +8,10 @@ import { Table, Td, Tr } from "~/components/table";
 import { db } from "~/database/db.server";
 import { generateOrphanedCodes } from "~/modules/qr/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import { requireAdmin } from "~/utils/roles.server";
 
@@ -42,7 +45,7 @@ export const loader = async ({ context, params }: LoaderFunctionArgs) => {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           title: "Organization not found",
           message:
@@ -54,7 +57,10 @@ export const loader = async ({ context, params }: LoaderFunctionArgs) => {
 
     return payload({ organization });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, organizationId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      organizationId,
+    });
     throw data(error(reason), { status: reason.status });
   }
 };
@@ -100,7 +106,7 @@ export const action = async ({
         return payload({ message: "Generated Orphaned QR codes" });
       }
       default:
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "Invalid intent",
           message: "The intent provided is not valid",
@@ -109,7 +115,10 @@ export const action = async ({
         });
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, organizationId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      organizationId,
+    });
     return data(error(reason), { status: reason.status });
   }
 };

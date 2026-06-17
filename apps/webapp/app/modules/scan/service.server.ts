@@ -1,6 +1,6 @@
 import type { Prisma, Scan } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import type { ErrorLabel } from "~/utils/error";
 import { wrapUserLinkForNote } from "~/utils/markdoc-wrappers";
 import { createNote } from "../note/service.server";
@@ -78,7 +78,7 @@ export async function createScan(params: {
 
     return scan;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating a scan. Please try again or contact support.",
@@ -119,7 +119,7 @@ export async function updateScan(params: {
       data,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while updating the scan. Please try again or contact support.",
@@ -145,7 +145,7 @@ export async function getScanByQrId({ qrId }: { qrId: string }) {
       take: 1,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the scan",
       additionalData: { qrId },
@@ -167,7 +167,7 @@ export async function getScanByQrId({ qrId }: { qrId: string }) {
  * @param params.latitude - Optional GPS latitude captured with the scan
  * @param params.longitude - Optional GPS longitude captured with the scan
  * @param params.manuallyGenerated - Whether GPS was manually entered
- * @throws {ShelfError} If the QR/asset lookup or note write fails
+ * @throws {EstoqueSoftSystemError} If the QR/asset lookup or note write fails
  */
 export async function createScanNote({
   userId,
@@ -255,7 +255,7 @@ export async function createScanNote({
       }
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating a scan note",
       additionalData: { userId, qrId, latitude, longitude, manuallyGenerated },
@@ -291,7 +291,7 @@ const SCAN_GEO_UPDATE_WINDOW_MS = 5 * 60 * 1000;
  * @param params.latitude - Geolocation latitude
  * @param params.longitude - Geolocation longitude
  * @returns The updated scan
- * @throws {ShelfError} 403 if the scan is missing, the qrId does not match,
+ * @throws {EstoqueSoftSystemError} 403 if the scan is missing, the qrId does not match,
  *                      the scan is older than the window, or its GPS was
  *                      already set (write-once)
  */
@@ -334,7 +334,7 @@ export async function updateScanGeolocation({
     scan.longitude !== null ||
     Date.now() - scan.createdAt.getTime() > SCAN_GEO_UPDATE_WINDOW_MS
   ) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Scan not found",
       message: "This scan can no longer be updated.",

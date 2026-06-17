@@ -7,7 +7,7 @@ import {
 import type { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { ExtendedPrismaClient } from "~/database/db.server";
 import { db } from "~/database/db.server";
-import { ShelfError, type ErrorLabel } from "~/utils/error";
+import { EstoqueSoftSystemError, type ErrorLabel } from "~/utils/error";
 import type { Column, ColumnLabelKey } from "./helpers";
 import {
   barcodeFields,
@@ -99,7 +99,7 @@ export async function createUserAssetIndexSettings({
 
     return settings;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to create asset index settings.",
       message:
@@ -145,7 +145,7 @@ export async function getAssetIndexSettings({
     });
     return validatedSettings || assetIndexSettings;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Asset Index Settings not found.",
       message:
@@ -217,7 +217,7 @@ export async function changeMode({
 
     return updatedAssetIndexSettings;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to update asset index settings.",
       message:
@@ -246,7 +246,7 @@ export async function updateColumns({
 
     return updatedAssetIndexSettings;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to update asset index settings.",
       message:
@@ -313,7 +313,7 @@ export async function updateAssetIndexSettingsAfterCfUpdate({
 
     await Promise.all(updates.filter(Boolean));
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to update asset index settings.",
       message:
@@ -357,7 +357,7 @@ export async function removeCustomFieldFromAssetIndexSettings({
         );
     `;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Failed to update asset index settings.",
       message:
@@ -418,7 +418,7 @@ export async function updateAssetIndexSettingsWithNewCustomFields({
 
     await Promise.all(updates);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update asset index settings with new custom fields",
       additionalData: { organizationId },
@@ -583,7 +583,7 @@ async function validateColumns({
 
     return null;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to validate columns structure",
       additionalData: { userId, organizationId },

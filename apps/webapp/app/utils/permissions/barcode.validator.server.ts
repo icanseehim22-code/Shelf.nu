@@ -1,5 +1,5 @@
 import type { Organization } from "@prisma/client";
-import { ShelfError } from "../error";
+import { EstoqueSoftSystemError } from "../error";
 
 /**
  * Server-side utility to check if barcodes are enabled for an organization
@@ -13,14 +13,14 @@ export function organizationHasBarcodesEnabled(
 
 /**
  * Server-side utility to validate that an organization has barcodes enabled
- * Throws ShelfError if not enabled
+ * Throws EstoqueSoftSystemError if not enabled
  */
 export function validateBarcodeEnabled(
   organization: Pick<Organization, "barcodesEnabled"> | undefined | null,
   additionalData?: Record<string, any>
 ): void {
   if (!organizationHasBarcodesEnabled(organization)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Barcodes not enabled",
       message: "Barcode functionality is not enabled for this workspace",

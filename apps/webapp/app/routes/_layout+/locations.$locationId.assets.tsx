@@ -49,7 +49,7 @@ import { getTeamMemberForCustodianFilter } from "~/modules/team-member/service.s
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { updateCookieWithPerPage } from "~/utils/cookies.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   payload,
   error,
@@ -153,7 +153,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       totalTeamMembers,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, locationId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -244,7 +244,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
         throw new Error(`Unsupported intent: ${intent}`);
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, locationId });
     return data(error(reason), { status: reason.status });
   }
 }

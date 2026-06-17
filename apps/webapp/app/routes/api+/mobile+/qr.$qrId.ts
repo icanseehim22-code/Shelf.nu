@@ -5,14 +5,14 @@ import {
   requireMobileAuth,
   MOBILE_ASSET_SELECT,
 } from "~/modules/api/mobile-auth.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { getParams } from "~/utils/http.server";
 
 /**
  * GET /api/mobile/qr/:qrId
  *
  * Resolves a QR code to its linked asset or kit.
- * Used by the mobile scanner after scanning a Shelf QR code.
+ * Used by the mobile scanner after scanning a EstoqueSoftSystem QR code.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
@@ -88,7 +88,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

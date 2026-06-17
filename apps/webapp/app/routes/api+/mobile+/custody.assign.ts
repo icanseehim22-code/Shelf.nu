@@ -9,7 +9,10 @@ import {
 import { bulkAssignCustody } from "~/modules/asset/service.server";
 import { getAssetIndexSettings } from "~/modules/asset-index-settings/service.server";
 import { getTeamMember } from "~/modules/team-member/service.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -68,7 +71,7 @@ export async function action({ request }: ActionFunctionArgs) {
       organizationId,
       select: { id: true, name: true },
     }).catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         title: "Team member not found",
         message: "The selected team member could not be found.",
@@ -91,7 +94,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return data({ success: true });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

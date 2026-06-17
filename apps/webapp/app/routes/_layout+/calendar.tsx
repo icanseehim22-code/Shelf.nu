@@ -41,7 +41,10 @@ import {
   isOneDayEvent,
 } from "~/utils/calendar";
 import { getWeekStartingAndEndingDates } from "~/utils/date-fns";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, getCurrentSearchParams } from "~/utils/http.server";
 import { getParamsValues } from "~/utils/list";
 import { parseMarkdownToReact } from "~/utils/md";
@@ -93,7 +96,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
     });
 
     if (isPersonalOrg(currentOrganization)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Not allowed",
         message:
@@ -168,7 +171,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 };

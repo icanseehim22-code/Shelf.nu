@@ -26,7 +26,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 // ── Startup diagnostic (visible in Metro terminal) ──────────────────
 if (__DEV__) {
   console.log(
-    `\n[Shelf] JS executing on ${Platform.OS} | SDK ${Constants.expoConfig?.sdkVersion} | RN ${Platform.constants?.reactNativeVersion?.major}.${Platform.constants?.reactNativeVersion?.minor}.${Platform.constants?.reactNativeVersion?.patch}\n`
+    `\n[EstoqueSoftSystem] JS executing on ${Platform.OS} | SDK ${Constants.expoConfig?.sdkVersion} | RN ${Platform.constants?.reactNativeVersion?.major}.${Platform.constants?.reactNativeVersion?.minor}.${Platform.constants?.reactNativeVersion?.patch}\n`
   );
 }
 

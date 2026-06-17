@@ -2,7 +2,7 @@ import type { RenderableTreeNode } from "@markdoc/markdoc";
 import type { OrganizationRoles, Prisma } from "@prisma/client";
 import { UpdateStatus } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 export type UpdateWithRelations = Prisma.UpdateGetPayload<{
   include: {
@@ -351,7 +351,7 @@ export async function createUpdate({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to create update",
       additionalData: { title, url, createdById },
@@ -396,7 +396,7 @@ export async function updateUpdate({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update update",
       additionalData: { id },
@@ -414,7 +414,7 @@ export async function deleteUpdate({ id }: { id: string }): Promise<void> {
       where: { id },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to delete update",
       additionalData: { id },

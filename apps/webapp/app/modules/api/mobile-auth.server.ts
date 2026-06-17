@@ -1,7 +1,7 @@
 import { OrganizationRoles } from "@prisma/client";
 import { db } from "~/database/db.server";
 import { getSupabaseAdmin } from "~/integrations/supabase/client";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import {
   type PermissionAction,
   type PermissionEntity,
@@ -20,7 +20,7 @@ export async function requireMobileAuth(request: Request) {
   const authHeader = request.headers.get("Authorization");
 
   if (!authHeader?.startsWith("Bearer ")) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Missing or invalid Authorization header",
       label: "Auth",
@@ -37,7 +37,7 @@ export async function requireMobileAuth(request: Request) {
   } = await getSupabaseAdmin().auth.getUser(token);
 
   if (error || !authUser) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: error,
       message: "Invalid or expired token",
       label: "Auth",
@@ -46,7 +46,7 @@ export async function requireMobileAuth(request: Request) {
   }
 
   if (!authUser.email) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "User account has no email address",
       label: "Auth",
@@ -69,7 +69,7 @@ export async function requireMobileAuth(request: Request) {
   });
 
   if (!user || user.deletedAt) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "User not found in database",
       label: "Auth",
@@ -133,7 +133,7 @@ export async function requireOrganizationAccess(
     request.headers.get("x-shelf-organization");
 
   if (!orgId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "Missing organization ID. Pass orgId as query param or x-shelf-organization header.",
@@ -148,7 +148,7 @@ export async function requireOrganizationAccess(
   });
 
   if (!membership) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "You don't have access to this organization",
       label: "Auth",
@@ -211,7 +211,7 @@ export async function getMobileUserContext(
   });
 
   if (!userOrg) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "User organization membership not found",
       label: "Auth",

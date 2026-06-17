@@ -5,14 +5,14 @@
  * These guards are the central IDOR chokepoint — every create/update/bulk path
  * that connects request-supplied IDs relies on them. The tests assert the
  * security-critical behaviors: org-scoped query shape, mismatch rejection,
- * input deduping, empty no-op, and the exact ShelfError status/title.
+ * input deduping, empty no-op, and the exact EstoqueSoftSystemError status/title.
  *
  * The guards accept an optional Prisma client (tx); we pass a fake client so
  * no database is required and the query args can be asserted directly.
  *
  * @see {@link file://./org-validation.server.ts}
  */
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import {
   assertAssetsBelongToOrg,
   assertCustomFieldsBelongToOrg,
@@ -98,7 +98,7 @@ describe("assertAssetsBelongToOrg", () => {
     });
   });
 
-  it("rejects with a 400 ShelfError when any ID is foreign/missing", async () => {
+  it("rejects with a 400 EstoqueSoftSystemError when any ID is foreign/missing", async () => {
     // a2 belongs to another org → findMany (org-scoped) returns only a1
     const tx = txWith({
       asset: { findMany: vitest.fn().mockResolvedValue([{ id: "a1" }]) },
@@ -109,7 +109,7 @@ describe("assertAssetsBelongToOrg", () => {
       tx
     ).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(err.title).toBe("Invalid assets");
   });
@@ -162,7 +162,7 @@ describe("assertLocationsBelongToOrg", () => {
     });
   });
 
-  it("rejects with a 400 ShelfError when any ID is foreign/missing", async () => {
+  it("rejects with a 400 EstoqueSoftSystemError when any ID is foreign/missing", async () => {
     // l2 belongs to another org → the org-scoped findMany returns only l1
     const tx = txWith({
       location: { findMany: vitest.fn().mockResolvedValue([{ id: "l1" }]) },
@@ -173,7 +173,7 @@ describe("assertLocationsBelongToOrg", () => {
       tx
     ).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(err.title).toBe("Invalid locations");
   });
@@ -220,7 +220,7 @@ describe("assertKitsBelongToOrg", () => {
     });
   });
 
-  it("rejects with a 400 ShelfError when any ID is foreign/missing", async () => {
+  it("rejects with a 400 EstoqueSoftSystemError when any ID is foreign/missing", async () => {
     // k2 belongs to another org → the org-scoped findMany returns only k1
     const tx = txWith({
       kit: { findMany: vitest.fn().mockResolvedValue([{ id: "k1" }]) },
@@ -231,7 +231,7 @@ describe("assertKitsBelongToOrg", () => {
       tx
     ).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(err.title).toBe("Invalid kits");
   });
@@ -246,7 +246,7 @@ describe("assertTagsBelongToOrg", () => {
     expect(tx.tag.findMany).not.toHaveBeenCalled();
   });
 
-  it("rejects with a 400 ShelfError when a tag is foreign/missing", async () => {
+  it("rejects with a 400 EstoqueSoftSystemError when a tag is foreign/missing", async () => {
     const tx = txWith({
       tag: { findMany: vitest.fn().mockResolvedValue([]) },
     });
@@ -256,7 +256,7 @@ describe("assertTagsBelongToOrg", () => {
       tx
     ).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(err.title).toBe("Invalid tags");
   });
@@ -319,7 +319,7 @@ describe("assertCustomFieldsBelongToOrg", () => {
     });
   });
 
-  it("rejects with a 400 ShelfError when a custom field is foreign/missing", async () => {
+  it("rejects with a 400 EstoqueSoftSystemError when a custom field is foreign/missing", async () => {
     // why: cf2 belongs to another org, so the org-scoped findMany returns only
     // cf1 — the count mismatch is what the guard must reject.
     const tx = txWith({
@@ -333,7 +333,7 @@ describe("assertCustomFieldsBelongToOrg", () => {
       tx
     ).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(err.title).toBe("Invalid custom fields");
   });
@@ -352,7 +352,7 @@ describe("single-entity guards reject foreign/missing with 400", () => {
       tx
     ).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(tx.teamMember.findFirst).toHaveBeenCalledWith({
       where: { id: "tm-foreign", organizationId: ORG },
@@ -380,7 +380,7 @@ describe("single-entity guards reject foreign/missing with 400", () => {
       { categoryId: "c-foreign", organizationId: ORG },
       tx
     ).catch((e) => e);
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
   });
 
@@ -392,7 +392,7 @@ describe("single-entity guards reject foreign/missing with 400", () => {
       { locationId: "l-foreign", organizationId: ORG },
       tx
     ).catch((e) => e);
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(err.title).toBe("Invalid location");
   });
@@ -417,7 +417,7 @@ describe("assertUserBelongsToOrg", () => {
       tx
     ).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(tx.userOrganization.findFirst).toHaveBeenCalledWith({
       where: { userId: "u-foreign", organizationId: ORG },

@@ -2,7 +2,7 @@ import { data, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import type { NotificationIcon } from "~/atoms/notifications";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 
 export const ClientNotificationSchema = z.object({
@@ -36,7 +36,7 @@ export async function action({ context, request }: LoaderFunctionArgs) {
 
     return data(payload({ success: true }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

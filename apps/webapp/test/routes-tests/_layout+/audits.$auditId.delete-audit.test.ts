@@ -11,8 +11,8 @@
  *     are rejected before `deleteAuditSession` is called.
  *   - Happy path returns a redirect to `/audits` (not a JSON `data(...)`
  *     payload).
- *   - 404/400/409 ShelfErrors thrown by the service surface with the
- *     matching HTTP status via `makeShelfError`.
+ *   - 404/400/409 EstoqueSoftSystemErrors thrown by the service surface with the
+ *     matching HTTP status via `makeEstoqueSoftSystemError`.
  *
  * Lives under `test/routes-tests/` rather than next to the route itself
  * because React Router's flat-routes scanner auto-registers any `*.ts` /
@@ -26,7 +26,7 @@ import { createActionArgs } from "@mocks/remix";
 
 import { action } from "~/routes/_layout+/audits.$auditId";
 import { deleteAuditSession } from "~/modules/audit/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -178,7 +178,7 @@ describe("audits.$auditId action — delete-audit intent", () => {
 
   it("rejects when the confirmation field is missing and does NOT call the service", async () => {
     // URLSearchParams drops the `confirmation` key entirely → zod's
-    // `z.string().min(1)` fails in parseData, which `makeShelfError`
+    // `z.string().min(1)` fails in parseData, which `makeEstoqueSoftSystemError`
     // converts to a non-200 response.
     const response = (await action(
       createActionArgs({
@@ -201,10 +201,10 @@ describe("audits.$auditId action — delete-audit intent", () => {
     [404, "Audit not found."],
     [409, "Only archived audits can be deleted. Archive it first."],
   ])(
-    "surfaces a %s ShelfError from the service with the matching status",
+    "surfaces a %s EstoqueSoftSystemError from the service with the matching status",
     async (status, message) => {
       vi.mocked(deleteAuditSession).mockRejectedValue(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message,
           label: "Audit",

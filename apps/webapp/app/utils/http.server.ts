@@ -5,8 +5,8 @@ import { sendNotification } from "./emitter/send-notification.server";
 import { SERVER_URL, URL_SHORTENER } from "./env";
 import type { Options } from "./error";
 import {
-  ShelfError,
-  makeShelfError,
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
   badRequest,
   notAllowedMethod,
 } from "./error";
@@ -102,7 +102,7 @@ export async function readFormData(request: Request): Promise<FormData> {
     return await request.formData();
   } catch (cause) {
     if (cause instanceof TypeError) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Invalid request body. Expected a form submission.",
         label: "Request validation",
@@ -132,7 +132,7 @@ export function parseData<Schema extends ZodType<any, any, any>>(
     try {
       data = parseFormAny(data);
     } catch (cause) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Invalid form data",
         label: "Request validation",
@@ -207,7 +207,10 @@ export function getParams<Schema extends ZodType<any, any, any>>(
       },
     });
   } catch (cause) {
-    const reason = cause instanceof ShelfError ? cause : makeShelfError(cause);
+    const reason =
+      cause instanceof EstoqueSoftSystemError
+        ? cause
+        : makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: 400 });
   }
 }
@@ -246,8 +249,8 @@ export function safeRedirect(
 
   // Absolute URL? Validate the allow-list by ORIGIN, never by prefix.
   // `SERVER_URL` has its trailing slash stripped, so a prefix check matches any
-  // host that merely begins with it — e.g. "https://app.shelf.nu.evil.com" or
-  // the "https://app.shelf.nu@evil.com" userinfo trick — which resolve
+  // host that merely begins with it — e.g. "https://app.estoquesoftsystem.com.evil.com" or
+  // the "https://app.estoquesoftsystem.com@evil.com" userinfo trick — which resolve
   // off-origin. `new URL(to)` throws for relative inputs, which fall through.
   try {
     const absolute = new URL(to);
@@ -300,7 +303,7 @@ export type DataResponse<T extends ResponsePayload = ResponsePayload> =
  * Log a caught server error for observability WITHOUT building a response.
  *
  * The logging half of {@link error}, for resource/API routes that catch a
- * `ShelfError` and return their own JSON shape (so they can't use `error()`,
+ * `EstoqueSoftSystemError` and return their own JSON shape (so they can't use `error()`,
  * which also fires a user notification and returns a richer payload). Mirrors
  * `error()`'s logging exactly: 5xx (and uncaught) reach Sentry via
  * `Logger.error`; handled 4xx land on the low-severity log trail via
@@ -308,9 +311,9 @@ export type DataResponse<T extends ResponsePayload = ResponsePayload> =
  * by `handleBeforeSendError`); client disconnects (status 499, "Request
  * aborted") are intentionally skipped from both.
  *
- * @param cause - The normalized `ShelfError` to log
+ * @param cause - The normalized `EstoqueSoftSystemError` to log
  */
-export function logException(cause: ShelfError) {
+export function logException(cause: EstoqueSoftSystemError) {
   if (cause.label === "Request aborted") {
     return;
   }
@@ -326,8 +329,11 @@ export function logException(cause: ShelfError) {
  * @param cause - The error that has been catch
  * @returns The normalized error with `error` key set to the error
  */
-export function error(cause: ShelfError, shouldSendNotification = true) {
-  // Single source of truth for "how we log a caught ShelfError": 5xx (and
+export function error(
+  cause: EstoqueSoftSystemError,
+  shouldSendNotification = true
+) {
+  // Single source of truth for "how we log a caught EstoqueSoftSystemError": 5xx (and
   // uncaught) reach Sentry via Logger.error; handled 4xx land on the
   // low-severity log trail via Logger.handledClientError (dropped from the
   // Sentry error pipeline by handleBeforeSendError); client disconnects

@@ -1,7 +1,10 @@
 import { data, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { exportBookingsFromIndexToCsv } from "~/utils/csv.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getCurrentSearchParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -33,7 +36,7 @@ export const loader = async ({ context, request }: LoaderFunctionArgs) => {
     const bookingsIds = searchParams.get("bookingsIds");
 
     if (!bookingsIds) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No bookings selected",
         label: "Booking",
@@ -56,7 +59,7 @@ export const loader = async ({ context, request }: LoaderFunctionArgs) => {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 };

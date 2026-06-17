@@ -1,5 +1,5 @@
 /**
- * Resolves whether Shelf branding should be displayed on labels.
+ * Resolves whether EstoqueSoftSystem branding should be displayed on labels.
  *
  * @param override - Explicit preference coming from the current render context.
  * @param organizationDefault - The stored organization preference, if available.

@@ -7,7 +7,7 @@ import {
   validateSession,
 } from "~/modules/auth/service.server";
 import { SERVER_URL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { safeRedirect } from "~/utils/http.server";
 import { isQrId } from "~/utils/id";
 import { Logger } from "~/utils/logger";
@@ -112,7 +112,7 @@ export function protect({
       );
       session.unset(authSessionKey);
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: "Session might have expired. Please log in again.",
           label: "Auth",

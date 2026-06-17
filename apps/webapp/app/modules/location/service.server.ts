@@ -17,8 +17,8 @@ import {
 } from "~/utils/constants";
 import type { ErrorLabel } from "~/utils/error";
 import {
-  ShelfError,
-  isLikeShelfError,
+  EstoqueSoftSystemError,
+  isLikeEstoqueSoftSystemError,
   isNotFoundError,
   maybeUniqueConstraintViolation,
 } from "~/utils/error";
@@ -67,7 +67,7 @@ const MAX_LOCATION_DEPTH = 12;
  * `assetId`s supplied via the form payload — silently reparenting a victim's
  * asset out of their workspace (CWE-862 / IDOR).
  *
- * @throws {ShelfError} 403 if any of `ids` does not belong to `organizationId`
+ * @throws {EstoqueSoftSystemError} 403 if any of `ids` does not belong to `organizationId`
  */
 async function assertAssetsInOrganization({
   ids,
@@ -85,7 +85,7 @@ async function assertAssetsInOrganization({
   });
 
   if (authorizedCount !== ids.length) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Unauthorized",
       message:
@@ -107,7 +107,7 @@ async function assertAssetsInOrganization({
  * `kitId`s supplied via the form payload — silently reparenting a victim's
  * kit (and its cascading assets) out of their workspace (CWE-862 / IDOR).
  *
- * @throws {ShelfError} 403 if any of `ids` does not belong to `organizationId`
+ * @throws {EstoqueSoftSystemError} 403 if any of `ids` does not belong to `organizationId`
  */
 async function assertKitsInOrganization({
   ids,
@@ -125,7 +125,7 @@ async function assertKitsInOrganization({
   });
 
   if (authorizedCount !== ids.length) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Unauthorized",
       message:
@@ -316,7 +316,7 @@ export async function getLocation(
           ? getRedirectUrlFromRequest(request)
           : undefined;
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Location not found.",
         message: "",
@@ -335,9 +335,9 @@ export async function getLocation(
 
     return { location, totalAssetsWithinLocation };
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Location not found",
       message:
@@ -345,10 +345,10 @@ export async function getLocation(
       additionalData: {
         id,
         organizationId,
-        ...(isLikeShelfError(cause) ? cause.additionalData : {}),
+        ...(isLikeEstoqueSoftSystemError(cause) ? cause.additionalData : {}),
       },
       label,
-      shouldBeCaptured: isShelfError
+      shouldBeCaptured: isEstoqueSoftSystemError
         ? cause.shouldBeCaptured
         : !isNotFoundError(cause),
     });
@@ -597,7 +597,7 @@ export async function getLocations(params: {
 
     return { locations, totalLocations };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the locations",
       additionalData: { ...params },
@@ -637,7 +637,7 @@ async function validateParentLocation({
   }
 
   if (currentLocationId && parentId === currentLocationId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "A location cannot be its own parent.",
       additionalData: { currentLocationId, parentId, organizationId },
@@ -653,7 +653,7 @@ async function validateParentLocation({
   });
 
   if (!parentLocation) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Parent location not found.",
       additionalData: { parentId, organizationId },
@@ -682,7 +682,7 @@ async function validateParentLocation({
         });
 
   if (parentDepth + 1 + subtreeDepth > MAX_LOCATION_DEPTH) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Not allowed",
       message: `Locations cannot be nested deeper than ${MAX_LOCATION_DEPTH} levels.`,
@@ -699,7 +699,7 @@ async function validateParentLocation({
   }
 
   if (currentLocationId && hierarchy.some((l) => l.id === currentLocationId)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "A location cannot be assigned to one of its descendants.",
       additionalData: { parentId, currentLocationId, organizationId },
@@ -783,7 +783,7 @@ export async function createLocation({
 
     return created;
   } catch (cause) {
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
     throw maybeUniqueConstraintViolation(cause, "Location", {
@@ -809,7 +809,7 @@ export async function deleteLocation({
 
     return location;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while deleting the location",
       additionalData: { id },
@@ -924,7 +924,7 @@ export async function updateLocation(payload: {
 
     return updatedLocation;
   } catch (cause) {
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
     throw maybeUniqueConstraintViolation(cause, "Location", {
@@ -1087,7 +1087,7 @@ export async function createLocationsIfNotExists({
 
     return Object.fromEntries(Array.from(locations));
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating locations. Seems like some of the location data in your import file is invalid. Please check and try again.",
@@ -1138,7 +1138,7 @@ export async function bulkDeleteLocations({
       });
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while bulk deleting locations.",
       additionalData: { locationIds, organizationId },
@@ -1228,9 +1228,9 @@ export async function updateLocationImage({
       await removePublicFile({ publicUrl: prevThumbnailUrl });
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while updating the location image.",
       additionalData: { locationId, field: "image" },
@@ -1288,9 +1288,9 @@ export async function generateLocationWithImages({
       });
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while generating locations.",
       additionalData: { organizationId, numberOfLocations },
@@ -1417,7 +1417,7 @@ export async function getLocationKits(
 
     return { kits, totalKits };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Something went wrong while fetching the location kits",
       message:
@@ -1442,7 +1442,7 @@ export async function getLocationKits(
  * @param params.userId - The acting user's ID
  * @param params.isRemoving - Whether the location is being removed
  * @param params.organizationId - Caller's validated organization ID
- * @throws {ShelfError} If the asset is not in `organizationId` or the write fails
+ * @throws {EstoqueSoftSystemError} If the asset is not in `organizationId` or the write fails
  */
 export async function createLocationChangeNote({
   currentLocation,
@@ -1483,7 +1483,7 @@ export async function createLocationChangeNote({
       organizationId,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating a location change note. Please try again or contact support",
@@ -1541,7 +1541,7 @@ async function createBulkLocationChangeNotes({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "User not found",
           additionalData: { userId },
@@ -1659,7 +1659,7 @@ async function createBulkLocationChangeNotes({
       });
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating bulk location change notes",
       additionalData: { userId, assetIds, removedAssetIds },
@@ -1697,9 +1697,9 @@ export async function updateLocationAssets({
       .catch((cause) => {
         // Only the genuine "record not found" path should become a
         // user-facing 404. Re-throw anything else so the outer try/catch
-        // (or `makeShelfError`) can wrap it as a 5xx with capture enabled.
+        // (or `makeEstoqueSoftSystemError`) can wrap it as a 5xx with capture enabled.
         if (isNotFoundError(cause)) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Location not found",
             additionalData: { locationId, userId, organizationId },
@@ -1795,7 +1795,7 @@ export async function updateLocationAssets({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "Something went wrong while fetching the assets. Please try again or contact support.",
@@ -1883,10 +1883,10 @@ export async function updateLocationAssets({
       organizationId,
     });
   } catch (cause) {
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating the location assets.",
       additionalData: { assetIds, organizationId, locationId },
@@ -1926,9 +1926,9 @@ export async function updateLocationKits({
       .catch((cause) => {
         // Only the genuine "record not found" path should become a
         // user-facing 404. Re-throw anything else so the outer try/catch
-        // (or `makeShelfError`) can wrap it as a 5xx with capture enabled.
+        // (or `makeEstoqueSoftSystemError`) can wrap it as a 5xx with capture enabled.
         if (isNotFoundError(cause)) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Location not found",
             additionalData: { locationId, userId, organizationId },
@@ -2046,7 +2046,7 @@ export async function updateLocationKits({
           },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message:
               "Something went wrong while adding the kits to the location. Please try again or contact support.",
@@ -2208,7 +2208,7 @@ export async function updateLocationKits({
           },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message:
               "Something went wrong while removing the kits from the location. Please try again or contact support.",
@@ -2277,10 +2277,10 @@ export async function updateLocationKits({
       }
     }
   } catch (cause) {
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating the location kits.",
       additionalData: { locationId, kitIds },

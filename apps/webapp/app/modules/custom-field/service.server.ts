@@ -9,8 +9,8 @@ import { db } from "~/database/db.server";
 import { getDefinitionFromCsvHeader } from "~/utils/custom-fields";
 import type { ErrorLabel } from "~/utils/error";
 import {
-  ShelfError,
-  isLikeShelfError,
+  EstoqueSoftSystemError,
+  isLikeEstoqueSoftSystemError,
   isNotFoundError,
   maybeUniqueConstraintViolation,
 } from "~/utils/error";
@@ -171,7 +171,7 @@ export async function getFilteredAndPaginatedCustomFields(params: {
       totalCustomFields,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the custom fields",
       additionalData: { ...params },
@@ -228,7 +228,7 @@ export async function getCustomField<
           ? getRedirectUrlFromRequest(request)
           : undefined;
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Custom field not found",
         message: "",
@@ -247,8 +247,8 @@ export async function getCustomField<
 
     return customField as CustomFieldWithInclude<T>;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
-    throw new ShelfError({
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Custom field not found",
       message:
@@ -256,10 +256,10 @@ export async function getCustomField<
       additionalData: {
         id,
         organizationId,
-        ...(isShelfError ? cause.additionalData : {}),
+        ...(isEstoqueSoftSystemError ? cause.additionalData : {}),
       },
       label,
-      shouldBeCaptured: isShelfError
+      shouldBeCaptured: isEstoqueSoftSystemError
         ? cause.shouldBeCaptured
         : !isNotFoundError(cause),
     });
@@ -349,7 +349,7 @@ export async function updateCustomField(payload: {
  * Note: This is a soft delete - data is preserved but not restorable via name reuse.
  * The `active` flag remains separate and controls feature toggle functionality.
  *
- * @throws ShelfError if custom field doesn't exist or deletion fails
+ * @throws EstoqueSoftSystemError if custom field doesn't exist or deletion fails
  */
 export async function softDeleteCustomField({
   id,
@@ -364,7 +364,7 @@ export async function softDeleteCustomField({
         });
 
         if (!existingCustomField) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message:
               "The custom field you are trying to delete does not exist.",
@@ -403,11 +403,11 @@ export async function softDeleteCustomField({
 
     return customField;
   } catch (cause) {
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while deleting the custom field. Please try again or contact support.",
@@ -445,7 +445,7 @@ export async function upsertCustomField(
         newOrUpdatedFields.push(newCustomField);
       } else {
         if (existingCustomField.type !== def.type) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: `Duplicate custom field name with different type. '${def.name}' already exist with different type '${existingCustomField.type}'`,
             additionalData: {
@@ -491,9 +491,9 @@ export async function upsertCustomField(
 
     return { customFields, newOrUpdatedFields };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Failed to update or create custom fields. Please try again or contact support.",
       additionalData: { definitions },
@@ -540,9 +540,9 @@ export async function createCustomFieldsIfNotExists({
     }
     return await upsertCustomField(Object.values(fieldToDefDraftMap));
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while creating custom fields. Seems like some of the custom field data in your import file is invalid. Please check and try again.",
       additionalData: { userId, organizationId },
@@ -620,7 +620,7 @@ export async function getActiveCustomFields({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Failed to get active custom fields. Please try again or contact support.",
@@ -640,7 +640,7 @@ export async function countActiveCustomFields({
       where: { organizationId, active: true, deletedAt: null },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching active custom fields. Please try again or contact support.",
@@ -718,7 +718,7 @@ export async function bulkActivateOrDeactivateCustomFields({
 
     return updatedFields;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while bulk activating custom fields.",
       additionalData: { customFields, organizationId, userId },

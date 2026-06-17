@@ -17,7 +17,10 @@ import {
 } from "~/modules/note/service.server";
 import type { ClientHint } from "~/utils/client-hints";
 import type { ErrorLabel } from "~/utils/error";
-import { isLikeShelfError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { getRedirectUrlFromRequest } from "~/utils/http";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import { Logger } from "~/utils/logger";
@@ -60,7 +63,7 @@ function assertAuditNotArchived(
   details: { auditSessionId: string; organizationId: string }
 ) {
   if (status === AuditStatus.ARCHIVED) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Archived audits are read-only.",
       additionalData: details,
@@ -243,7 +246,7 @@ export async function createAuditSession(
   const uniqueAssetIds = Array.from(new Set(assetIds));
 
   if (uniqueAssetIds.length === 0) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "You need to select at least one asset to start an audit.",
       label,
@@ -264,7 +267,7 @@ export async function createAuditSession(
   });
 
   if (assets.length !== uniqueAssetIds.length) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "Some of the selected assets could not be found. Please refresh the page and try again.",
@@ -321,7 +324,7 @@ export async function createAuditSession(
     });
 
     if (!sessionWithAssignments) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Unable to load the newly created audit session.",
         label,
@@ -434,7 +437,7 @@ export async function updateAuditSession({
     });
 
     if (!currentAudit) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit not found",
         additionalData: { id, organizationId },
@@ -449,7 +452,7 @@ export async function updateAuditSession({
     });
 
     if (currentAudit.status === AuditStatus.CANCELLED) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Cancelled audits cannot be edited.",
         additionalData: { id, organizationId },
@@ -459,7 +462,7 @@ export async function updateAuditSession({
     }
 
     if (currentAudit.status === AuditStatus.COMPLETED) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Completed audits cannot be edited.",
         additionalData: { id, organizationId },
@@ -708,7 +711,7 @@ export async function getAuditSessionDetails({
     });
 
     if (!session) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit session not found",
         additionalData: { id, organizationId },
@@ -728,7 +731,7 @@ export async function getAuditSessionDetails({
           ? getRedirectUrlFromRequest(request)
           : undefined;
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Audit not found",
         message: "",
@@ -780,11 +783,14 @@ export async function getAuditSessionDetails({
     };
   } catch (cause) {
     // Re-throw special 404 errors without modification
-    if (isLikeShelfError(cause) && cause.additionalData?.model === "audit") {
+    if (
+      isLikeEstoqueSoftSystemError(cause) &&
+      cause.additionalData?.model === "audit"
+    ) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to load audit session",
       additionalData: { id, organizationId },
@@ -821,7 +827,7 @@ export async function scheduleNextAuditJob({
     return id;
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to schedule audit job",
         additionalData: { data, when },
@@ -864,7 +870,7 @@ async function cancelAuditReminders(auditId: string, organizationId: string) {
     Logger.info(`Cancelled all reminder jobs for audit ${auditId}`);
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to cancel audit reminder jobs",
         additionalData: { auditId },
@@ -1099,7 +1105,7 @@ export async function getAssetsForAuditSession({
       search,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to load assets for audit session",
       additionalData: { auditSessionId, organizationId },
@@ -1169,7 +1175,7 @@ export async function recordAuditScan(
     });
 
     if (!session) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit session not found",
         additionalData: { auditSessionId, organizationId },
@@ -1222,7 +1228,7 @@ export async function recordAuditScan(
     // migration would add lock contention to this hot scan path to guard an
     // unreachable state, so it is intentionally out of scope.
     if (!scannedAsset || scannedAsset.organizationId !== organizationId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "The scanned asset could not be found in this workspace. It may have been deleted or belong to a different organization.",
@@ -1410,11 +1416,11 @@ export async function recordAuditScan(
 
     return result;
   } catch (cause) {
-    // Preserve already-typed ShelfErrors (e.g. the asset/session 404s above)
+    // Preserve already-typed EstoqueSoftSystemErrors (e.g. the asset/session 404s above)
     // so their status and `shouldBeCaptured: false` survive instead of being
     // re-wrapped into a captured generic 500. Matches the pattern used by
     // other handlers in this file.
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
     // TOCTOU fallback: the pre-transaction guard validated the asset, but it
@@ -1423,7 +1429,7 @@ export async function recordAuditScan(
     // violation on `AuditScan_assetId_fkey`. Convert it to the same clean,
     // non-captured 404 the guard returns instead of a captured generic 500.
     if (isAuditAssetFkViolation(cause)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "The scanned asset could not be found in this workspace. It may have been deleted or belong to a different organization.",
@@ -1433,7 +1439,7 @@ export async function recordAuditScan(
         label,
       });
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to record audit scan",
       additionalData: { auditSessionId, assetId, userId },
@@ -1467,7 +1473,7 @@ export async function getAuditScans({
     });
 
     if (!session) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit session not found",
         additionalData: { auditSessionId, organizationId },
@@ -1575,7 +1581,7 @@ export async function getAuditScans({
       };
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch audit scans",
       additionalData: { auditSessionId, organizationId },
@@ -1613,7 +1619,7 @@ export async function completeAuditSession({
       });
 
       if (!session) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Audit session not found",
           additionalData: { sessionId, organizationId },
@@ -1631,7 +1637,7 @@ export async function completeAuditSession({
         session.status === AuditStatus.COMPLETED ||
         session.status === AuditStatus.CANCELLED
       ) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             session.status === AuditStatus.COMPLETED
@@ -1820,15 +1826,17 @@ export async function completeAuditSession({
     // Cancel all scheduled reminder jobs
     await cancelAuditReminders(sessionId, organizationId);
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
-    throw new ShelfError({
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Failed to complete audit session",
       additionalData: { sessionId, organizationId, userId },
       label,
-      shouldBeCaptured: isShelfError ? cause.shouldBeCaptured : undefined,
+      shouldBeCaptured: isEstoqueSoftSystemError
+        ? cause.shouldBeCaptured
+        : undefined,
     });
   }
 }
@@ -1889,7 +1897,7 @@ export async function getAuditsForOrganization(params: {
   // Fail loud — and OUTSIDE the try/catch below so the precise error reaches
   // the caller (the catch wraps everything in a generic "fetch failed").
   if (isSelfServiceOrBase && !userId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Missing user context for assignment-scoped audit query.",
       additionalData: { organizationId, isSelfServiceOrBase },
@@ -1962,7 +1970,7 @@ export async function getAuditsForOrganization(params: {
 
     return { audits, totalAudits };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching audits. Please try again or contact support.",
@@ -1974,12 +1982,12 @@ export async function getAuditsForOrganization(params: {
 
 /**
  * Validates that the user is assigned to the audit session.
- * Throws a 403 ShelfError if the user is not an assignee.
+ * Throws a 403 EstoqueSoftSystemError if the user is not an assignee.
  *
  * When isSelfServiceOrBase is false (admin/owner), allows the user to perform
  * actions if the audit has no assignees.
  *
- * @throws {ShelfError} 403 error if user is not an assignee
+ * @throws {EstoqueSoftSystemError} 403 error if user is not an assignee
  */
 export async function requireAuditAssignee({
   auditSessionId,
@@ -2015,7 +2023,7 @@ export async function requireAuditAssignee({
   );
 
   if (!isAssignee) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "Only users assigned to this audit can perform this action. Please contact the audit creator to be assigned.",
@@ -2030,7 +2038,7 @@ export async function requireAuditAssignee({
  * Validates that a BASE/SELF_SERVICE user is assigned to an audit.
  * For ADMIN/OWNER users, this check is skipped (they can access all audits).
  *
- * @throws {ShelfError} If BASE/SELF_SERVICE user is not assigned to the audit
+ * @throws {EstoqueSoftSystemError} If BASE/SELF_SERVICE user is not assigned to the audit
  */
 export function requireAuditAssigneeForBaseSelfService({
   audit,
@@ -2049,7 +2057,7 @@ export function requireAuditAssigneeForBaseSelfService({
     );
 
     if (!isAssignee) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Unauthorized",
         message: "You don't have permission to view this audit",
@@ -2075,7 +2083,7 @@ export function requireAuditAssigneeForBaseSelfService({
  * @param isAdminOrOwner - Whether the acting user is admin/owner in the
  *   audit's organization. The route layer derives this from the workspace
  *   role and passes it in; the service trusts it.
- * @throws {ShelfError} 404 if the audit isn't found, 403 if the user is
+ * @throws {EstoqueSoftSystemError} 404 if the audit isn't found, 403 if the user is
  *   neither the creator nor an admin/owner, 400 if the audit is in a
  *   terminal status that can't be cancelled.
  */
@@ -2131,7 +2139,7 @@ export async function cancelAuditSession({
     });
 
     if (!auditSession) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit not found",
         additionalData: { auditSessionId, organizationId },
@@ -2149,7 +2157,7 @@ export async function cancelAuditSession({
     // admins/owners to cancel any audit in the org — needed when team
     // members create audits the supervisor needs to clean up later.
     if (auditSession.createdById !== userId && !isAdminOrOwner) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Only the audit creator or a workspace admin/owner can cancel the audit",
@@ -2168,7 +2176,7 @@ export async function cancelAuditSession({
       auditSession.status === AuditStatus.COMPLETED ||
       auditSession.status === AuditStatus.CANCELLED
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Cannot cancel an audit that is already ${auditSession.status.toLowerCase()}`,
         additionalData: { auditSessionId, status: auditSession.status },
@@ -2200,7 +2208,7 @@ export async function cancelAuditSession({
     });
 
     if (transition.count !== 1) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Audit status changed before cancellation could complete. Please refresh and try again.",
@@ -2311,14 +2319,14 @@ export async function cancelAuditSession({
 
     return updatedAudit;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while cancelling the audit.",
-      additionalData: isShelfError
+      additionalData: isEstoqueSoftSystemError
         ? cause.additionalData
         : { auditSessionId, organizationId, userId },
       label,
@@ -2398,7 +2406,7 @@ export async function addAssetsToAudit({
       });
 
       if (!audit) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Audit not found",
           additionalData: { auditId, organizationId },
@@ -2408,7 +2416,7 @@ export async function addAssetsToAudit({
       }
 
       if (audit.status !== AuditStatus.PENDING) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Can only add assets to pending audits",
           additionalData: { auditId, status: audit.status },
@@ -2540,7 +2548,7 @@ export async function removeAssetFromAudit({
       });
 
       if (!audit) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Audit not found",
           additionalData: { auditId, organizationId },
@@ -2550,7 +2558,7 @@ export async function removeAssetFromAudit({
       }
 
       if (audit.status !== AuditStatus.PENDING) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Can only remove assets from pending audits",
           additionalData: { auditId, status: audit.status },
@@ -2566,7 +2574,7 @@ export async function removeAssetFromAudit({
       });
 
       if (!auditAsset) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Audit asset not found",
           additionalData: { auditAssetId },
@@ -2656,7 +2664,7 @@ export async function removeAssetsFromAudit({
       });
 
       if (!audit) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Audit not found",
           additionalData: { auditId, organizationId },
@@ -2666,7 +2674,7 @@ export async function removeAssetsFromAudit({
       }
 
       if (audit.status !== AuditStatus.PENDING) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Can only remove assets from pending audits",
           additionalData: { auditId, status: audit.status },
@@ -2754,7 +2762,7 @@ export async function removeAssetsFromAudit({
  * @param auditSessionId - The ID of the audit to archive
  * @param organizationId - The organization ID for scoping
  * @param userId - The user performing the archive action
- * @throws {ShelfError} If the audit is not found or not in a terminal status
+ * @throws {EstoqueSoftSystemError} If the audit is not found or not in a terminal status
  */
 export async function archiveAuditSession({
   auditSessionId,
@@ -2781,7 +2789,7 @@ export async function archiveAuditSession({
       });
 
       if (result.count === 0) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "Audit could not be archived. It may not exist, is not in a terminal state, or was already modified.",
@@ -2825,8 +2833,8 @@ export async function archiveAuditSession({
       );
     });
   } catch (cause) {
-    if (isLikeShelfError(cause)) throw cause;
-    throw new ShelfError({
+    if (isLikeEstoqueSoftSystemError(cause)) throw cause;
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to archive audit session",
       additionalData: { auditSessionId, organizationId, userId },
@@ -2921,7 +2929,7 @@ export function getAuditWhereInput({
  * @param params.currentSearchParams - Serialized URL params for select-all filtering
  * @param params.isSelfServiceOrBase - When true, restrict select-all resolution
  *   to audits assigned to userId (matches the index loader's assignment scope)
- * @throws {ShelfError} If the selection is empty or any selected audit is not
+ * @throws {EstoqueSoftSystemError} If the selection is empty or any selected audit is not
  *   in a terminal state
  */
 export async function bulkArchiveAudits({
@@ -2956,7 +2964,7 @@ export async function bulkArchiveAudits({
     });
 
     if (audits.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No archivable audits were found for your selection.",
         label,
@@ -2971,7 +2979,7 @@ export async function bulkArchiveAudits({
     );
 
     if (someNotTerminal) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Some audits are not in a completed or cancelled state. Only completed or cancelled audits can be archived.",
@@ -3005,7 +3013,7 @@ export async function bulkArchiveAudits({
       });
 
       if (result.count !== audits.length) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "Some audits could not be archived because their status changed. Please refresh and try again.",
@@ -3048,8 +3056,8 @@ export async function bulkArchiveAudits({
       );
     });
   } catch (cause) {
-    if (isLikeShelfError(cause)) throw cause;
-    throw new ShelfError({
+    if (isLikeEstoqueSoftSystemError(cause)) throw cause;
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to bulk archive audits",
       additionalData: { auditIds, organizationId, userId },
@@ -3080,7 +3088,7 @@ async function safeRemoveAuditImageFiles(image: {
     // Supabase URLs contain storage object keys and a trailing token;
     // `imageId` is enough to trace the record if we need to.
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: null,
         message: "Failed to remove audit image from storage during delete",
         additionalData: {
@@ -3098,7 +3106,7 @@ async function safeRemoveAuditImageFiles(image: {
       await removePublicFile({ publicUrl: image.thumbnailUrl });
     } catch (cause) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message:
             "Failed to remove audit thumbnail from storage during delete",
@@ -3152,7 +3160,7 @@ const normalizeAuditName = (s: string): string =>
  * @param organizationId - Scoping organization (enforces tenant isolation)
  * @param userId - User performing the delete (for error context + log trail)
  * @param expectedName - Confirmation string the user typed in the dialog
- * @throws {ShelfError} 400 if confirmation doesn't match the stored name;
+ * @throws {EstoqueSoftSystemError} 400 if confirmation doesn't match the stored name;
  *   404 if not found; 409 if not ARCHIVED; 500 on DB failure
  */
 export async function deleteAuditSession({
@@ -3176,7 +3184,7 @@ export async function deleteAuditSession({
     });
 
     if (!audit) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit not found.",
         additionalData: { auditSessionId, organizationId, userId },
@@ -3186,7 +3194,7 @@ export async function deleteAuditSession({
     }
 
     if (normalizeAuditName(expectedName) !== normalizeAuditName(audit.name)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Confirmation did not match the audit name.",
         additionalData: { auditSessionId, organizationId },
@@ -3197,7 +3205,7 @@ export async function deleteAuditSession({
     }
 
     if (audit.status !== AuditStatus.ARCHIVED) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Only archived audits can be deleted. Archive it first.",
         additionalData: {
@@ -3230,7 +3238,7 @@ export async function deleteAuditSession({
     });
 
     if (result.count === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Audit could not be deleted. Its status may have changed, or it was removed by another process — please refresh and try again.",
@@ -3254,8 +3262,8 @@ export async function deleteAuditSession({
       await safeRemoveAuditImageFiles(image);
     }
   } catch (cause) {
-    if (isLikeShelfError(cause)) throw cause;
-    throw new ShelfError({
+    if (isLikeEstoqueSoftSystemError(cause)) throw cause;
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to delete audit session",
       additionalData: { auditSessionId, organizationId, userId },
@@ -3300,7 +3308,7 @@ export async function deleteAuditSession({
  * @param userId - User performing the bulk delete (for error context + log trail)
  * @param currentSearchParams - Serialized URL params, used when ALL_SELECTED_KEY
  * @returns Object with the count of audits actually deleted
- * @throws {ShelfError} If selection is empty, any audit is not ARCHIVED, or
+ * @throws {EstoqueSoftSystemError} If selection is empty, any audit is not ARCHIVED, or
  *   if a concurrent status change makes the bulk delete non-atomic
  */
 export async function bulkDeleteAudits({
@@ -3328,7 +3336,7 @@ export async function bulkDeleteAudits({
         .get("status")
         ?.toUpperCase();
       if (paramStatus !== AuditStatus.ARCHIVED) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "Select-all delete requires the status filter to be set to Archived.",
@@ -3360,7 +3368,7 @@ export async function bulkDeleteAudits({
     });
 
     if (audits.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No deletable audits were found for your selection.",
         additionalData: { auditIds, organizationId },
@@ -3379,7 +3387,7 @@ export async function bulkDeleteAudits({
         (id) => id !== ALL_SELECTED_KEY && !foundIds.has(id)
       );
       if (missing.length > 0) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "Some selected audits are not archived. Only archived audits can be deleted.",
@@ -3417,7 +3425,7 @@ export async function bulkDeleteAudits({
       });
 
       if (deleted.count !== targetIds.length) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           // The pre-read already confirmed every id was ARCHIVED + in-org,
           // so a mismatch here means a concurrent process either changed
@@ -3463,8 +3471,8 @@ export async function bulkDeleteAudits({
 
     return { count };
   } catch (cause) {
-    if (isLikeShelfError(cause)) throw cause;
-    throw new ShelfError({
+    if (isLikeEstoqueSoftSystemError(cause)) throw cause;
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to bulk delete audits",
       additionalData: { auditIds, organizationId, userId },
@@ -3520,7 +3528,7 @@ export type DuplicateAuditResult = {
  * @param organizationId - Workspace scoping
  * @param userId - User performing the duplication (becomes creator)
  * @returns The new audit session and missing-asset counts for warning UX
- * @throws {ShelfError} 404 if the audit isn't found, 400 if the source is not
+ * @throws {EstoqueSoftSystemError} 404 if the audit isn't found, 400 if the source is not
  *   in a terminal status, 400 if every original asset is gone
  */
 export async function duplicateAuditSession({
@@ -3544,7 +3552,7 @@ export async function duplicateAuditSession({
     });
 
     if (!originalAudit) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit not found.",
         additionalData: { auditSessionId, organizationId },
@@ -3561,7 +3569,7 @@ export async function duplicateAuditSession({
         originalAudit.status as (typeof DUPLICATE_AUDIT_ALLOWED_STATUSES)[number]
       )
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Only completed, cancelled, or archived audits can be duplicated.",
@@ -3584,7 +3592,7 @@ export async function duplicateAuditSession({
     const droppedAssetCount = originalAssetCount - resolvedAssetIds.length;
 
     if (resolvedAssetIds.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "None of the original assets exist anymore. Cannot duplicate.",
         additionalData: { auditSessionId, organizationId },
@@ -3610,8 +3618,8 @@ export async function duplicateAuditSession({
       originalAssetCount,
     };
   } catch (cause) {
-    if (isLikeShelfError(cause)) throw cause;
-    throw new ShelfError({
+    if (isLikeEstoqueSoftSystemError(cause)) throw cause;
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while duplicating the audit.",
       additionalData: { auditSessionId, organizationId, userId },

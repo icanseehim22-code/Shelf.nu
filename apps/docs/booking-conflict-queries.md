@@ -1,10 +1,10 @@
 # Booking Conflict Queries & Reservation Logic
 
-This document provides comprehensive documentation for all booking conflict detection patterns used throughout the Shelf.nu codebase. Understanding these patterns is crucial for maintaining consistency when modifying booking-related functionality.
+This document provides comprehensive documentation for all booking conflict detection patterns used throughout the EstoqueSoftSystem codebase. Understanding these patterns is crucial for maintaining consistency when modifying booking-related functionality.
 
 ## Overview
 
-Shelf.nu uses three distinct patterns for handling booking conflicts and asset availability:
+EstoqueSoftSystem uses three distinct patterns for handling booking conflicts and asset availability:
 
 1. **[Booking Conflict Detection](#pattern-1-booking-conflict-detection)** - Finding conflicting bookings for availability labels
 2. **[Asset/Kit Filtering](#pattern-2-assetkit-filtering)** - Filtering unavailable assets/kits from query results

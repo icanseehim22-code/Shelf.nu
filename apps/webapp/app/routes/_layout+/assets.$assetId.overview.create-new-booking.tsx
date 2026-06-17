@@ -9,7 +9,10 @@ import NewBooking, {
   action as newBookingAction,
 } from "~/routes/_layout+/bookings.new";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -43,7 +46,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       });
 
     if (isPersonalOrg(currentOrganization)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Not allowed",
         message:
@@ -75,7 +78,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       : undefined;
 
     if (isSelfServiceOrBase && !selfServiceOrBaseUser) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Seems like something is wrong with your user. Please contact support to get this resolved. Make sure to include the trace id seen below.",
@@ -97,7 +100,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       ...tagsData,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, assetId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, assetId });
     throw data(error(reason), { status: reason.status });
   }
 }

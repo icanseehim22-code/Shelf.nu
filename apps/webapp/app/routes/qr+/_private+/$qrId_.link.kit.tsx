@@ -44,7 +44,11 @@ import {
 import { getQr } from "~/modules/qr/service.server";
 import css from "~/styles/link-existing-asset.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import {
   payload,
@@ -76,7 +80,7 @@ export const loader = async ({
   try {
     const qr = await getQr({ id: qrId });
     if (qr?.assetId || qr?.kitId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         message: "This QR code is already linked to an asset or a kit.",
         title: "QR already linked",
         label: "QR",
@@ -116,7 +120,7 @@ export const loader = async ({
           take: searchParams.get("getAll") === "teamMember" ? undefined : 12,
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message:
               "Something went wrong while fetching team members. Please try again or contact support.",
@@ -158,7 +162,7 @@ export const loader = async ({
       totalTeamMembers,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, qrId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, qrId });
     throw data(error(reason), { status: reason.status });
   }
 };
@@ -194,7 +198,7 @@ export const action = async ({
 
     return redirect(`/qr/${qrId}/successful-link?type=kit`);
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 };

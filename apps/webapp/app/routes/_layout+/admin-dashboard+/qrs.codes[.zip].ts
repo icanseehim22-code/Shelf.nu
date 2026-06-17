@@ -1,6 +1,6 @@
 import { data, type LoaderFunctionArgs } from "react-router";
 import { generateUnclaimedCodesForPrint } from "~/modules/qr/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error } from "~/utils/http.server";
 import { requireAdmin } from "~/utils/roles.server";
 import { createQrCodesZip } from "~/utils/zip-qr-codes";
@@ -26,7 +26,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

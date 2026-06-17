@@ -6,7 +6,7 @@ import {
   getMobileUserContext,
 } from "~/modules/api/mobile-auth.server";
 import { getBookings } from "~/modules/booking/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 
 /**
  * GET /api/mobile/dashboard
@@ -240,7 +240,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       })),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

@@ -22,7 +22,10 @@ import { setSelectedOrganizationIdCookie } from "~/modules/organization/context.
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
 import { INVITE_TOKEN_SECRET, SUPPORT_EMAIL } from "~/utils/env";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -61,11 +64,11 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
-          title: "Invite not found",
+          title: "Convite não encontrado",
           message:
-            "The invitation you are trying to accept is either not found or expired",
+            "O convite que você está tentando aceitar não foi encontrado ou expirou",
           label: "Invite",
         });
       });
@@ -85,9 +88,9 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
       workspace: `${invite.organization.name}`,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(
-      error({ ...reason, title: reason.title || "Accept team invite" }),
+      error({ ...reason, title: reason.title || "Aceitar convite de equipe" }),
       {
         status: reason.status,
       }
@@ -95,7 +98,9 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
   }
 }
 
-export const meta = () => [{ title: appendToMetaTitle("Accept team invite") }];
+export const meta = () => [
+  { title: appendToMetaTitle("Aceitar convite de equipe") },
+];
 
 export async function action({ context, request }: LoaderFunctionArgs) {
   try {
@@ -104,7 +109,7 @@ export async function action({ context, request }: LoaderFunctionArgs) {
       z.object({ token: z.string() }),
       {
         message:
-          "The invitation link doesn't have a token provided. Please try clicking the link in your email again or request a new invite. If the issue persists, feel free to contact support",
+          "O link do convite não tem um token. Tente clicar no link do seu e-mail novamente ou solicite um novo convite. Se o problema persistir, contate o suporte",
       }
     );
 
@@ -119,10 +124,9 @@ export async function action({ context, request }: LoaderFunctionArgs) {
     });
 
     if (updatedInvite.status !== InviteStatuses.ACCEPTED) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
-        message:
-          "Something went wrong with updating your invite. Please try again",
+        message: "Algo deu errado ao atualizar seu convite. Tente novamente",
         label: "Invite",
       });
     }
@@ -170,18 +174,18 @@ export async function action({ context, request }: LoaderFunctionArgs) {
       }
     );
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     let titleOverride = null;
     if (cause instanceof Error && cause.name === "JsonWebTokenError") {
-      titleOverride = "Invalid invite token";
+      titleOverride = "Token de convite inválido";
       reason.message =
-        "The invitation link is invalid. Please try clicking the link in your email again or request a new invite. If the issue persists, feel free to contact support";
+        "O link do convite é inválido. Tente clicar no link do seu e-mail novamente ou solicite um novo convite. Se o problema persistir, contate o suporte";
     }
 
     return data(
       error({
         ...reason,
-        title: titleOverride ?? (reason.title || "Accept team invite"),
+        title: titleOverride ?? (reason.title || "Aceitar convite de equipe"),
       }),
       {
         status: reason.status,
@@ -230,15 +234,16 @@ export default function AcceptInvite() {
               ))}
             </p>
             <Button to="/" variant={"secondary"}>
-              Back to home
+              Voltar ao início
             </Button>
           </div>
         ) : (
           <div>
-            <h2>Accept invite</h2>
+            <h2>Aceitar convite</h2>
             <p className="mt-2">
-              <strong>{inviter}</strong> invites you to join Shelf as a member
-              of <strong>{workspace}’s</strong> workspace.
+              <strong>{inviter}</strong> convida você para entrar no
+              EstoqueSoftSystem como membro do workspace de{" "}
+              <strong>{workspace}</strong>.
             </p>
             <Form method="post" className="my-3">
               <input
@@ -248,7 +253,7 @@ export default function AcceptInvite() {
               />
 
               <Button type="submit" disabled={disabled || error}>
-                {disabled ? "Validating token..." : "Accept invite"}
+                {disabled ? "Validando token..." : "Aceitar convite"}
               </Button>
             </Form>
           </div>
@@ -256,8 +261,8 @@ export default function AcceptInvite() {
       </div>
       <div className=" mx-4 mt-20 flex flex-col items-center text-center text-gray-600 md:mx-[-200px]">
         <p>
-          If you have any questions or need assistance, please don't hesitate to
-          contact our support team at{" "}
+          Se tiver dúvidas ou precisar de ajuda, não hesite em contatar nossa
+          equipe de suporte em{" "}
           <Button variant={"link-gray"} to={`mailto:${SUPPORT_EMAIL}`}>
             {SUPPORT_EMAIL}
           </Button>

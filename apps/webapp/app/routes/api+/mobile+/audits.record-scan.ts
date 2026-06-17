@@ -7,7 +7,7 @@ import {
   getMobileUserContext,
 } from "~/modules/api/mobile-auth.server";
 import { recordAuditScan } from "~/modules/audit/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -84,7 +84,7 @@ export async function action({ request }: ActionFunctionArgs) {
       unexpectedAssetCount,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

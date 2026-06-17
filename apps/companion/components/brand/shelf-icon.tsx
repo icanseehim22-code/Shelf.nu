@@ -1,5 +1,5 @@
 /**
- * Shelf brand icon — orange rounded-rect with white shelf lines.
+ * EstoqueSoftSystem brand icon — orange rounded-rect with white shelf lines.
  *
  * SVG paths extracted from the webapp's full logo component
  * (`apps/webapp/app/components/brand/logo.tsx`, icon portion).
@@ -11,7 +11,7 @@ import Svg, { Path, Rect, type SvgProps } from "react-native-svg";
 type ShelfIconProps = Omit<SvgProps, "viewBox"> & {
   /** Icon size (width = height). Default 80. */
   size?: number;
-  /** Background color of the icon square. Default Shelf orange. */
+  /** Background color of the icon square. Default EstoqueSoftSystem orange. */
   iconBgColor?: string;
   /** Color of the shelf line shapes. Default white. */
   iconShelfsColor?: string;
@@ -30,13 +30,13 @@ export default function ShelfIcon({
       width={size}
       height={size}
       viewBox={VIEWBOX}
-      accessibilityLabel="Shelf icon"
+      accessibilityLabel="EstoqueSoftSystem icon"
       {...rest}
     >
       {/* Orange background */}
       <Rect width={79.771} height={79.771} rx={12} fill={iconBgColor} />
 
-      {/* Shelf line shapes */}
+      {/* EstoqueSoftSystem line shapes */}
       <Path d="M19.044 26.569h16.031v6.413H19.044z" fill={iconShelfsColor} />
       <Path
         d="M27.06 23.362v-6.413l25.65-2.432v8.845Z"

@@ -17,7 +17,10 @@ import { useScannerCameraId } from "~/hooks/use-scanner-camera-id";
 import { useViewportHeight } from "~/hooks/use-viewport-height";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
@@ -59,7 +62,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           title: "Kit not found!",
           message:
@@ -77,7 +80,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     return payload({ title, header, kit });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     throw data(error(reason), { status: reason.status });
   }
 }

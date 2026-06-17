@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { eventStream } from "remix-utils/sse/server";
 import { emitter } from "~/utils/emitter/emitter.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 
 export function loader({ context, request }: LoaderFunctionArgs) {
@@ -42,7 +42,7 @@ export function loader({ context, request }: LoaderFunctionArgs) {
         }
 
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause,
             message: "Failed to send SSE notification",
             additionalData: { userId: authSession.userId },

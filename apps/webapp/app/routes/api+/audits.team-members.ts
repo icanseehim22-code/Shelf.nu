@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import type { LoaderFunctionArgs } from "react-router";
 import { data } from "react-router";
 import { db } from "~/database/db.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -61,7 +61,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
     return data(payload({ teamMembers }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

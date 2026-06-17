@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ShelfError } from "./error";
+import type { EstoqueSoftSystemError } from "./error";
 import { getValidationErrors } from "./http";
 import { parseData } from "./http.server";
 
@@ -12,7 +12,7 @@ describe(getValidationErrors.name, () => {
     try {
       parseData({}, schema);
     } catch (e) {
-      const error = e as ShelfError;
+      const error = e as EstoqueSoftSystemError;
 
       const validationErrors = getValidationErrors<typeof schema>(error);
 
@@ -28,7 +28,7 @@ describe(getValidationErrors.name, () => {
     try {
       parseData({}, schema);
     } catch (e) {
-      const error = e as ShelfError;
+      const error = e as EstoqueSoftSystemError;
 
       const validationErrors = getValidationErrors<typeof schema>(error);
 

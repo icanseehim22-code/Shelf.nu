@@ -54,7 +54,7 @@ import type {
   TopBookedAssetRow,
 } from "~/modules/reports/types";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -82,7 +82,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
   const { reportId } = params;
   if (!reportId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Report ID is required",
       label: "Report",
@@ -92,7 +92,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
   // Validate report exists and is enabled
   const reportDef = getReportById(reportId);
   if (!reportDef) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: `Report "${reportId}" not found`,
       label: "Report",
@@ -101,7 +101,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
   }
 
   if (!reportDef.enabled) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: `Report "${reportDef.title}" is not yet available`,
       label: "Report",
@@ -253,7 +253,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       break;
 
     default:
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Report "${reportId}" is not implemented`,
         label: "Report",

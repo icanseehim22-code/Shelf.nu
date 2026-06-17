@@ -67,7 +67,7 @@ type HandleScannerInputValueArgs = {
  * @param rawValue - The raw input value from the scanner
  * @param paused - Whether the scanner is currently paused
  * @param onCodeDetectionSuccess - Callback to trigger on successful code detection
- * @param allowNonShelfCodes - Whether to allow non-shelf codes (barcodes not in the Shelf system)
+ * @param allowNonShelfCodes - Whether to allow non-shelf codes (barcodes not in the EstoqueSoftSystem system)
  * @returns true if a value was processed, false otherwise
  */
 export async function handleScannerInputValue({

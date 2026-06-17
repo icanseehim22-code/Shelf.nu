@@ -136,7 +136,7 @@ export default function AnimatedSplash({
         },
       ]}
       pointerEvents={isReady && introComplete ? "none" : "auto"}
-      accessibilityLabel="Loading Shelf"
+      accessibilityLabel="Loading EstoqueSoftSystem"
       accessibilityRole="progressbar"
     >
       <View style={styles.content}>

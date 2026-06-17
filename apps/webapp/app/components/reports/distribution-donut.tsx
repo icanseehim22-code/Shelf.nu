@@ -43,7 +43,7 @@ export interface DistributionDonutProps {
  * Uses a harmonious progression from warm to cool colors.
  */
 const DISTRIBUTION_COLORS = [
-  "orange", // Primary (Shelf brand)
+  "orange", // Primary (EstoqueSoftSystem brand)
   "blue", // Secondary
   "emerald", // Tertiary
   "violet", // Quaternary

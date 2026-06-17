@@ -6,7 +6,7 @@ import {
   requireOrganizationAccess,
 } from "~/modules/api/mobile-auth.server";
 import { updateAssetMainImage } from "~/modules/asset/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -83,7 +83,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return data({ asset: updatedAsset });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

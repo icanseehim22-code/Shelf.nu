@@ -19,7 +19,7 @@ vi.mock("~/database/db.server", () => ({
 }));
 
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import {
   createAuditAssetNote,
@@ -89,7 +89,7 @@ describe("audit asset details service", () => {
       expect(result.user?.firstName).toBe("John");
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       vi.mocked(db.auditNote.create).mockRejectedValue(
         new Error("Database connection failed")
       );
@@ -101,7 +101,7 @@ describe("audit asset details service", () => {
           auditSessionId: "audit-1",
           auditAssetId: "audit-asset-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         createAuditAssetNote({
@@ -185,7 +185,7 @@ describe("audit asset details service", () => {
           content: "Updated content",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       expect(db.auditNote.update).not.toHaveBeenCalled();
     });
@@ -200,7 +200,7 @@ describe("audit asset details service", () => {
           content: "Updated content",
           userId: "wrong-user",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       expect(db.auditNote.update).not.toHaveBeenCalled();
     });
@@ -271,7 +271,7 @@ describe("audit asset details service", () => {
           noteId: "nonexistent-note",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       expect(db.auditNote.delete).not.toHaveBeenCalled();
     });
@@ -284,7 +284,7 @@ describe("audit asset details service", () => {
           noteId: "note-1",
           userId: "wrong-user",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       expect(db.auditNote.delete).not.toHaveBeenCalled();
     });
@@ -374,7 +374,7 @@ describe("audit asset details service", () => {
       expect(result).toEqual([]);
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       vi.mocked(db.auditNote.findMany).mockRejectedValue(
         new Error("Database timeout")
       );
@@ -384,7 +384,7 @@ describe("audit asset details service", () => {
           auditSessionId: "audit-1",
           auditAssetId: "audit-asset-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         getAuditAssetNotes({
@@ -468,7 +468,7 @@ describe("audit asset details service", () => {
       expect(duration).toBeLessThan(50);
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       vi.mocked(db.auditNote.count).mockRejectedValue(
         new Error("Database error")
       );
@@ -478,7 +478,7 @@ describe("audit asset details service", () => {
           auditSessionId: "audit-1",
           auditAssetId: "audit-asset-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         getAuditAssetDetailsCounts({

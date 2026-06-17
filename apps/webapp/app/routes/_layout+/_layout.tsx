@@ -59,7 +59,11 @@ import {
   setCookie,
   userPrefs,
 } from "~/utils/cookies.server";
-import { isLikeShelfError, makeShelfError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isRouteError } from "~/utils/http";
 import { payload, error } from "~/utils/http.server";
 import { skipRevalidationOnClientViewChange } from "~/utils/list-view-params";
@@ -180,7 +184,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       (isOwner || isOrgAdmin) && !currentOrganization.hasSequentialIdsMigrated;
 
     if (!organizations.length || !currentOrganization) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "No organization",
         message:
@@ -246,7 +250,9 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       }
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId: authSession.userId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId: authSession.userId,
+    });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -260,7 +266,7 @@ export const meta: MetaFunction<typeof loader> = ({ error }) => {
 
   if (isRouteError(error)) {
     title = error.data.error?.title ?? "";
-  } else if (isLikeShelfError(error)) {
+  } else if (isLikeEstoqueSoftSystemError(error)) {
     title = error?.title ?? "";
   } else if (error instanceof Error) {
     title = error.name;

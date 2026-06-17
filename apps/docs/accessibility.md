@@ -1,6 +1,6 @@
 # Accessibility Guidelines
 
-Shelf.nu is committed to providing an accessible experience for all users. This guide outlines our accessibility standards and provides practical guidance for developers.
+EstoqueSoftSystem is committed to providing an accessible experience for all users. This guide outlines our accessibility standards and provides practical guidance for developers.
 
 ## Standards
 
@@ -350,7 +350,7 @@ import {
 
 ## Component Library
 
-Shelf uses [Radix UI](https://www.radix-ui.com) primitives which provide:
+EstoqueSoftSystem uses [Radix UI](https://www.radix-ui.com) primitives which provide:
 
 - ✅ Built-in keyboard navigation
 - ✅ ARIA attributes

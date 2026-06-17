@@ -91,7 +91,7 @@ export const mobilePkceChallengeCookie = createCookie("mobile_pkce_challenge", {
 export const userPrefs = createCookie("user-prefs", {
   maxAge: 604_800, // one week
   sameSite: "lax" as const,
-  domain: COOKIE_DOMAIN, // e.g. ".shelf.nu" — lets the marketing site detect signed-in users
+  domain: COOKIE_DOMAIN, // e.g. ".estoquesoftsystem.com" — lets the marketing site detect signed-in users
 });
 
 /**

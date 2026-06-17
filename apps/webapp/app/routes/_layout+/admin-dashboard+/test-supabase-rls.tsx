@@ -4,7 +4,7 @@ import { data, type LoaderFunctionArgs } from "react-router";
 import { Button } from "~/components/shared/button";
 import { supabaseClient } from "~/integrations/supabase/client";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import { requireAdmin } from "~/utils/roles.server";
 
@@ -19,7 +19,7 @@ export const loader = async ({ context }: LoaderFunctionArgs) => {
 
     return payload({ success: true });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 };

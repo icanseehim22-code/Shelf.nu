@@ -13,7 +13,7 @@ import { Td, Th } from "~/components/table";
 import { config } from "~/config/shelf.config";
 import { getPaginatedAndFilterableUsers } from "~/modules/user/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import { requireAdmin } from "~/utils/roles.server";
 import { getStripeCustomer } from "~/utils/stripe.server";
@@ -88,7 +88,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       tierItems,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }

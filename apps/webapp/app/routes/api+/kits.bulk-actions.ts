@@ -17,10 +17,10 @@ import { getTeamMember } from "~/modules/team-member/service.server";
 import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
 import {
-  isLikeShelfError,
+  isLikeEstoqueSoftSystemError,
   isNotFoundError,
-  makeShelfError,
-  ShelfError,
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
 } from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
@@ -98,7 +98,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
           organizationId,
           select: { id: true, userId: true },
         }).catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             title: "Team member not found",
             message: "The selected team member could not be found.",
@@ -108,14 +108,14 @@ export async function action({ request, context }: ActionFunctionArgs) {
             // `getTeamMember` already classifies its errors — forward that
             // decision so DB / connectivity failures inside it still reach
             // Sentry. Fall back to the Prisma not-found check otherwise.
-            shouldBeCaptured: isLikeShelfError(cause)
+            shouldBeCaptured: isLikeEstoqueSoftSystemError(cause)
               ? cause.shouldBeCaptured
               : !isNotFoundError(cause),
           });
         });
 
         if (isSelfService && teamMember.userId !== userId) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             title: "Action not allowed",
             message: "Self user can only assign custody to themselves only.",
@@ -158,7 +158,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
           if (
             custodies.some((custody) => custody.custodian.userId !== userId)
           ) {
-            throw new ShelfError({
+            throw new EstoqueSoftSystemError({
               cause: null,
               title: "Action not allowed",
               message: "Self user can release custody of themselves only.",
@@ -217,7 +217,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

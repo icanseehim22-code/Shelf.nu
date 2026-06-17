@@ -40,7 +40,7 @@ import {
   userPrefs,
 } from "~/utils/cookies.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { geolocate } from "~/utils/geolocate.server";
 import {
   payload,
@@ -133,7 +133,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
       }
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, locationId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -180,7 +180,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/locations`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     return data(error(reason), { status: reason.status });
   }
 }

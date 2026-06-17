@@ -21,7 +21,10 @@ import { db } from "~/database/db.server";
 import { useUserRoleHelper } from "~/hooks/user-user-role-helper";
 import { getTeamMemberNotes } from "~/modules/team-member-note/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -54,7 +57,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     });
 
     if (!teamMember) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "You are not a member of this workspace",
         status: 404,
@@ -77,7 +80,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       header,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }

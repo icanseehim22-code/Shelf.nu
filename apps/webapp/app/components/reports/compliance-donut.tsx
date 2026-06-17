@@ -2,7 +2,7 @@
  * Compliance Donut Chart
  *
  * Visual representation of on-time vs late booking returns.
- * Uses Tremor's DonutChart with Shelf's primary colors.
+ * Uses Tremor's DonutChart with EstoqueSoftSystem's primary colors.
  *
  * @see {@link file://../../components/dashboard/assets-by-status-chart.tsx}
  */

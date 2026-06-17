@@ -21,7 +21,11 @@ import { createUser, findUserByEmail } from "~/modules/user/service.server";
 import { generateUniqueUsername } from "~/modules/user/utils.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
-import { ShelfError, makeShelfError, notAllowedMethod } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import {
   payload,
@@ -48,12 +52,12 @@ export function loader({ context, request }: LoaderFunctionArgs) {
 }
 
 const OtpSchema = z.object({
-  otp: z.string().min(2, "Please enter the code sent to your email"),
+  otp: z.string().min(2, "Insira o código enviado para o seu e-mail"),
   email: z
     .string()
     .transform((email) => email.toLowerCase())
     .refine(validEmail, () => ({
-      message: "Please enter a valid email",
+      message: "Insira um e-mail válido",
     })),
 });
 
@@ -69,9 +73,9 @@ export async function action({ context, request }: ActionFunctionArgs) {
         } catch (cause) {
           return data(
             error(
-              new ShelfError({
+              new EstoqueSoftSystemError({
                 cause,
-                message: "Invalid request body",
+                message: "Corpo da requisição inválido",
                 label: "Request validation",
                 shouldBeCaptured: false,
                 status: 400,
@@ -126,7 +130,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }
@@ -174,7 +178,7 @@ export default function OtpPage() {
       });
     } catch {
       setMessage({
-        message: "Something went wrong. Please try again.",
+        message: "Algo deu errado. Tente novamente.",
         type: "error",
       });
     }
@@ -190,7 +194,7 @@ export default function OtpPage() {
         });
       } else {
         setMessage({
-          message: "Email sent successfully. Please check your inbox.",
+          message: "E-mail enviado com sucesso. Confira sua caixa de entrada.",
           type: "success",
         });
       }
@@ -242,9 +246,9 @@ export default function OtpPage() {
             className="mt-6 w-full text-center text-sm font-semibold"
             onClick={handleResendOtp}
           >
-            Did not receive a code?{" "}
+            Não recebeu o código?{" "}
             <span className="text-primary-500">
-              {fetcherDisabled ? "Sending code..." : "Send again"}
+              {fetcherDisabled ? "Enviando código..." : "Enviar novamente"}
             </span>
           </button>
         </div>

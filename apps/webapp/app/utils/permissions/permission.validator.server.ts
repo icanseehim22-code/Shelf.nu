@@ -6,7 +6,7 @@ import {
   type PermissionAction,
   type PermissionEntity,
 } from "./permission.data";
-import { ShelfError } from "../error";
+import { EstoqueSoftSystemError } from "../error";
 
 export interface PermissionCheckProps {
   organizationId: string;
@@ -28,7 +28,7 @@ export async function hasPermission(
       });
 
       if (!userOrg) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `User doesn't belong to organization`,
           status: 403,
@@ -62,7 +62,7 @@ export async function hasPermission(
 
     return validRoles.length > 0;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Error while checking permission",
       additionalData: { ...params },
@@ -75,7 +75,7 @@ export const validatePermission = async (props: PermissionCheckProps) => {
   const res = await hasPermission(props);
 
   if (!res) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Unauthorized",
       message: `You have no permission to perform this action`,

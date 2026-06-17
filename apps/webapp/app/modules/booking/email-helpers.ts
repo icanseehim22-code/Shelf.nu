@@ -6,7 +6,7 @@ import type { ClientHint } from "~/utils/client-hints";
 import { getDateTimeFormatFromHints } from "~/utils/client-hints";
 import { getTimeRemainingMessage } from "~/utils/date-fns";
 import { SERVER_URL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { resolveUserDisplayName } from "~/utils/user";
 import { BOOKING_INCLUDE_FOR_EMAIL } from "./constants";
@@ -60,7 +60,7 @@ To view the booking, follow the link below:
 ${SERVER_URL}/bookings/${bookingId}
 ${customEmailFooter ? `\n---\n${customEmailFooter}` : ""}
 Thanks,
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 };
 
@@ -133,7 +133,7 @@ export async function sendCheckinReminder(
     resolveUserDisplayName(booking.custodianUser) ||
     (booking.custodianTeamMember?.name as string);
 
-  const subject = `🔔 Checkin reminder (${booking.name}) - shelf.nu`;
+  const subject = `🔔 Checkin reminder (${booking.name}) - estoquesoftsystem.com`;
 
   const text = checkinReminderEmailContent({
     hints,
@@ -307,7 +307,7 @@ export async function sendBookingUpdatedEmail({
         booking.custodianTeamMember?.name) ??
       "";
 
-    const subject = `📝 Booking updated (${booking.name}) - shelf.nu`;
+    const subject = `📝 Booking updated (${booking.name}) - estoquesoftsystem.com`;
 
     const emailArgs: BasicEmailContentArgs = {
       bookingName: booking.name,
@@ -384,7 +384,7 @@ export async function sendBookingUpdatedEmail({
     }
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to send booking updated email",
         additionalData: { bookingId },

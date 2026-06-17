@@ -21,7 +21,7 @@ import { SENTRY_DSN } from "~/utils/env";
 import {
   isAbortError,
   isHandledClientError,
-  isLikeShelfError,
+  isLikeEstoqueSoftSystemError,
 } from "~/utils/error";
 
 /**
@@ -97,10 +97,10 @@ if (SENTRY_DSN) {
 /**
  * Filter for ERROR events (not transactions). Drops:
  *  - non-Error exceptions
- *  - ShelfError instances flagged `shouldBeCaptured: false`
- *  - client-disconnect / abort errors that bypass `makeShelfError`
+ *  - EstoqueSoftSystemError instances flagged `shouldBeCaptured: false`
+ *  - client-disconnect / abort errors that bypass `makeEstoqueSoftSystemError`
  *
- * Also redacts the auth-session cookie and attaches our ShelfError
+ * Also redacts the auth-session cookie and attaches our EstoqueSoftSystemError
  * metadata as Sentry tags / extras.
  */
 function handleBeforeSendError<E extends Event>(event: E, hint: EventHint) {
@@ -108,12 +108,12 @@ function handleBeforeSendError<E extends Event>(event: E, hint: EventHint) {
 
   if (
     !(exception instanceof Error) ||
-    (isLikeShelfError(exception) && !exception.shouldBeCaptured)
+    (isLikeEstoqueSoftSystemError(exception) && !exception.shouldBeCaptured)
   ) {
     return null;
   }
 
-  // Drop aborted-request errors that bypass `makeShelfError` — usually thrown
+  // Drop aborted-request errors that bypass `makeEstoqueSoftSystemError` — usually thrown
   // raw from streaming handlers or middleware when a client disconnects.
   if (isAbortError(exception)) {
     return null;
@@ -141,21 +141,21 @@ function handleBeforeSendError<E extends Event>(event: E, hint: EventHint) {
     ...event,
     ...context,
     // Merge tags so scope-set values (e.g. organizationId from
-    // requirePermission) survive the ShelfError-derived overlay.
+    // requirePermission) survive the EstoqueSoftSystemError-derived overlay.
     // Without this merge the spread above would clobber event.tags
     // with only { label, shelf_trace_id } and we'd lose org filtering
     // on error events. Same applies to extras.
     tags: { ...(event.tags ?? {}), ...context.tags },
     extra: { ...(event.extra ?? {}), ...context.extra },
     // Prefer the explicit user we set in requirePermission; only fall
-    // back to the ShelfError-extracted id if the scope didn't have one.
+    // back to the EstoqueSoftSystemError-extracted id if the scope didn't have one.
     user: event.user ?? context.user,
   };
 }
 
 /**
  * Keys whose values are credentials/secrets and must NEVER reach Sentry, even
- * if one slips into a ShelfError's `additionalData`. Defense-in-depth: callers
+ * if one slips into a EstoqueSoftSystemError's `additionalData`. Defense-in-depth: callers
  * shouldn't put secrets in `additionalData` in the first place, but this
  * guarantees a stray one can't be spread into the captured event's `extra`.
  */
@@ -193,12 +193,12 @@ function redactValue(value: unknown, seen: WeakSet<object>): unknown {
 }
 
 /**
- * Redact a ShelfError's `additionalData` for safe inclusion in a Sentry event's
+ * Redact a EstoqueSoftSystemError's `additionalData` for safe inclusion in a Sentry event's
  * `extra`. Non-object input yields an empty object so the result is spreadable.
  * Defense-in-depth: callers must still avoid putting secrets in `additionalData`
  * at all — this guarantees a stray one (at any depth) can't reach Sentry.
  *
- * @param data - A ShelfError's `additionalData`
+ * @param data - A EstoqueSoftSystemError's `additionalData`
  * @returns A deep copy with secret-keyed values replaced by `"[redacted]"`
  */
 function redactSecrets(data: unknown): Record<string, unknown> {
@@ -209,16 +209,16 @@ function redactSecrets(data: unknown): Record<string, unknown> {
 }
 
 /**
- * Build a Sentry overlay (user / tags / extras) from a ShelfError.
+ * Build a Sentry overlay (user / tags / extras) from a EstoqueSoftSystemError.
  *
- * Returns `undefined` for anything that isn't a ShelfError so the caller
+ * Returns `undefined` for anything that isn't a EstoqueSoftSystemError so the caller
  * can fall through to the scope-derived event without overlaying noisy
  * fallback tags ("Unknown" / "?"). Plain Errors that bubble up still get
  * captured — they just don't gain Shelf-specific tagging they can't
  * provide meaningful values for.
  */
 function makeSentryContext(exception: unknown) {
-  if (!isLikeShelfError(exception)) {
+  if (!isLikeEstoqueSoftSystemError(exception)) {
     return;
   }
 

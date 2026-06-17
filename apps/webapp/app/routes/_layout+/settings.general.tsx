@@ -38,7 +38,10 @@ import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { resolveShowShelfBranding } from "~/utils/branding";
 import { DEFAULT_MAX_IMAGE_UPLOAD_SIZE } from "~/utils/constants";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -107,7 +110,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
           },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "User not found",
             additionalData: { userId, organizationId },
@@ -161,7 +164,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       premiumIsEnabled,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -239,7 +242,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
         /** User is allowed to edit his/her current organization only not other organizations. */
         if (currentOrganization.id !== id) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "You are not allowed to edit this organization.",
             label: "Organization",
@@ -263,7 +266,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
           });
         } catch (parseError) {
           if (parseError instanceof MaxFileSizeExceededError) {
-            const reason = new ShelfError({
+            const reason = new EstoqueSoftSystemError({
               cause: parseError,
               message: `Image size exceeds maximum allowed size of ${
                 DEFAULT_MAX_IMAGE_UPLOAD_SIZE / (1024 * 1024)
@@ -276,7 +279,10 @@ export async function action({ context, request }: ActionFunctionArgs) {
             return data(error(reason), { status: reason.status });
           }
 
-          const reason = makeShelfError(parseError, { userId, organizationId });
+          const reason = makeEstoqueSoftSystemError(parseError, {
+            userId,
+            organizationId,
+          });
           return data(error(reason), { status: reason.status });
         }
 
@@ -318,7 +324,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
         /** User is allowed to edit his/her current organization only not other organizations. */
         if (currentOrganization.id !== id) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "You are not allowed to edit this organization.",
             label: "Organization",
@@ -347,7 +353,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
       case "sso": {
         if (role !== OrganizationRoles.OWNER) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             title: "Permission denied",
             message: "You are not allowed to edit SSO settings.",
@@ -356,7 +362,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         }
 
         if (!currentOrganization.enabledSso) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "SSO is not enabled for this organization.",
             label: "Settings",
@@ -375,7 +381,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
         /** User is allowed to edit his/her current organization only not other organizations. */
         if (currentOrganization.id !== id) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "You are not allowed to edit this organization.",
             label: "Organization",
@@ -426,7 +432,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         return redirect("/assets");
       }
       default: {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Invalid action",
           additionalData: { intent },
@@ -435,7 +441,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     // File size errors are now handled in the validation above
     return data(error(reason), { status: reason.status });
   }
@@ -466,8 +472,8 @@ export default function GeneralPage() {
         </p>
         <p className=" font-italic mb-2 text-sm text-gray-600">
           IMPORTANT NOTE: QR codes will not be included in the export. Due to
-          the nature of how Shelf's QR codes work, they currently cannot be
-          exported with assets because they have unique ids. <br />
+          the nature of how EstoqueSoftSystem's QR codes work, they currently
+          cannot be exported with assets because they have unique ids. <br />
           Importing a backup will just create a new QR code for each asset.
         </p>
         <ExportBackupButton canExportAssets={canExportAssets} />

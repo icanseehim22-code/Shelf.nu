@@ -10,7 +10,7 @@ import {
 } from "~/modules/tier/service.server";
 import { SERVER_URL, STRIPE_SECRET_KEY } from "./env";
 import type { ErrorLabel } from "./error";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 
 const label: ErrorLabel = "Stripe";
 export const premiumIsEnabled = config.enablePremiumFeatures;
@@ -49,7 +49,7 @@ export function getDomainUrl(request: Request) {
     request.headers.get("X-Forwarded-Host") ?? request.headers.get("host");
 
   if (!host) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Could not determine domain URL.",
 
@@ -86,7 +86,7 @@ export async function createStripeCheckoutSession({
 }): Promise<string> {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { priceId, userId, domainUrl, customerId },
@@ -97,7 +97,7 @@ export async function createStripeCheckoutSession({
     const SECRET_KEY = STRIPE_SECRET_KEY;
 
     if (!SECRET_KEY) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe secret key not found",
         additionalData: { priceId, userId, domainUrl, customerId },
@@ -157,7 +157,7 @@ export async function createStripeCheckoutSession({
     });
 
     if (!url) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No url found in stripe checkout session response",
         additionalData: { priceId, userId, domainUrl, customerId },
@@ -166,7 +166,7 @@ export async function createStripeCheckoutSession({
     }
     return url;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating a checkout session. Please try again later or contact support.",
@@ -188,7 +188,7 @@ export async function getStripePricesAndProducts() {
       };
     }
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         label,
@@ -212,7 +212,7 @@ export async function getStripePricesAndProducts() {
 
     return groupPricesByInterval(filteredPrices);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching prices and products from Stripe. Please try again later or contact support.",
@@ -249,7 +249,7 @@ export async function getStripePricesForTrialPlanSelection() {
       ),
     ];
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching prices and products from Stripe. Please try again later or contact support.",
@@ -290,7 +290,7 @@ function groupPricesByInterval(prices: PriceWithProduct[]) {
  * and return the customerId.
  * @param user - The user object containing id, email, firstName, lastName, and customerId
  * @returns The customerId of the user in Stripe
- * @throws ShelfError if no customerId is found for the user
+ * @throws EstoqueSoftSystemError if no customerId is found for the user
  */
 export async function getOrCreateCustomerId(
   user: Pick<User, "id" | "email" | "firstName" | "lastName" | "customerId">
@@ -308,7 +308,7 @@ export async function getOrCreateCustomerId(
       });
 
   if (!customerId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "No customer ID found for user",
       additionalData: { user },
@@ -347,7 +347,7 @@ export const createStripeCustomer = async ({
       return customerId;
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to create customer in Stripe",
       additionalData: { email, name, userId },
@@ -363,7 +363,7 @@ export const getStripeCustomer = async (customerId: string) => {
       expand: ["subscriptions"],
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to retrieve customer from Stripe",
       additionalData: { customerId },
@@ -396,7 +396,7 @@ export const getCustomerSubscriptionsWithProducts = async (
 
     return subscriptions;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to retrieve subscriptions from Stripe",
       additionalData: { customerId },
@@ -418,7 +418,7 @@ export async function createBillingPortalSession({
 
     return { url };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating a billing portal session. Please try again later or contact support.",
@@ -472,7 +472,7 @@ export async function fetchStripeSubscription(id: string) {
       expand: ["items.data.plan.product"],
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch subscription from Stripe",
       additionalData: { id },
@@ -525,7 +525,7 @@ export async function getDataFromStripeEvent(event: Stripe.Event) {
       hasBarcodeAddon: !!barcodeItem,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching data from Stripe event",
       additionalData: { event },
@@ -585,7 +585,7 @@ export async function createTeamTrialSubscription({
 }) {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { customerId, priceId, userId },
@@ -631,7 +631,7 @@ export async function createTeamTrialSubscription({
 
     return { subscription, hasPaymentMethod: !!defaultPaymentMethod };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating team trial subscription. Please try again later or contact support.",
@@ -699,7 +699,7 @@ export async function getCustomerOpenInvoices(customerId: string) {
     });
     return invoices.data;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch open invoices",
       additionalData: { customerId },
@@ -738,7 +738,7 @@ export async function getCustomerPaidInvoices(customerId: string, limit = 10) {
     });
     return invoices.data;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch paid invoices",
       additionalData: { customerId },
@@ -749,7 +749,7 @@ export async function getCustomerPaidInvoices(customerId: string, limit = 10) {
 
 /**
  * Retrieves Stripe customer data and builds a deduplicated email list.
- * Use this when sending subscription-related emails to both Stripe and Shelf emails.
+ * Use this when sending subscription-related emails to both Stripe and EstoqueSoftSystem emails.
  */
 export async function getCustomerNotificationData({
   customerId,
@@ -764,7 +764,7 @@ export async function getCustomerNotificationData({
   const stripeName =
     stripeCustomer && !stripeCustomer.deleted ? stripeCustomer.name : null;
 
-  // Deduplicate emails (Stripe email + Shelf user email)
+  // Deduplicate emails (Stripe email + EstoqueSoftSystem user email)
   const emailsToNotify = new Set<string>();
   if (stripeEmail) emailsToNotify.add(stripeEmail.toLowerCase());
   if (user.email) emailsToNotify.add(user.email.toLowerCase());
@@ -777,7 +777,7 @@ export async function getCustomerNotificationData({
 
 /**
  * Prepares invoice notification data and returns deduplicated email list.
- * Use this when sending invoice-related emails to both Stripe and Shelf emails.
+ * Use this when sending invoice-related emails to both Stripe and EstoqueSoftSystem emails.
  */
 export async function getInvoiceNotificationData({
   customerId,
@@ -794,7 +794,7 @@ export async function getInvoiceNotificationData({
   });
 
   const subscriptionName =
-    invoice.lines?.data?.[0]?.description || "Shelf Subscription";
+    invoice.lines?.data?.[0]?.description || "EstoqueSoftSystem Subscription";
   const amountDue = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: invoice.currency,
@@ -859,7 +859,7 @@ export async function getCustomerUpcomingInvoices(
       (invoice): invoice is NonNullable<typeof invoice> => invoice !== null
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch upcoming invoices",
       additionalData: { customerId: customer.id },
@@ -905,7 +905,7 @@ export async function getUserActiveSubscription(
 
     return getCustomerActiveSubscription({ customer });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get user active subscription",
       additionalData: { userId },
@@ -939,7 +939,7 @@ export async function getUserActiveSubscriptions(
       (sub) => sub.status === "active" || sub.status === "trialing"
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get user active subscriptions",
       additionalData: { userId },
@@ -1036,7 +1036,7 @@ export async function getOwnerSubscriptionInfo(
       tierId: user.tierId,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get owner subscription info",
       additionalData: { ownerId, organizationId },
@@ -1067,7 +1067,7 @@ export async function transferSubscriptionToCustomer({
 }): Promise<Stripe.Subscription> {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { subscriptionId, newCustomerId },
@@ -1085,7 +1085,7 @@ export async function transferSubscriptionToCustomer({
     // In newer Stripe API, current_period_end is on subscription items
     const firstItem = existingSubscription.items.data[0];
     if (!firstItem) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Subscription has no items",
         additionalData: { subscriptionId },
@@ -1161,7 +1161,7 @@ export async function transferSubscriptionToCustomer({
 
     return newSubscription;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to transfer subscription to new customer",
       additionalData: { subscriptionId, newCustomerId },
@@ -1207,7 +1207,7 @@ export async function customerHasPaymentMethod(
 
     return !!customer.default_source;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to check customer payment method",
       additionalData: { customerId },

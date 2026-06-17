@@ -2,7 +2,10 @@ import type { LoaderFunctionArgs } from "react-router";
 import { data } from "react-router";
 import { z } from "zod";
 import { getWorkingHoursForOrganization } from "~/modules/working-hours/service.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -31,7 +34,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     // Ensure the requested org matches the user's current org
     if (paramOrgId !== organizationId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Organization access denied",
         label: "Working hours",
@@ -55,7 +58,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

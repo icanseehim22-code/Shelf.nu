@@ -31,7 +31,7 @@ import type {
   AssetFromQr,
   KitFromQr,
 } from "~/routes/api+/get-scanned-item.$qrId";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { objectToFormData } from "~/utils/object-to-form-data";
 import { tw } from "~/utils/tw";
 import {
@@ -275,7 +275,7 @@ function ReleaseCustodyForm({ disableSubmit }: { disableSubmit: boolean }) {
               ...state,
               assetStatus: "error",
               assetErrorMessage:
-                error instanceof ShelfError
+                error instanceof EstoqueSoftSystemError
                   ? error.message
                   : "Something went wrong while releasing custody. Please try again.",
             }));
@@ -317,7 +317,7 @@ function ReleaseCustodyForm({ disableSubmit }: { disableSubmit: boolean }) {
               ...state,
               kitStatus: "error",
               kitErrorMessage:
-                error instanceof ShelfError
+                error instanceof EstoqueSoftSystemError
                   ? error.message
                   : "Something went wrong while releasing custody. Please try again.",
             }));

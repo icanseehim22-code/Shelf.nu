@@ -8,7 +8,7 @@ import {
   type UserFriendlyRoles,
 } from "~/routes/_layout+/settings.team";
 import { updateCookieWithPerPage } from "~/utils/cookies.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { getCurrentSearchParams } from "~/utils/http.server";
 import { getParamsValues } from "~/utils/list";
 
@@ -126,7 +126,7 @@ export async function getPaginatedAndFilterableSettingUsers({
       totalItems,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while getting registered users",
       additionalData: { organizationId },
@@ -198,7 +198,7 @@ export async function getPaginatedAndFilterableSettingTeamMembers({
       teamMembers,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while getting team members",
       additionalData: { organizationId },

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { FailureReason } from "./error";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import {
   isGet,
   getCurrentPath,
@@ -174,8 +174,12 @@ describe(safeRedirect.name, () => {
     expect(safeRedirect("/__manifest")).toBe("/");
     // Absolute allow-list is matched by origin, not prefix: a host that merely
     // begins with SERVER_URL, or hides it in userinfo, must not pass.
-    expect(safeRedirect("https://app.shelf.nu.evil.com/phish")).toBe("/");
-    expect(safeRedirect("https://app.shelf.nu@evil.com/phish")).toBe("/");
+    expect(
+      safeRedirect("https://app.estoquesoftsystem.com.evil.com/phish")
+    ).toBe("/");
+    expect(
+      safeRedirect("https://app.estoquesoftsystem.com@evil.com/phish")
+    ).toBe("/");
   });
 });
 
@@ -199,7 +203,7 @@ describe(error.name, () => {
       label: "Unknown",
     };
 
-    const result = error(new ShelfError(reason));
+    const result = error(new EstoqueSoftSystemError(reason));
 
     expect(result).toEqual({
       error: {
@@ -218,7 +222,7 @@ describe(error.name, () => {
       title: "Oops!",
     };
 
-    const result = error(new ShelfError(reason));
+    const result = error(new EstoqueSoftSystemError(reason));
 
     expect(result).toEqual({
       error: {
@@ -238,7 +242,7 @@ describe(error.name, () => {
       additionalData: { key: "value" },
     };
 
-    const result = error(new ShelfError(reason));
+    const result = error(new EstoqueSoftSystemError(reason));
 
     expect(result).toEqual({
       error: {
@@ -251,7 +255,7 @@ describe(error.name, () => {
   });
 
   it("should log the cause", () => {
-    const cause = new ShelfError({
+    const cause = new EstoqueSoftSystemError({
       cause: null,
       message: "An error occurred",
       label: "Unknown",
@@ -263,7 +267,7 @@ describe(error.name, () => {
   });
 
   it("records a handled client error to the log trail", () => {
-    const cause = new ShelfError({
+    const cause = new EstoqueSoftSystemError({
       cause: null,
       message: "Validation failed",
       label: "Request validation",
@@ -281,7 +285,7 @@ describe(error.name, () => {
     // Clear first — earlier tests in this describe call error() and the
     // Logger mocks accumulate (no beforeEach in this block).
     vitest.clearAllMocks();
-    const cause = new ShelfError({
+    const cause = new EstoqueSoftSystemError({
       cause: null,
       message: "Request aborted",
       label: "Request aborted",
@@ -395,8 +399,8 @@ describe(parseData.name, () => {
     try {
       parseData(params, z.object({ id: z.string() }));
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      const error = e as ShelfError;
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      const error = e as EstoqueSoftSystemError;
       expect(error.status).toEqual(400);
       // Uses the first validation error message for better UX
       expect(error.message).toEqual("Required");
@@ -423,8 +427,8 @@ describe(parseData.name, () => {
         },
       });
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
-      const error = e as ShelfError;
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
+      const error = e as EstoqueSoftSystemError;
       expect(error.status).toEqual(400);
       expect(error.title).toEqual("Oops!");
       expect(error.message).toEqual("Params are invalid!");

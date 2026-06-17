@@ -3,7 +3,10 @@ import { z } from "zod";
 import { db } from "~/database/db.server";
 import { setSelectedOrganizationIdCookie } from "~/modules/organization/context.server";
 import { setCookie } from "~/utils/cookies.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, parseData, safeRedirect } from "~/utils/http.server";
 import { Logger } from "~/utils/logger";
 
@@ -34,7 +37,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     });
 
     if (!membership) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "You are not a member of this organization.",
         status: 403,
@@ -43,7 +46,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     }
 
     if (membership.user.sso && membership.organization.type === "PERSONAL") {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "SSO users cannot access personal workspaces.",
         status: 403,
@@ -74,7 +77,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       ],
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

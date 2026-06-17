@@ -1,7 +1,7 @@
 import type { AssetReminder } from "@prisma/client";
 import { isBefore } from "date-fns";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { QueueNames, scheduler } from "~/utils/scheduler.server";
 
@@ -41,7 +41,7 @@ export async function scheduleAssetReminder({
       data: { activeSchedulerReference: reference },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while schedulng asset alert",
       label: "Asset Scheduler",
@@ -71,7 +71,7 @@ export async function cancelAssetReminderScheduler(
     await scheduler.cancel(reminder.activeSchedulerReference);
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to cancel asset reminder scheduler",
         additionalData: { ...reminder },

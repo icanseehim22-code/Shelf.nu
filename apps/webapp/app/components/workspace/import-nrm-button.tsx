@@ -16,8 +16,8 @@ export const ImportNrmButton = ({
         ? {
             reason: (
               <>
-                Importing is not available on the free tier of shelf.{" "}
-                <UpgradeMessage />
+                Importing is not available on the free tier of
+                EstoqueSoftSystem. <UpgradeMessage />
               </>
             ),
           }

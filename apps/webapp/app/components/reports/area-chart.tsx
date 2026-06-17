@@ -1,7 +1,7 @@
 /**
  * Area Chart Component
  *
- * Time-series area chart built on Recharts with Shelf's design tokens.
+ * Time-series area chart built on Recharts with EstoqueSoftSystem's design tokens.
  * Optimized for reports: clean axes, minimal gridlines, monochrome palette.
  *
  * Features:
@@ -27,7 +27,7 @@ import {
 
 import type { ChartSeries } from "~/modules/reports/types";
 
-/** Shelf's color palette for charts */
+/** EstoqueSoftSystem's color palette for charts */
 const CHART_COLORS = {
   primary: "#101828", // gray-900
   primaryLight: "#344054", // gray-700

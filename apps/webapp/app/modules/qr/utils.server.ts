@@ -5,7 +5,10 @@ import QRCode, {
 } from "qrcode-generator";
 import { SERVER_URL, URL_SHORTENER } from "~/utils/env";
 import type { ErrorLabel } from "~/utils/error";
-import { isLikeShelfError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { gifToPng } from "~/utils/gif-to-png";
 // eslint-disable-next-line import/no-cycle
 import { createQr, getQrByAssetId, getQrByKitId } from "./service.server";
@@ -52,7 +55,7 @@ export async function generateCode({
       },
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while generating the QR code. Please try again or contact support.",
@@ -75,7 +78,7 @@ export async function generateQrObj({
 }) {
   try {
     if (!kitId && !assetId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No kitId or assetId provided",
         label: "QR",
@@ -114,9 +117,9 @@ export async function generateQrObj({
       showSidebar: true,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Failed to find qr code",
       additionalData: { kitId, assetId, organizationId, userId },

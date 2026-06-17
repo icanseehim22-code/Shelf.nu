@@ -10,7 +10,7 @@ import type { HonoServerOptions } from "react-router-hono-server/node";
 import { createHonoServer } from "react-router-hono-server/node";
 import { getSession, session } from "remix-hono/session";
 import { initEnv } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { runWithTabId } from "~/utils/tab-id.server";
 
 import { logger } from "./logger";
@@ -57,7 +57,7 @@ export const getLoadContext: HonoServerOptions<ServerEnv>["getLoadContext"] = (
       const auth = session.get(authSessionKey);
 
       if (!auth) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "There is no session here. This should not happen because if you require it, this route should be mark as protected and catch by the protect middleware.",

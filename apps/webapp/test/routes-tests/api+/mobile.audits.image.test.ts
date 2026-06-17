@@ -73,11 +73,11 @@ vi.mock("~/modules/audit/helpers.server", () => ({
 
 // why: control error formatting in the catch block
 vi.mock("~/utils/error", () => ({
-  makeShelfError: vi.fn((cause: any) => ({
+  makeEstoqueSoftSystemError: vi.fn((cause: any) => ({
     message: cause?.message || "Unknown error",
     status: cause?.status || 500,
   })),
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     status: number;
     constructor(opts: any) {
       super(opts.message);

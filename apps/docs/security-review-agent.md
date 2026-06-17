@@ -1,6 +1,6 @@
 # Security Review Agent
 
-Shelf ships with a Claude-powered security reviewer that runs automatically
+EstoqueSoftSystem ships with a Claude-powered security reviewer that runs automatically
 on `git commit` against security-sensitive diffs. It catches the regressions
 the team has hit most often — cross-org IDORs, missing `requirePermission`
 gates, open redirects, missing Zod validation, audit-trail gaps — before the
@@ -11,7 +11,7 @@ report, and (by default) lets the commit proceed. It does not edit code.
 
 ## Components
 
-There are **two** agent variants — the same Shelf-specific checklist, but
+There are **two** agent variants — the same EstoqueSoftSystem-specific checklist, but
 different capability boundaries for different invocation contexts.
 
 | File                                                 | Role                                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -90,7 +90,7 @@ sensitive directory:
 
 ## What the agent checks
 
-The agent operates against a Shelf-specific checklist baked into
+The agent operates against a EstoqueSoftSystem-specific checklist baked into
 `.claude/agents/shelf-security-reviewer.md`. High-impact items:
 
 - **Cross-org IDOR** — missing `organizationId` filters on `findUnique` /
@@ -111,7 +111,7 @@ The agent operates against a Shelf-specific checklist baked into
   matching `ENABLE ROW LEVEL SECURITY` line in the same PR (a `CREATE TABLE`
   without it is High, or Critical for credential/token/PII/tenant tables —
   this is the `MobileAuthCode` regression of 2026-06-16). Policies are a
-  separate, weaker requirement: Shelf's norm is RLS-enabled-with-no-policies,
+  separate, weaker requirement: EstoqueSoftSystem's norm is RLS-enabled-with-no-policies,
   so missing `CREATE POLICY` is only flagged for tables read directly by a
   Supabase client. Direct-Prisma access to per-tenant data is flagged where
   RLS-enforcing Supabase access would be safer.
@@ -413,7 +413,7 @@ genuinely security-relevant but doesn't match the allow-list, add it to
 
 ## Customizing the agent
 
-The Shelf-specific checklist lives in
+The EstoqueSoftSystem-specific checklist lives in
 `.claude/agents/shelf-security-reviewer.md`. Anyone with the repo can
 extend it — for example, adding a new auth pattern to enforce, or a new
 historical incident class to flag. Changes are picked up on the next

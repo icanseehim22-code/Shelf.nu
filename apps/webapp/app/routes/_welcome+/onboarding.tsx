@@ -48,7 +48,10 @@ import { getUserByID, updateUser } from "~/modules/user/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
 import { SMTP_FROM } from "~/utils/env";
-import { isZodValidationError, makeShelfError } from "~/utils/error";
+import {
+  isZodValidationError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { getValidationErrors } from "~/utils/http";
 import {
@@ -280,7 +283,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
     const title = "Set up your account";
     const subHeading =
-      "You are almost ready to use Shelf. We just need some basic information to get you started.";
+      "You are almost ready to use EstoqueSoftSystem. We just need some basic information to get you started.";
 
     return payload({
       title,
@@ -295,7 +298,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       organizationId: verifiedOrganizationId,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -459,10 +462,12 @@ export async function action({ context, request }: ActionFunctionArgs) {
     if (config.sendOnboardingEmail) {
       /** Send onboarding email */
       sendEmail({
-        from: SMTP_FROM || `"Carlos from shelf.nu" <carlos@emails.shelf.nu>`,
-        replyTo: "carlos@shelf.nu",
+        from:
+          SMTP_FROM ||
+          `"Carlos from estoquesoftsystem.com" <carlos@emails.estoquesoftsystem.com>`,
+        replyTo: "carlos@estoquesoftsystem.com",
         to: user.email,
-        subject: "🏷️ Welcome to Shelf - can I ask you a question?",
+        subject: "🏷️ Welcome to EstoqueSoftSystem - can I ask you a question?",
         text: onboardingEmailText({ firstName: user.firstName as string }),
       });
     }
@@ -483,7 +488,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       headers,
     });
   } catch (cause) {
-    const reason = makeShelfError(
+    const reason = makeEstoqueSoftSystemError(
       cause,
       { userId },
       !isZodValidationError(cause)
@@ -580,7 +585,7 @@ export default function Onboarding() {
         <div>
           <Input
             label="Username"
-            addOn="shelf.nu/"
+            addOn="estoquesoftsystem.com/"
             autoComplete="username"
             required
             type="text"
@@ -663,7 +668,7 @@ export default function Onboarding() {
             <When truthy={!isPersonalUse && requireCompanyName}>
               <Input
                 label="Company/Organization"
-                placeholder="Shelf Inc."
+                placeholder="EstoqueSoftSystem Inc."
                 name={zo.fields.companyName()}
                 error={zo.errors.companyName()?.message}
                 defaultValue={companyNameDefault}
@@ -689,7 +694,7 @@ export default function Onboarding() {
                 className="flex w-full items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-left font-medium text-gray-700 hover:bg-gray-100"
               >
                 <span>
-                  Help us customize Shelf
+                  Help us customize EstoqueSoftSystem
                   <span className="ml-1 text-sm font-normal text-gray-500">
                     (optional)
                   </span>

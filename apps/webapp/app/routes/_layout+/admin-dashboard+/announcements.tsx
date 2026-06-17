@@ -7,7 +7,10 @@ import { Button } from "~/components/shared/button";
 import { Table, Td, Th, Tr } from "~/components/table";
 import { db } from "~/database/db.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import { parseMarkdownToReact } from "~/utils/md";
 import { requireAdmin } from "~/utils/roles.server";
@@ -28,7 +31,7 @@ export const loader = async ({ context }: LoaderFunctionArgs) => {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to load announcements",
           additionalData: { userId },
@@ -43,7 +46,7 @@ export const loader = async ({ context }: LoaderFunctionArgs) => {
       })),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 };
@@ -73,7 +76,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to update announcement",
           additionalData: { userId, published, announcementId },
@@ -83,7 +86,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
     return payload(null);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 };

@@ -21,7 +21,11 @@ import {
 } from "~/modules/booking-note/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -72,7 +76,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     return payload({ booking: { ...booking, notes: bookingNotes }, header });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -123,7 +127,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     });
 
     if (!booking) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Booking not found or access denied",
         additionalData: { userId, bookingId, organizationId },
@@ -189,7 +193,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     return data(error(reason), { status: reason.status });
   }
 }

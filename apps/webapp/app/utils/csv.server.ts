@@ -48,7 +48,7 @@ import { getDateTimeFormat } from "./client-hints";
 import { getAdvancedFiltersFromRequest } from "./cookies.server";
 import { formatCurrency } from "./currency";
 import { SERVER_URL } from "./env";
-import { isLikeShelfError, ShelfError } from "./error";
+import { isLikeEstoqueSoftSystemError, EstoqueSoftSystemError } from "./error";
 import { ALL_SELECTED_KEY } from "./list";
 import { cleanMarkdownFormatting } from "./markdown-cleaner";
 import { sanitizeNoteContent } from "./note-sanitizer.server";
@@ -139,7 +139,7 @@ export const csvDataFromRequest = async ({ request }: { request: Request }) => {
     return parsed;
   } catch (cause) {
     if (isMaxFileSizeError(cause)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         title: "File too large",
         message:
@@ -149,7 +149,7 @@ export const csvDataFromRequest = async ({ request }: { request: Request }) => {
       });
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         cause instanceof CsvError
@@ -248,7 +248,7 @@ export async function exportAssetsBackupToCsv({
     });
 
     if (!csvData || !csvData.length) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "No assets to export",
         message:
@@ -274,9 +274,9 @@ export async function exportAssetsBackupToCsv({
 
     return csvString;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while exporting the assets.",
       additionalData: { organizationId },
@@ -617,7 +617,7 @@ const formatCustomFieldForCsv = (
  * @param canSeeAllBookings - Whether the user may export bookings they don't own
  * @param organizationId - The active workspace; scopes every booking read
  * @returns The CSV body as a single CRLF-joined string
- * @throws {ShelfError} If fetching bookings or building rows fails
+ * @throws {EstoqueSoftSystemError} If fetching bookings or building rows fails
  */
 export async function exportBookingsFromIndexToCsv({
   request,
@@ -707,11 +707,11 @@ export async function exportBookingsFromIndexToCsv({
     return csvData.join("\r\n");
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk archive booking.";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: { bookingsIds, organizationId },
@@ -1191,10 +1191,10 @@ export async function exportNRMsToCsv({
 
     return buildCsvExportDataFromTeamMembers({ teamMembers });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Team Member",
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while exporting NRMs to csv.",
       additionalData: { nrmIds, organizationId },
@@ -1250,7 +1250,7 @@ export function buildCsvExportDataFromTeamMembers({
     // Join rows with CRLF as per CSV spec
     return finalCsv.join("\r\n");
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Team Member",
       message:

@@ -1,5 +1,5 @@
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import {
   getBookingSettingsForOrganization,
@@ -161,7 +161,7 @@ describe("getBookingSettingsForOrganization", () => {
     expect(result).toEqual(defaultSettings);
   });
 
-  it("should throw ShelfError when database operation fails", async () => {
+  it("should throw EstoqueSoftSystemError when database operation fails", async () => {
     expect.assertions(2);
     const dbError = new Error("Database connection failed");
     //@ts-expect-error missing vitest type
@@ -169,7 +169,7 @@ describe("getBookingSettingsForOrganization", () => {
 
     await expect(
       getBookingSettingsForOrganization(mockOrganizationId)
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     await expect(
       getBookingSettingsForOrganization(mockOrganizationId)
@@ -183,7 +183,7 @@ describe("getBookingSettingsForOrganization", () => {
     expect.assertions(1);
 
     await expect(getBookingSettingsForOrganization("")).rejects.toThrow(
-      ShelfError
+      EstoqueSoftSystemError
     );
   });
 });
@@ -656,7 +656,7 @@ describe("updateBookingSettings", () => {
     expect(result).toEqual(updatedSettings);
   });
 
-  it("should throw ShelfError when database operation fails", async () => {
+  it("should throw EstoqueSoftSystemError when database operation fails", async () => {
     expect.assertions(2);
     const dbError = new Error("Database connection failed");
     //@ts-expect-error missing vitest type
@@ -667,7 +667,7 @@ describe("updateBookingSettings", () => {
         organizationId: mockOrganizationId,
         bufferStartTime: 24,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     await expect(
       updateBookingSettings({
@@ -701,7 +701,7 @@ describe("updateBookingSettings", () => {
         organizationId: "non-existent-org",
         bufferStartTime: 24,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     await expect(
       updateBookingSettings({
@@ -730,7 +730,7 @@ describe("updateBookingSettings", () => {
         organizationId: "",
         bufferStartTime: 24,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should not call update when no fields are provided", async () => {

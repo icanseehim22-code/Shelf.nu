@@ -1,5 +1,5 @@
 /**
- * Shelf brand wordmark — the word "shelf" rendered as SVG vector paths.
+ * EstoqueSoftSystem brand wordmark — the word "shelf" rendered as SVG vector paths.
  *
  * Source: `apps/webapp/public/static/images/shelf-typography.svg`
  * Original viewBox: 61 x 32 (aspect ratio ≈ 1.906:1).

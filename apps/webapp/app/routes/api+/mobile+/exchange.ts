@@ -16,7 +16,11 @@ import {
   deleteExpiredMobileAuthCodes,
   redeemMobileAuthCode,
 } from "~/modules/auth/mobile-sso.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { getActionMethod, logException } from "~/utils/http.server";
 
 const ExchangeSchema = z.object({
@@ -53,7 +57,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const body = await request.json().catch(() => null);
     const parsed = ExchangeSchema.safeParse(body);
     if (!parsed.success) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Authorization code is required",
         label: "Auth",
@@ -76,7 +80,7 @@ export async function action({ request }: ActionFunctionArgs) {
       refreshToken: authSession.refreshToken,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     // why: this resource route returns failures as JSON (the companion app
     // parses `{ error }`) and never re-throws, so without an explicit log a
     // genuine 5xx (Supabase mint outage, broken auth contract, DB fault) would

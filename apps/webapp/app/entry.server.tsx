@@ -12,7 +12,7 @@ import { registerAddonTrialWorkers } from "./modules/addon-trial/worker.server";
 import { regierAssetWorkers } from "./modules/asset-reminder/worker.server";
 import { registerAuditWorkers } from "./modules/audit/worker.server";
 import { registerBookingWorkers } from "./modules/booking/worker.server";
-import { ShelfError } from "./utils/error";
+import { EstoqueSoftSystemError } from "./utils/error";
 import { Logger } from "./utils/logger";
 import * as schedulerService from "./utils/scheduler.server";
 export * from "../server";
@@ -26,7 +26,7 @@ schedulerService
         .then(() => console.log("Booking workers registered"))
         .catch((cause) => {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message:
                 "Something went wrong while registering booking workers.",
@@ -38,7 +38,7 @@ schedulerService
         .then(() => console.log("Asset workers registered"))
         .catch((cause) => {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message: "Something went wrong while registering asset workers.",
               label: "Scheduler",
@@ -49,7 +49,7 @@ schedulerService
         .then(() => console.log("Email workers registered"))
         .catch((cause) => {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message: "Something went wrong while registering email workers.",
               label: "Scheduler",
@@ -60,7 +60,7 @@ schedulerService
         .then(() => console.log("Audit workers registered"))
         .catch((cause) => {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message: "Something went wrong while registering audit workers.",
               label: "Scheduler",
@@ -71,7 +71,7 @@ schedulerService
         .then(() => console.log("Addon trial workers registered"))
         .catch((cause) => {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message:
                 "Something went wrong while registering addon trial workers.",
@@ -87,7 +87,7 @@ schedulerService
   })
   .catch((cause) => {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Scheduler crash",
         label: "Scheduler",

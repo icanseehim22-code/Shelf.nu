@@ -3,7 +3,7 @@ import {
   requireMobileAuth,
   getUserOrganizations,
 } from "~/modules/api/mobile-auth.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 
 /**
  * GET /api/mobile/me
@@ -21,7 +21,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       organizations,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

@@ -6,7 +6,7 @@ import HorizontalTabs from "~/components/layout/horizontal-tabs";
 import type { Item } from "~/components/layout/horizontal-tabs/types";
 import When from "~/components/when/when";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -36,7 +36,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
       orgName: currentOrganization.name,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 };

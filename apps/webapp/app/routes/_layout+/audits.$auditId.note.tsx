@@ -6,7 +6,11 @@ import { db } from "~/database/db.server";
 import { createAuditNote } from "~/modules/audit/note-service.server";
 import { requireAuditAssigneeForBaseSelfService } from "~/modules/audit/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   error,
   getActionMethod,
@@ -52,7 +56,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     });
 
     if (!audit || audit.organizationId !== organizationId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit not found or access denied",
         additionalData: { userId, auditId },
@@ -127,7 +131,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause, {
+    const reason = makeEstoqueSoftSystemError(cause, {
       userId,
       auditId,
       label: "Audit Note",

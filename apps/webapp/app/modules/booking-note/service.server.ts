@@ -1,6 +1,6 @@
 import type { Booking, BookingNote, Prisma, User } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label = "Booking";
 
@@ -72,7 +72,7 @@ export type BookingNoteTxClient = {
  * @param tx - Optional Prisma transaction client; defaults to the global `db`.
  *   Pass it so the ownership check runs in the same transaction as the note
  *   write it guards.
- * @throws {ShelfError} 404 if the booking does not exist in `organizationId`
+ * @throws {EstoqueSoftSystemError} 404 if the booking does not exist in `organizationId`
  */
 async function assertBookingInOrganization(
   {
@@ -91,7 +91,7 @@ async function assertBookingInOrganization(
   });
 
   if (!booking) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Booking not found or access denied",
       additionalData: { bookingId, organizationId },
@@ -113,7 +113,7 @@ async function assertBookingInOrganization(
  * @param tx - Optional Prisma transaction client. When the caller already runs
  *   inside a `db.$transaction`, pass it so the ownership check and the note
  *   write commit atomically with the surrounding mutation. Defaults to `db`.
- * @throws {ShelfError} 404 if the booking is not in `organizationId`
+ * @throws {EstoqueSoftSystemError} 404 if the booking is not in `organizationId`
  */
 export async function createBookingNote(
   {
@@ -156,10 +156,10 @@ export async function createBookingNote(
       data,
     });
   } catch (cause) {
-    if (cause instanceof ShelfError) {
+    if (cause instanceof EstoqueSoftSystemError) {
       throw cause;
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating a booking note",
       additionalData: { type, userId, bookingId, organizationId },
@@ -241,7 +241,7 @@ export async function getBookingNotes({
     });
 
     if (!booking) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Booking not found or access denied",
         additionalData: { bookingId, organizationId },
@@ -269,10 +269,10 @@ export async function getBookingNotes({
       },
     });
   } catch (cause) {
-    if (cause instanceof ShelfError) {
+    if (cause instanceof EstoqueSoftSystemError) {
       throw cause;
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching booking notes",
       additionalData: { bookingId, organizationId },
@@ -318,7 +318,7 @@ export async function deleteBookingNote({
     });
     return result;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while deleting the booking note",
       additionalData: { id, bookingId, userId, organizationId },

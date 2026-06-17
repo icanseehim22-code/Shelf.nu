@@ -8,7 +8,7 @@ import {
 } from "~/modules/api/mobile-auth.server";
 import { bulkUpdateAssetLocation } from "~/modules/asset/service.server";
 import { getAssetIndexSettings } from "~/modules/asset-index-settings/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -66,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return data({ success: true });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

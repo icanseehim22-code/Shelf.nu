@@ -1,4 +1,4 @@
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { QueueNames, scheduler } from "~/utils/scheduler.server";
 
 export type AddonTrialSchedulerData = {
@@ -29,7 +29,7 @@ export async function scheduleTrialEndsTomorrowEmail({
       when
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while scheduling addon trial ends tomorrow email",

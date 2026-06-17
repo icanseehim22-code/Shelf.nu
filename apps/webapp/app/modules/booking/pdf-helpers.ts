@@ -11,7 +11,7 @@ import { db } from "~/database/db.server";
 import { validateBookingOwnership } from "~/utils/booking-authorization.server";
 import { calculateTotalValueOfAssets } from "~/utils/bookings";
 import { getClientHint } from "~/utils/client-hints";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { filterBookingAssets, groupAndSortAssetsByKit } from "./helpers";
 import { getBooking } from "./service.server";
 import { getQrCodeMaps } from "../qr/service.server";
@@ -132,7 +132,7 @@ export async function fetchAllPdfRelatedData(
     ]);
 
     if (!organization) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Organization not found",
         status: 404,
@@ -167,7 +167,7 @@ export async function fetchAllPdfRelatedData(
       assetIdToQrCodeMap,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Error fetching booking data for PDF",
       status: 500,

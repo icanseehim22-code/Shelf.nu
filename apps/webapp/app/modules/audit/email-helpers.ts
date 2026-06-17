@@ -4,7 +4,7 @@ import { sendEmail } from "~/emails/mail.server";
 import type { ClientHint } from "~/utils/client-hints";
 import { getDateTimeFormatFromHints } from "~/utils/client-hints";
 import { SERVER_URL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { resolveUserDisplayName } from "~/utils/user";
 
@@ -56,7 +56,7 @@ To view the audit, follow the link below:
 ${SERVER_URL}/audits/${auditId}/overview${orgQuery}
 ${customEmailFooter ? `\n---\n${customEmailFooter}\n` : ""}
 Thanks,
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 };
 
@@ -180,7 +180,7 @@ export async function sendAuditAssignedEmail({
 
     sendEmail({
       to: assigneeEmail,
-      subject: `🔍 You've been assigned to audit: "${audit.name}" - shelf.nu`,
+      subject: `🔍 You've been assigned to audit: "${audit.name}" - estoquesoftsystem.com`,
       text: auditAssignedEmailContent({
         auditName: audit.name,
         assetsCount: assetCount,
@@ -199,7 +199,7 @@ export async function sendAuditAssignedEmail({
     );
   } catch (emailError) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: emailError,
         message: "Failed to send audit assignment email",
         additionalData: {
@@ -220,7 +220,7 @@ export async function sendAuditAssignedEmail({
  * the service decides who to notify. This function only handles delivery and
  * fan-out: per recipient it builds the plain-text + HTML versions, calls
  * {@link sendEmail}, and logs success or wraps any per-send failure in a
- * {@link ShelfError} via {@link Logger.error}. Failures for one recipient do
+ * {@link EstoqueSoftSystemError} via {@link Logger.error}. Failures for one recipient do
  * not stop sends to the others.
  *
  * @param args
@@ -276,7 +276,7 @@ export function sendAuditCancelledEmails({
 
       sendEmail({
         to: assignment.user.email,
-        subject: `❌ Audit cancelled: "${audit.name}" - shelf.nu`,
+        subject: `❌ Audit cancelled: "${audit.name}" - estoquesoftsystem.com`,
         text: auditCancelledEmailContent({
           auditName: audit.name,
           assetsCount: assetCount,
@@ -298,7 +298,7 @@ export function sendAuditCancelledEmails({
       );
     } catch (emailError) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: emailError,
           message: "Failed to send audit cancellation email",
           additionalData: {
@@ -357,7 +357,7 @@ export function sendAuditCompletedEmail({
 
       sendEmail({
         to: assignment.user.email,
-        subject: `✅ Audit completed: "${audit.name}" - shelf.nu`,
+        subject: `✅ Audit completed: "${audit.name}" - estoquesoftsystem.com`,
         text: auditCompletedEmailContent({
           auditName: audit.name,
           assetsCount: assetCount,
@@ -381,7 +381,7 @@ export function sendAuditCompletedEmail({
       );
     } catch (emailError) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: emailError,
           message: "Failed to send audit completion email",
           additionalData: {
@@ -436,7 +436,7 @@ export function sendAuditReminderEmail({
 
       sendEmail({
         to: assignment.user.email,
-        subject: `${heading}: "${audit.name}" - shelf.nu`,
+        subject: `${heading}: "${audit.name}" - estoquesoftsystem.com`,
         text: auditReminderEmailContent({
           auditName: audit.name,
           assetsCount: assetCount,
@@ -458,7 +458,7 @@ export function sendAuditReminderEmail({
       );
     } catch (emailError) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: emailError,
           message: `Failed to send ${timeframe} reminder email`,
           additionalData: {
@@ -504,7 +504,7 @@ export function sendAuditOverdueEmail({
 
       sendEmail({
         to: recipient.email,
-        subject: `⚠️ Audit overdue: "${audit.name}" - shelf.nu`,
+        subject: `⚠️ Audit overdue: "${audit.name}" - estoquesoftsystem.com`,
         text: auditOverdueEmailContent({
           auditName: audit.name,
           assetsCount: assetCount,
@@ -524,7 +524,7 @@ export function sendAuditOverdueEmail({
       );
     } catch (emailError) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: emailError,
           message: "Failed to send overdue notice email",
           additionalData: {

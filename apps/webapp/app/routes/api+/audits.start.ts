@@ -20,7 +20,7 @@ import {
 } from "~/modules/audit/service.server";
 import { getClientHint } from "~/utils/client-hints";
 import { DATE_TIME_FORMAT } from "~/utils/constants";
-import { badRequest, makeShelfError } from "~/utils/error";
+import { badRequest, makeEstoqueSoftSystemError } from "~/utils/error";
 import { assertIsPost, error, parseData, payload } from "~/utils/http.server";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import {
@@ -331,7 +331,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

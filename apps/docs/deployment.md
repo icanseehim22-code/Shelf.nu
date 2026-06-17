@@ -1,12 +1,12 @@
 # Deployment Guide 🚀
 
-This guide covers deploying Shelf.nu to production environments. We'll focus on Fly.io deployment with GitHub Actions for CI/CD.
+This guide covers deploying EstoqueSoftSystem to production environments. We'll focus on Fly.io deployment with GitHub Actions for CI/CD.
 
 ## Prerequisites ✅
 
 - ✅ **Working local development setup** ([Local Development Guide](./local-development.md))
 - ✅ **Supabase project configured** ([Supabase Setup Guide](./supabase-setup.md))
-- ✅ **GitHub repository** with your Shelf.nu code
+- ✅ **GitHub repository** with your EstoqueSoftSystem code
 - ✅ **Fly.io account** (free tier available)
 
 ---
@@ -120,7 +120,7 @@ fly secrets set SMTP_HOST="smtp.yourhost.com"
 fly secrets set SMTP_PORT=465
 fly secrets set SMTP_USER="you@example.com"
 fly secrets set SMTP_PWD="yourSMTPpassword"
-fly secrets set SMTP_FROM="Shelf.nu <noreply@yourapp.com>"
+fly secrets set SMTP_FROM="EstoqueSoftSystem <noreply@yourapp.com>"
 
 # Security tokens
 fly secrets set INVITE_TOKEN_SECRET=$(openssl rand -hex 32)
@@ -267,7 +267,7 @@ fly scale vm shared-cpu-1x     # Change VM size
 
 ## Email Service Setup 📧
 
-Shelf requires email for authentication. Here are recommended providers:
+EstoqueSoftSystem requires email for authentication. Here are recommended providers:
 
 ### Resend (Recommended)
 
@@ -279,7 +279,7 @@ Shelf requires email for authentication. Here are recommended providers:
    fly secrets set SMTP_PORT=587
    fly secrets set SMTP_USER="resend"
    fly secrets set SMTP_PWD="your-resend-api-key"
-   fly secrets set SMTP_FROM="Shelf.nu <noreply@yourdomain.com>"
+   fly secrets set SMTP_FROM="EstoqueSoftSystem <noreply@yourdomain.com>"
    ```
 
 ### SendGrid
@@ -329,7 +329,7 @@ Shelf requires email for authentication. Here are recommended providers:
 ### Application Security
 
 - ✅ **Enable HTTPS only** (Fly.io provides this)
-- ✅ **Set secure headers** (included in Shelf)
+- ✅ **Set secure headers** (included in EstoqueSoftSystem)
 - ✅ **Monitor error logs**
 - ✅ **Keep dependencies updated**
 
@@ -465,4 +465,4 @@ After successful deployment:
 - 🐛 **[GitHub Issues](https://github.com/Shelf-nu/shelf.nu/issues)** - Report deployment issues
 - 📧 **[Fly.io Support](https://fly.io/docs/getting-help/)** - Fly.io specific support
 
-Congratulations on deploying Shelf.nu! 🎉
+Congratulations on deploying EstoqueSoftSystem! 🎉

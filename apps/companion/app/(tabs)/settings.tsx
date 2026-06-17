@@ -311,7 +311,9 @@ export default function SettingsScreen() {
                 size={20}
                 color={colors.foreground}
               />
-              <Text style={styles.settingLabel}>Shelf Companion</Text>
+              <Text style={styles.settingLabel}>
+                EstoqueSoftSystem Companion
+              </Text>
             </View>
             <Text style={styles.settingValue}>v{appVersion}</Text>
           </View>
@@ -348,7 +350,7 @@ export default function SettingsScreen() {
             onPress={() => {
               Alert.alert(
                 "Delete Account",
-                "Account deletion is handled through the Shelf web app. You will be redirected to shelf.nu to complete this process.",
+                "Account deletion is handled through the EstoqueSoftSystem web app. You will be redirected to shelf.nu to complete this process.",
                 [
                   { text: "Cancel", style: "cancel" },
                   {

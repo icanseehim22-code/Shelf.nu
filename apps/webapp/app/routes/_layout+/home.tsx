@@ -34,7 +34,10 @@ import {
   checklistOptions,
   getCustodiansOrderedByTotalCustodies,
 } from "~/utils/dashboard.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import { parseMarkdownToReact } from "~/utils/md";
 import {
@@ -102,7 +105,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
           _sum: { valuation: true },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Failed to load asset aggregation",
             additionalData: { userId, organizationId },
@@ -224,7 +227,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
           include: { category: true },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Failed to load newest assets",
             additionalData: { userId, organizationId },
@@ -242,7 +245,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
           orderBy: { createdAt: "desc" },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Failed to load announcement",
             additionalData: { userId, organizationId },
@@ -336,7 +339,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       }),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }

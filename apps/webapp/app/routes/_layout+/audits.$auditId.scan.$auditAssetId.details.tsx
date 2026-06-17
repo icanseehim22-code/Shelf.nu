@@ -38,7 +38,10 @@ import {
 import { stripMarkdocDelimiters } from "~/modules/audit/note-content.server";
 import { requireAuditAssigneeForBaseSelfService } from "~/modules/audit/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getParams, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -97,7 +100,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
     });
 
     if (!auditAsset) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit asset not found",
         additionalData: { auditAssetId, organizationId },
@@ -170,7 +173,11 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       auditId,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, auditId, auditAssetId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      auditId,
+      auditAssetId,
+    });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -207,7 +214,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       const content = stripMarkdocDelimiters(rawContent ?? "");
 
       if (!content) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Note content is required",
           additionalData: { auditAssetId },
@@ -247,7 +254,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       const noteId = formData.get("noteId") as string;
 
       if (!noteId) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Note ID is required",
           additionalData: { auditAssetId },
@@ -263,7 +270,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       });
 
       if (noteToDelete?.type === "UPDATE") {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Cannot delete auto-generated notes",
           additionalData: { noteId },
@@ -296,7 +303,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       );
 
       if (files.length === 0) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "No image files found in the request",
           additionalData: { auditAssetId },
@@ -387,7 +394,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       const noteId = formData.get("noteId") as string;
 
       if (!noteId) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Note ID is required to attach images",
           additionalData: { auditAssetId },
@@ -405,7 +412,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       );
 
       if (files.length === 0) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "No image files found in the request",
           additionalData: { auditAssetId },
@@ -445,7 +452,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
         });
 
         if (!existingNote) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "Note not found",
             additionalData: { noteId },
@@ -495,7 +502,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       const imageId = formData.get("imageId") as string;
 
       if (!imageId) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Image ID is required",
           additionalData: { auditAssetId },
@@ -512,7 +519,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       return payload({ success: true });
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Invalid intent",
       additionalData: { intent },
@@ -520,7 +527,11 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       status: 400,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, auditId, auditAssetId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      auditId,
+      auditAssetId,
+    });
     return data(error(reason), { status: reason.status });
   }
 }

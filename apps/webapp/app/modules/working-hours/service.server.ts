@@ -1,5 +1,8 @@
 import { db } from "~/database/db.server";
-import { isLikeShelfError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import type { WeeklyScheduleForUpdate } from "./types";
 
 const label = "Working hours";
@@ -42,7 +45,7 @@ export async function getWorkingHoursForOrganization(organizationId: string) {
 
     return newWorkingHours;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to retrieve or create working hours configuration",
       additionalData: { organizationId },
@@ -66,7 +69,7 @@ export async function toggleWorkingHours({
 
     return updatedWorkingHours;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to toggle working hours",
       additionalData: { organizationId, enabled },
@@ -92,7 +95,7 @@ export async function updateWorkingHoursSchedule({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update weekly schedule",
       additionalData: { organizationId, weeklySchedule },
@@ -139,7 +142,7 @@ export async function createWorkingHoursOverride({
     });
 
     if (existingOverride) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Invalid date",
         message: "An override already exists for this date",
@@ -163,11 +166,11 @@ export async function createWorkingHoursOverride({
 
     return override;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Failed to create working hours override",
       additionalData: {
@@ -221,7 +224,7 @@ export async function updateWorkingHoursOverride({
 
     return updatedOverride;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update working hours override",
       additionalData: { overrideId, date, isOpen, openTime, closeTime, reason },
@@ -236,7 +239,7 @@ export async function deleteWorkingHoursOverride(overrideId: string) {
       where: { id: overrideId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to delete working hours override",
       additionalData: { overrideId },
@@ -265,7 +268,7 @@ export async function getWorkingHoursOverridesForOrganization(
 
     return workingHours?.overrides || [];
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to retrieve working hours overrides",
       additionalData: { organizationId },

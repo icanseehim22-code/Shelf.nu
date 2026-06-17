@@ -18,7 +18,7 @@ import {
 } from "~/modules/organization/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getParams, parseData, payload } from "~/utils/http.server";
 import { requireAdmin } from "~/utils/roles.server";
 import {
@@ -75,7 +75,7 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
       premiumIsEnabled,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -83,9 +83,9 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
 /**
  * Handles the transfer ownership form submission.
  *
- * This action allows Shelf admins to transfer ownership of any organization
+ * This action allows EstoqueSoftSystem admins to transfer ownership of any organization
  * to one of its existing admins. The flow:
- * 1. Validates that the current user is a Shelf admin
+ * 1. Validates that the current user is a EstoqueSoftSystem admin
  * 2. Parses and validates the form data (new owner ID + confirmation checkbox)
  * 3. Fetches the organization to get its details for the transfer
  * 4. Calls transferOwnership which updates the org owner and swaps user roles
@@ -128,7 +128,10 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/admin-dashboard/org/${organizationId}`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, organizationId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      organizationId,
+    });
     return data(error(reason), { status: reason.status });
   }
 }

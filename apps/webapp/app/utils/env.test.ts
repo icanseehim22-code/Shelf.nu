@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { getEnv } from "./env";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 
 // why: Mock isBrowser to ensure we're testing server-side behavior
 vi.mock("./is-browser", () => ({
@@ -25,7 +25,7 @@ describe("getEnv", () => {
 
       expect(() => {
         getEnv("ADMIN_EMAIL");
-      }).toThrow(ShelfError);
+      }).toThrow(EstoqueSoftSystemError);
     });
 
     it("should throw error when env var is empty string", () => {
@@ -33,7 +33,7 @@ describe("getEnv", () => {
 
       expect(() => {
         getEnv("ADMIN_EMAIL");
-      }).toThrow(ShelfError);
+      }).toThrow(EstoqueSoftSystemError);
     });
 
     it("should return value when env var is set", () => {
@@ -55,7 +55,7 @@ describe("getEnv", () => {
           allowEmpty: true,
           // Note: NOT passing isRequired - should default to true
         });
-      }).toThrow(ShelfError);
+      }).toThrow(EstoqueSoftSystemError);
     });
 
     it("should allow empty string when env var is set to empty", () => {
@@ -149,7 +149,7 @@ describe("getEnv", () => {
 
       expect(() => {
         getEnv("DISABLE_SSO", { allowEmpty: true });
-      }).toThrow(ShelfError);
+      }).toThrow(EstoqueSoftSystemError);
       expect(() => {
         getEnv("DISABLE_SSO", { allowEmpty: true });
       }).toThrow("DISABLE_SSO is not set");
@@ -178,7 +178,7 @@ describe("getEnv", () => {
 
       expect(() => {
         getEnv("DATABASE_URL");
-      }).toThrow(ShelfError);
+      }).toThrow(EstoqueSoftSystemError);
       expect(() => {
         getEnv("DATABASE_URL");
       }).toThrow("DATABASE_URL is not set");
@@ -189,7 +189,7 @@ describe("getEnv", () => {
 
       expect(() => {
         getEnv("SESSION_SECRET");
-      }).toThrow(ShelfError);
+      }).toThrow(EstoqueSoftSystemError);
     });
   });
 });

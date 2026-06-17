@@ -61,7 +61,10 @@ import {
   getCustomFieldDisplayValue,
 } from "~/utils/custom-fields";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { error, getParams, payload, parseData } from "~/utils/http.server";
 import { isLink } from "~/utils/misc";
@@ -240,7 +243,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       allCustomFieldDefs,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -374,7 +377,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
           });
           const fieldDef = customFields.find((cf) => cf.id === customFieldId);
           if (!fieldDef) {
-            throw new ShelfError({
+            throw new EstoqueSoftSystemError({
               cause: null,
               message: "Custom field not found",
               label: "Assets",
@@ -392,7 +395,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
            * enforces this via mergedSchema; inline editing must match.
            */
           if (!builtValue && fieldDef.required) {
-            throw new ShelfError({
+            throw new EstoqueSoftSystemError({
               cause: null,
               message: `${fieldDef.name} is required and cannot be empty`,
               label: "Assets",
@@ -431,7 +434,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       return payload(null);
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -515,7 +518,7 @@ export default function AssetOverview() {
               {asset?.qrCodes?.[0] ? (
                 <li className="w-full border-b-[1.1px] border-b-gray-100 p-4 last:border-b-0 md:flex">
                   <span className="w-1/4 text-[14px] font-medium text-gray-900">
-                    Shelf QR ID
+                    EstoqueSoftSystem QR ID
                   </span>
                   <div className="mt-1 w-3/5 text-gray-600 md:mt-0">
                     {asset.qrCodes[0].id}
@@ -718,7 +721,7 @@ export default function AssetOverview() {
                                 <Button
                                   variant="link"
                                   target="_blank"
-                                  to="https://www.shelf.nu/knowledge-base/alternative-barcodes"
+                                  to="https://www.estoquesoftsystem.com/knowledge-base/alternative-barcodes"
                                 >
                                   barcode support
                                 </Button>

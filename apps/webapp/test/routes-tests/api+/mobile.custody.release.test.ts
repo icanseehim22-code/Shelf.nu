@@ -65,11 +65,11 @@ vitest.mock("~/utils/markdoc-wrappers", () => ({
 
 // why: we need to control error formatting without running real error logic
 vitest.mock("~/utils/error", () => ({
-  makeShelfError: vitest.fn((cause: any) => ({
+  makeEstoqueSoftSystemError: vitest.fn((cause: any) => ({
     message: cause?.message || "Unknown error",
     status: cause?.status || 500,
   })),
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     status: number;
     constructor(opts: any) {
       super(opts.message);

@@ -6,7 +6,7 @@ import { db } from "~/database/db.server";
 import { bulkActivateOrDeactivateCustomFields } from "~/modules/custom-field/service.server";
 import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { assertIsPost, payload, error, parseData } from "~/utils/http.server";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import {
@@ -120,7 +120,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

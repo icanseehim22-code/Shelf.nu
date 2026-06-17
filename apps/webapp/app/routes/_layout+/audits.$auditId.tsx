@@ -36,7 +36,10 @@ import actionsCss from "~/styles/actions-dropdown.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { getClientHint } from "~/utils/client-hints";
 import { DATE_TIME_FORMAT } from "~/utils/constants";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getParams, payload } from "~/utils/http.server";
 import { parseData } from "~/utils/http.server";
 import {
@@ -165,7 +168,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       // Only admin/owner can archive — UI gates this, but enforce server-side
       // to prevent direct POST bypass by self-service/base roles
       if (isSelfServiceOrBase) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "You do not have permission to archive audits.",
           additionalData: { userId, auditId },
@@ -190,7 +193,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       // UI hides the button for self-service/base, but enforce server-side
       // to prevent direct POST bypass.
       if (isSelfServiceOrBase) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "You do not have permission to delete audits.",
           additionalData: { userId, auditId },
@@ -221,7 +224,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       return redirect("/audits");
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Invalid action intent",
       additionalData: { intent },
@@ -229,7 +232,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       status: 400,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, auditId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, auditId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -295,7 +298,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       );
 
       if (!isAssignee) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "Access denied",
           message: "You are not assigned to this audit.",
@@ -334,7 +337,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, auditId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, auditId });
     throw data(error(reason), { status: reason.status });
   }
 }

@@ -3,7 +3,10 @@ import { data, type ActionFunctionArgs } from "react-router";
 import { db } from "~/database/db.server";
 import { getAssetsWhereInput } from "~/modules/asset/utils.server";
 import { generateQrObj } from "~/modules/qr/utils.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import {
@@ -50,7 +53,7 @@ export async function loader({ context, request }: ActionFunctionArgs) {
     const assetIds = searchParams.getAll("assetIds");
 
     if (assetIds.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         status: 400,
         message: "No asset id provided.",
@@ -73,7 +76,7 @@ export async function loader({ context, request }: ActionFunctionArgs) {
     });
 
     if (assets.length > 100) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Assets",
         message:
@@ -104,7 +107,7 @@ export async function loader({ context, request }: ActionFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

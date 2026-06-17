@@ -29,7 +29,10 @@ import type { AuthSession } from "@server/session";
 import { db } from "~/database/db.server";
 import { getSupabaseAdmin } from "~/integrations/supabase/client";
 import type { ErrorLabel } from "~/utils/error";
-import { isLikeShelfError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { mapAuthSession } from "./mappers.server";
 
 const label: ErrorLabel = "Auth";
@@ -121,7 +124,7 @@ function isRateLimitError(cause: unknown): boolean {
  *
  * @param email - The already-authenticated user's email
  * @returns A mapped auth session (fresh access + refresh tokens)
- * @throws The raw Supabase error, or a {@link ShelfError} if Supabase returns
+ * @throws The raw Supabase error, or a {@link EstoqueSoftSystemError} if Supabase returns
  *   success without a usable token/session
  */
 async function mintMobileSessionOnce(email: string): Promise<AuthSession> {
@@ -137,7 +140,7 @@ async function mintMobileSessionOnce(email: string): Promise<AuthSession> {
 
   const tokenHash = linkData.properties?.hashed_token;
   if (!tokenHash) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Supabase did not return a verifiable token",
       label,
@@ -156,7 +159,7 @@ async function mintMobileSessionOnce(email: string): Promise<AuthSession> {
 
   const { session } = otpData;
   if (!session) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "The session returned by Supabase is null",
       label,
@@ -185,7 +188,7 @@ async function mintMobileSessionOnce(email: string): Promise<AuthSession> {
  *
  * @param email - The already-authenticated user's email
  * @returns A mapped auth session (fresh access + refresh tokens)
- * @throws {ShelfError} 429 when rate-limited; otherwise re-throws the underlying
+ * @throws {EstoqueSoftSystemError} 429 when rate-limited; otherwise re-throws the underlying
  *   cause, which {@link redeemMobileAuthCode} maps to a captured 500
  */
 async function mintMobileSessionForUser(email: string): Promise<AuthSession> {
@@ -196,7 +199,7 @@ async function mintMobileSessionForUser(email: string): Promise<AuthSession> {
       // Rate-limited: retrying inside the window won't help. Surface a clear,
       // user-retryable 429 instead of a generic 500.
       if (isRateLimitError(cause)) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "Too many sign-in attempts. Please wait a moment and try again.",
@@ -207,7 +210,7 @@ async function mintMobileSessionForUser(email: string): Promise<AuthSession> {
       }
 
       // Only transient Supabase failures (504s / network) are worth retrying;
-      // deterministic 4xx errors and our own ShelfErrors won't change on retry.
+      // deterministic 4xx errors and our own EstoqueSoftSystemErrors won't change on retry.
       const canRetry =
         attempt < MINT_MAX_ATTEMPTS && isAuthRetryableFetchError(cause);
       if (canRetry) {
@@ -216,14 +219,14 @@ async function mintMobileSessionForUser(email: string): Promise<AuthSession> {
       }
 
       // Deterministic failure, or a transient one that exhausted its retries.
-      // redeemMobileAuthCode re-throws ShelfErrors as-is and wraps anything
+      // redeemMobileAuthCode re-throws EstoqueSoftSystemErrors as-is and wraps anything
       // else (raw Supabase / DB errors) in a captured 500.
       throw cause;
     }
   }
 
   // Unreachable: every iteration returns or throws. Satisfies the compiler.
-  throw new ShelfError({
+  throw new EstoqueSoftSystemError({
     cause: null,
     message: "Could not establish a mobile session. Please try again.",
     label,
@@ -241,7 +244,7 @@ async function mintMobileSessionForUser(email: string): Promise<AuthSession> {
  *   can only be redeemed with a matching verifier (see
  *   {@link redeemMobileAuthCode}). Omitted by legacy (pre-PKCE) app builds.
  * @returns The plaintext authorization code to embed in the deeplink
- * @throws {ShelfError} If the row cannot be created
+ * @throws {EstoqueSoftSystemError} If the row cannot be created
  */
 export async function createMobileAuthCode(
   userId: string,
@@ -261,7 +264,7 @@ export async function createMobileAuthCode(
 
     return code;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to create the mobile authorization code",
       label,
@@ -292,7 +295,7 @@ export async function createMobileAuthCode(
  * @param code - The plaintext authorization code from the deeplink
  * @param codeVerifier - PKCE verifier; required iff the code carries a challenge
  * @returns A freshly minted, mapped auth session for the device
- * @throws {ShelfError} 400 if the code is missing/invalid/expired/used, or if a
+ * @throws {EstoqueSoftSystemError} 400 if the code is missing/invalid/expired/used, or if a
  *   PKCE-bound code is presented without a matching verifier
  */
 export async function redeemMobileAuthCode(
@@ -301,7 +304,7 @@ export async function redeemMobileAuthCode(
 ): Promise<AuthSession> {
   try {
     if (!code) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Authorization code is required",
         label,
@@ -319,7 +322,7 @@ export async function redeemMobileAuthCode(
     });
 
     if (count !== 1) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Invalid or expired authorization code",
         label,
@@ -340,7 +343,7 @@ export async function redeemMobileAuthCode(
       codeChallenge &&
       (!codeVerifier || !verifyPkceChallenge(codeVerifier, codeChallenge))
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Invalid or expired authorization code",
         label,
@@ -355,10 +358,10 @@ export async function redeemMobileAuthCode(
     // 400 and re-thrown here unchanged. Anything else (e.g. a Supabase outage
     // while minting) is an INTERNAL failure and must surface as 500 — not a
     // client 400 — so retry and monitoring behavior can tell the two apart.
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to complete the mobile authorization exchange",
       label,

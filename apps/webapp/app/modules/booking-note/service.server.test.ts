@@ -20,9 +20,9 @@ vi.mock("~/database/db.server", () => ({
   },
 }));
 
-// why: testing error handling behavior without actual ShelfError implementation
+// why: testing error handling behavior without actual EstoqueSoftSystemError implementation
 vi.mock("~/utils/error", () => ({
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     constructor(config: any) {
       super(config.message);
       Object.assign(this, config);

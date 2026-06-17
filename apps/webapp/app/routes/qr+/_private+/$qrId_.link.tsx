@@ -22,7 +22,11 @@ import { setSelectedOrganizationIdCookie } from "~/modules/organization/context.
 import { claimQrCode } from "~/modules/qr/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -65,7 +69,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
     }
 
     if (qr?.organizationId && qr.organizationId !== organizationId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         message: "This QR code doesn't belong to your current organization.",
         title: "Not allowed",
         label: "QR",
@@ -83,7 +87,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       currentOrganizationId: currentOrganization.id,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -127,7 +131,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }
@@ -160,7 +164,7 @@ export default function QrLink() {
               <p className="text-gray-600">
                 {comesFromClaim
                   ? "Thanks for claiming the code. Now its time to link it to a kit or asset."
-                  : "This code is part of your Shelf environment but is not linked with an asset. Would you like to link it?"}
+                  : "This code is part of your EstoqueSoftSystem environment but is not linked with an asset. Would you like to link it?"}
               </p>
             </div>
             <div className="flex flex-col justify-center gap-2">

@@ -46,7 +46,10 @@ import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 import { delay } from "~/utils/delay";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
 import { ADMIN_EMAIL, SERVER_URL } from "~/utils/env";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -193,7 +196,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         });
 
         if (!currentUser.sso) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "Display name can only be set by SSO users.",
             label: "User",
@@ -220,7 +223,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
       case "updateUserContact": {
         if (parsedData.type !== "updateUserContact")
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "Invalid payload type",
             label: "User",
@@ -257,7 +260,9 @@ export async function action({ context, request }: ActionFunctionArgs) {
         }
 
         sendEmail({
-          to: ADMIN_EMAIL || `"Shelf" <updates@emails.shelf.nu>`,
+          to:
+            ADMIN_EMAIL ||
+            `"EstoqueSoftSystem" <updates@emails.estoquesoftsystem.com>`,
           subject: "Delete account request",
           text: `User with id ${userId} and email ${parsedData.email} has requested to delete their account. \n User: ${SERVER_URL}/admin-dashboard/${userId} \n\n Reason: ${reason}\n\n`,
         });
@@ -265,7 +270,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         sendEmail({
           to: parsedData.email,
           subject: "Delete account request received",
-          text: `We have received your request to delete your account. It will be processed within 72 hours.\n\n Kind regards,\nthe Shelf team \n\n`,
+          text: `We have received your request to delete your account. It will be processed within 72 hours.\n\n Kind regards,\nthe EstoqueSoftSystem team \n\n`,
         });
 
         sendNotification({
@@ -314,7 +319,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
         if (generateError) {
           const emailExists = generateError.code === "email_exists";
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: generateError,
             ...(emailExists && { title: "Email is already taken." }),
             message: emailExists
@@ -329,7 +334,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         // Send email with OTP using our email service
         sendEmail({
           to: newEmail,
-          subject: `🔐 Shelf verification code: ${linkData.properties.email_otp}`,
+          subject: `🔐 EstoqueSoftSystem verification code: ${linkData.properties.email_otp}`,
           text: changeEmailAddressTextEmail({
             otp: linkData.properties.email_otp,
             user,
@@ -372,7 +377,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         });
 
         if (verifyError) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: verifyError,
             message: "Invalid or expired verification code",
             additionalData: { userId },
@@ -412,7 +417,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -433,7 +438,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
     return payload({ title, user });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }

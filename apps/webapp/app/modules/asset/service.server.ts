@@ -81,8 +81,8 @@ import {
 import { dateTimeInUnix } from "~/utils/date-time-in-unix";
 import type { ErrorLabel } from "~/utils/error";
 import {
-  ShelfError,
-  isLikeShelfError,
+  EstoqueSoftSystemError,
+  isLikeEstoqueSoftSystemError,
   isNotFoundError,
   maybeUniqueConstraintViolation,
   VALIDATION_ERROR,
@@ -388,7 +388,7 @@ async function validateKitCustodyConflicts({
   }
 
   if (conflicts.length > 0) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: `We found custody conflicts with existing kits. Assets with custody cannot be imported into existing kits that are not in custody.`,
       additionalData: {
@@ -446,7 +446,7 @@ export async function getAsset<T extends Prisma.AssetInclude | undefined>({
           ? getRedirectUrlFromRequest(request)
           : undefined;
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Asset not found",
         message: "",
@@ -465,8 +465,8 @@ export async function getAsset<T extends Prisma.AssetInclude | undefined>({
 
     return asset as AssetWithInclude<T>;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
-    throw new ShelfError({
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Asset not found",
       message:
@@ -474,10 +474,10 @@ export async function getAsset<T extends Prisma.AssetInclude | undefined>({
       additionalData: {
         id,
         organizationId,
-        ...(isShelfError ? cause.additionalData : {}),
+        ...(isEstoqueSoftSystemError ? cause.additionalData : {}),
       },
       label,
-      shouldBeCaptured: isShelfError
+      shouldBeCaptured: isEstoqueSoftSystemError
         ? cause.shouldBeCaptured
         : !isNotFoundError(cause),
     });
@@ -789,7 +789,7 @@ export async function getAssets(params: {
       }
     }
     if (hideUnavailable === true && (!bookingFrom || !bookingTo)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "booking dates are needed to hide unavailable assets",
         additionalData: {
@@ -935,7 +935,7 @@ export async function getAssets(params: {
 
     return { assets, totalAssets };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching assets",
       additionalData: { ...params },
@@ -1065,7 +1065,7 @@ export async function getAdvancedPaginatedAndFilterableAssets({
       cookie,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to fetch paginated and filterable assets",
       additionalData: {
@@ -1384,7 +1384,7 @@ export async function createAsset({
   }
 
   // If we reach here, all retry attempts failed
-  throw new ShelfError({
+  throw new EstoqueSoftSystemError({
     cause: null,
     message:
       "Failed to create asset after maximum retry attempts for sequential ID generation",
@@ -1427,7 +1427,7 @@ export async function updateAsset({
       });
 
       if (assetWithKit?.kit) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `This asset's location is managed by its parent kit "${assetWithKit.kit.name}". Please update the kit's location instead.`,
           additionalData: {
@@ -1510,7 +1510,7 @@ export async function updateAsset({
         select: { id: true },
       });
       if (!orgLocation) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "Location not found",
           message:
@@ -1702,7 +1702,7 @@ export async function updateAsset({
         select: { barcodesEnabled: true },
       });
       if (!orgEntitlement.barcodesEnabled) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "Per-asset preferred-barcode overrides require the alternative-barcodes add-on. " +
@@ -1748,7 +1748,7 @@ export async function updateAsset({
       }
 
       if (!isMember) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "The selected preferred barcode is not linked to this asset.",
@@ -2206,9 +2206,9 @@ export async function updateAsset({
 
     return asset;
   } catch (cause) {
-    // If it's already a ShelfError with validation errors, re-throw as is
+    // If it's already a EstoqueSoftSystemError with validation errors, re-throw as is
     if (
-      cause instanceof ShelfError &&
+      cause instanceof EstoqueSoftSystemError &&
       cause.additionalData?.[VALIDATION_ERROR]
     ) {
       throw cause;
@@ -2260,7 +2260,7 @@ export async function deleteAsset({
     // Cancel reminders outside transaction (cleanup operation, not critical for atomicity)
     await Promise.all(deletedAsset.reminders.map(cancelAssetReminderScheduler));
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while deleting asset",
       additionalData: { id, organizationId },
@@ -2352,10 +2352,10 @@ export async function updateAssetMainImage({
       });
     }
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
-    throw new ShelfError({
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while updating asset main image",
       additionalData: { assetId, userId, field: "mainImage" },
@@ -2407,7 +2407,7 @@ export async function deleteOtherImages({
         .list(`${userId}/${assetId}`);
 
     if (deletedImagesError) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: deletedImagesError,
         message: "Failed to fetch images",
         additionalData: { userId, assetId, currentImage, data },
@@ -2436,7 +2436,7 @@ export async function deleteOtherImages({
     // Image cleanup is non-critical — the asset duplication still succeeds.
     // Transient Supabase storage errors (e.g., 502) should not pollute Sentry.
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         title: "Oops, deletion of other asset images failed",
         message: "Something went wrong while deleting other asset images",
@@ -2457,7 +2457,7 @@ export async function uploadDuplicateAssetMainImage(
     const originalPath = extractStoragePath(mainImageUrl, "assets");
 
     if (!originalPath) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Failed to extract asset image path for duplication",
         additionalData: { mainImageUrl, assetId, userId },
@@ -2470,7 +2470,7 @@ export async function uploadDuplicateAssetMainImage(
       await getSupabaseAdmin().storage.from("assets").download(originalPath);
 
     if (downloadError) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: downloadError,
         message: "Failed to download asset image for duplication",
         additionalData: { originalPath, assetId, userId },
@@ -2483,7 +2483,7 @@ export async function uploadDuplicateAssetMainImage(
     const detectedFormat = detectImageFormat(imageBuffer);
 
     if (!detectedFormat) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Unsupported image format for asset duplication",
         additionalData: { originalPath, assetId, userId },
@@ -2508,7 +2508,7 @@ export async function uploadDuplicateAssetMainImage(
     /** Getting the signed url from supabase to we can view image  */
     return await createSignedUrl({ filename: data.path });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Oops, duplicating failed",
       message: "Something went wrong while uploading the image",
@@ -2555,7 +2555,7 @@ export function createCustomFieldsPayloadFromAsset(
  * @param params.organizationId - The caller's validated organization ID; all
  *   duplicates and copied tags are constrained to this org
  * @returns The list of created duplicate assets
- * @throws {ShelfError} If a copied tag does not belong to `organizationId`
+ * @throws {EstoqueSoftSystemError} If a copied tag does not belong to `organizationId`
  *   (cross-org guard) or if duplication otherwise fails
  */
 export async function duplicateAsset({
@@ -2637,7 +2637,7 @@ export async function duplicateAsset({
         } catch (cause) {
           // Log the error so we are aware there is an issue anc can check if it is on our side
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message: "Skipping duplicate asset image due to upload failure",
               additionalData: {
@@ -2657,7 +2657,7 @@ export async function duplicateAsset({
 
     return duplicatedAssets;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while duplicating the asset",
       additionalData: { asset, userId, amountOfDuplicates, organizationId },
@@ -2728,7 +2728,7 @@ export async function getAllEntriesForCreateAndEdit({
       totalLocations,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Fail to get all entries for create and edit",
       additionalData: {
@@ -2869,7 +2869,7 @@ export async function getPaginatedAndFilterableAssets({
       ...teamMembersData,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Fail to fetch paginated and filterable assets",
       additionalData: {
@@ -2892,7 +2892,7 @@ export async function getPaginatedAndFilterableAssets({
  * @param params.organizationId - The asset's organization ID; scopes the note
  *   write so it cannot be attached cross-org
  * @returns void (no note is created when the change produces an empty message)
- * @throws {ShelfError} If the note creation fails
+ * @throws {EstoqueSoftSystemError} If the note creation fails
  */
 export async function createCustomFieldChangeNote({
   customFieldName,
@@ -2938,7 +2938,7 @@ export async function createCustomFieldChangeNote({
       organizationId,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating a custom field change note. Please try again or contact support",
@@ -2977,7 +2977,7 @@ export async function fetchAssetsForExport({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching assets for export",
       additionalData: { organizationId },
@@ -3027,7 +3027,7 @@ export async function createAssetsFromContentImport({
     );
 
     if (hasBarcodesData && !canUseBarcodes) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Your workspace doesn't have barcodes enabled. Please contact sales to learn more about barcodes.",
@@ -3130,11 +3130,11 @@ export async function createAssetsFromContentImport({
               definition.type === "AMOUNT" || definition.type === "NUMBER";
 
             if (isNumericField) {
-              // If the error is already a ShelfError with a specific message from sanitizeNumericInput,
+              // If the error is already a EstoqueSoftSystemError with a specific message from sanitizeNumericInput,
               // enhance it with asset context. Otherwise, create a generic message.
               let message: string;
 
-              if (isLikeShelfError(error)) {
+              if (isLikeEstoqueSoftSystemError(error)) {
                 // Check if asset context has already been added by checking additionalData
                 const hasAssetContext =
                   error.additionalData && "assetKey" in error.additionalData;
@@ -3156,7 +3156,7 @@ export async function createAssetsFromContentImport({
                 );
               }
 
-              throw new ShelfError({
+              throw new EstoqueSoftSystemError({
                 cause: error,
                 label,
                 message,
@@ -3165,7 +3165,8 @@ export async function createAssetsFromContentImport({
                   customFieldId: definition.id,
                   customFieldType: definition.type,
                   rawValue: asset[key],
-                  ...(isLikeShelfError(error) && error.additionalData),
+                  ...(isLikeEstoqueSoftSystemError(error) &&
+                    error.additionalData),
                 },
                 shouldBeCaptured: false,
               });
@@ -3184,7 +3185,7 @@ export async function createAssetsFromContentImport({
       if (asset.imageUrl) {
         try {
           if (!isValidImageUrl(asset.imageUrl)) {
-            throw new ShelfError({
+            throw new EstoqueSoftSystemError({
               cause: null,
               message:
                 "Image URL must be a valid http(s) URL, including the https:// prefix.",
@@ -3218,12 +3219,12 @@ export async function createAssetsFromContentImport({
         } catch (cause) {
           // This catch block should rarely be reached now since uploadImageFromUrl returns null instead of throwing
           // But we keep it for any unexpected errors in createSignedUrl or other operations
-          const isShelfError = isLikeShelfError(cause);
+          const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
-              message: isShelfError
+              message: isEstoqueSoftSystemError
                 ? `${cause?.message} for asset: ${asset.title}`
                 : `Unexpected error during image processing for asset ${asset.title}`,
               additionalData: { imageUrl: asset.imageUrl, assetId },
@@ -3246,7 +3247,7 @@ export async function createAssetsFromContentImport({
       const kitId = kitKey ? kits?.[kitKey]?.id : undefined;
       // Surface a clear import error instead of a TypeError when a kit value can't be resolved.
       if (kitKey && !kitId) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `Kit "${kitKey}" could not be resolved for asset "${asset.title}". Please verify the kit column values in your CSV.`,
           additionalData: {
@@ -3265,7 +3266,7 @@ export async function createAssetsFromContentImport({
         : undefined;
       // Surface a clear import error instead of a TypeError when a custodian value can't be resolved.
       if (custodianKey && !custodianId) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `Custodian "${custodianKey}" could not be resolved for asset "${asset.title}". Please verify the custodian column values in your CSV.`,
           additionalData: {
@@ -3316,9 +3317,9 @@ export async function createAssetsFromContentImport({
 
     return true;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
     const rawConstraintMessage = (() => {
-      if (isShelfError && cause.cause instanceof Error) {
+      if (isEstoqueSoftSystemError && cause.cause instanceof Error) {
         return cause.cause.message;
       }
 
@@ -3334,7 +3335,7 @@ export async function createAssetsFromContentImport({
       rawConstraintMessage.includes("AssetCustomFieldValue") &&
       rawConstraintMessage.includes("ensure_value_structure_and_types")
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         label,
         message:
@@ -3342,21 +3343,21 @@ export async function createAssetsFromContentImport({
         additionalData: {
           userId,
           organizationId,
-          ...(isShelfError && cause.additionalData),
+          ...(isEstoqueSoftSystemError && cause.additionalData),
         },
         shouldBeCaptured: false,
       });
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause?.message
         : "Something went wrong while creating assets from content import",
       additionalData: {
         userId,
         organizationId,
-        ...(isShelfError && cause.additionalData),
+        ...(isEstoqueSoftSystemError && cause.additionalData),
       },
       label,
     });
@@ -3622,7 +3623,7 @@ export async function createAssetsFromBackupImport({
       })
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating assets from backup import",
       additionalData: { userId, organizationId },
@@ -3732,7 +3733,7 @@ export function updateAssetsWithBookingCustodians<
 
     /** Data integrity edge case: asset is CHECKED_OUT but booking has no custodian assigned */
     Logger.warn(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: null,
         message: "Couldn't find custodian for asset",
         additionalData: { assetId: a.id, status: a.status },
@@ -3747,7 +3748,7 @@ export function updateAssetsWithBookingCustodians<
 /**
  * Checks if an error indicates the storage object was not found.
  * Walks both additionalData and the cause chain to handle
- * Supabase StorageApiError wrapped by ShelfError.
+ * Supabase StorageApiError wrapped by EstoqueSoftSystemError.
  */
 export function isStorageObjectNotFound(error: unknown): boolean {
   if (!error || typeof error !== "object") return false;
@@ -3908,7 +3909,7 @@ export async function refreshExpiredAssetImages<
           : true;
 
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: error,
           message: `Failed to refresh expired image URLs for asset ${asset.id}`,
           additionalData: { assetId: asset.id },
@@ -3993,7 +3994,7 @@ export async function updateAssetQrCode({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Couldn't disconnect existing codes",
           label,
@@ -4012,7 +4013,7 @@ export async function updateAssetQrCode({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Couldn't connect the new QR code",
           label,
@@ -4020,7 +4021,7 @@ export async function updateAssetQrCode({
         });
       });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating asset QR code",
       label,
@@ -4107,7 +4108,7 @@ export async function bulkDeleteAssets({
         )
       );
     } catch (cause) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message:
           "Something went wrong while deleting assets. The transaction was failed.",
@@ -4116,11 +4117,11 @@ export async function bulkDeleteAssets({
     }
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk deleting assets";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: { assetIds, organizationId },
@@ -4143,7 +4144,7 @@ export async function bulkDeleteAssets({
  *   against `organizationId` (cross-org IDOR guard) before any custody row
  *   is written
  * @param params.organizationId - The caller's validated organization ID
- * @throws {ShelfError} If the custodian does not belong to `organizationId`,
+ * @throws {EstoqueSoftSystemError} If the custodian does not belong to `organizationId`,
  *   or if any selected asset is not AVAILABLE
  */
 export async function bulkAssignCustody({
@@ -4224,7 +4225,7 @@ export async function bulkAssignCustody({
       role === OrganizationRoles.SELF_SERVICE &&
       custodianTeamMember?.user?.id !== userId
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Action not allowed",
         message: "Self user can only assign custody to themselves only.",
@@ -4240,7 +4241,7 @@ export async function bulkAssignCustody({
     );
 
     if (assetsNotAvailable) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "There are some unavailable assets. Please make sure you are selecting only available assets.",
@@ -4326,11 +4327,11 @@ export async function bulkAssignCustody({
     return true;
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while assigning custody.";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: { assetIds, custodianId },
@@ -4407,7 +4408,7 @@ export async function bulkReleaseCustody({
     const hasAssetsWithoutCustody = assets.some((asset) => !asset.custody);
 
     if (hasAssetsWithoutCustody) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "There are some assets without custody. Please make sure you are selecting assets with custody.",
@@ -4422,7 +4423,7 @@ export async function bulkReleaseCustody({
       role === OrganizationRoles.SELF_SERVICE &&
       assets.some((asset) => asset.custody?.custodian?.userId !== userId)
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Action not allowed",
         message:
@@ -4448,7 +4449,7 @@ export async function bulkReleaseCustody({
             in: assets.map((asset) => {
               /** This case should not happen but in case */
               if (!asset.custody) {
-                throw new ShelfError({
+                throw new EstoqueSoftSystemError({
                   cause: null,
                   label: "Assets",
                   message: "Could not find custody over asset.",
@@ -4500,11 +4501,11 @@ export async function bulkReleaseCustody({
     return true;
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while releasing custody.";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: { assetIds, userId },
@@ -4567,7 +4568,7 @@ export async function bulkUpdateAssetLocation({
       const kitNames = Array.from(
         new Set(assetsInKits.map((asset) => asset.kit?.name))
       ).join(", ");
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Cannot update location for assets that belong to kits: ${kitNames}. Update the kit locations instead.`,
         additionalData: {
@@ -4729,11 +4730,11 @@ export async function bulkUpdateAssetLocation({
 
     return true;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk updating location.",
       additionalData: { userId, assetIds, newLocationId },
@@ -4803,7 +4804,7 @@ export async function bulkUpdateAssetCategory({
       : null;
 
     if (newCategoryId && !newCategory) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Category not found",
         message:
@@ -4857,7 +4858,7 @@ export async function bulkUpdateAssetCategory({
 
     return true;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while bulk updating category.",
       additionalData: { userId, assetIds, organizationId, categoryId },
@@ -4906,7 +4907,7 @@ export async function bulkAssignAssetTags({
         select: { id: true },
       });
       if (orgTags.length !== new Set(tagsIds).size) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "Tag not found",
           message:
@@ -5016,11 +5017,11 @@ export async function bulkAssignAssetTags({
 
     return true;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk updating tags.",
       additionalData: { userId, assetIds, organizationId, tagsIds },
@@ -5063,7 +5064,7 @@ export async function bulkMarkAvailability({
 
     return true;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while marking assets as available.",
       additionalData: { assetIds, organizationId },
@@ -5105,7 +5106,7 @@ export async function relinkAssetQrCode({
 
   /** User cannot link qr code of other organization */
   if (qr.organizationId && qr.organizationId !== organizationId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "QR not valid.",
       message: "This QR code does not belong to your organization",
@@ -5116,7 +5117,7 @@ export async function relinkAssetQrCode({
   }
 
   if (qr.kitId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "QR already linked.",
       message:
@@ -5127,7 +5128,7 @@ export async function relinkAssetQrCode({
   }
 
   if (qr.assetId && qr.assetId !== assetId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "QR already linked.",
       message:
@@ -5235,7 +5236,7 @@ export async function getUserAssetsTabLoaderData({
       headers,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
       message: "Something went wrong while fetching assets",
@@ -5354,7 +5355,7 @@ export async function getEntitiesWithSelectedValues({
 
 /**
  * Parses a raw valuation string from a form input into a finite number, or
- * null when the field was left blank. Throws a 400 ShelfError for any input
+ * null when the field was left blank. Throws a 400 EstoqueSoftSystemError for any input
  * that cannot be coerced to a finite number.
  *
  * Used by the asset overview's inline-edit action so that browser-side
@@ -5363,13 +5364,13 @@ export async function getEntitiesWithSelectedValues({
  *
  * @param raw - The raw string value from `formData.get("fieldValue")`
  * @returns A finite number, or null when the input is blank
- * @throws {ShelfError} 400 when the input is non-empty but not a finite number
+ * @throws {EstoqueSoftSystemError} 400 when the input is non-empty but not a finite number
  */
 export function parseAssetValuation(raw: string | null): number | null {
   if (!raw || raw.trim() === "") return null;
   const parsed = Number(raw);
   if (!Number.isFinite(parsed)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Value must be a valid number",
       label: "Assets",
@@ -5382,14 +5383,14 @@ export function parseAssetValuation(raw: string | null): number | null {
 
 /**
  * Returns the active custom field definitions scoped to the given asset's
- * category. Throws a 404 ShelfError when the asset does not exist in the
+ * category. Throws a 404 EstoqueSoftSystemError when the asset does not exist in the
  * given organization — this is the source of truth for the cross-org IDOR
  * guard used by the asset overview inline-edit action.
  *
  * @param params.id - Asset id
  * @param params.organizationId - Organization id (asset must belong to it)
  * @returns The array of active custom-field definitions for the asset's category
- * @throws {ShelfError} 404 when the asset is not found in the organization
+ * @throws {EstoqueSoftSystemError} 404 when the asset is not found in the organization
  */
 export async function getActiveCustomFieldsForAsset({
   id,
@@ -5404,7 +5405,7 @@ export async function getActiveCustomFieldsForAsset({
   });
 
   if (!asset) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Asset not found",
       label: "Assets",
@@ -5462,7 +5463,7 @@ export async function getCategoriesForCreateAndEdit({
       totalCategories,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching categories",
       additionalData: { organizationId, categorySelected },
@@ -5503,7 +5504,7 @@ export async function getLocationsForCreateAndEdit({
       totalLocations,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching tags",
       additionalData: { organizationId, defaultLocation },

@@ -23,7 +23,7 @@ import { useViewportHeight } from "~/hooks/use-viewport-height";
 import { getTeamMemberForCustodianFilter } from "~/modules/team-member/service.server";
 import scannerCss from "~/styles/scanner.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getCurrentSearchParams, payload } from "~/utils/http.server";
 import { getParamsValues } from "~/utils/list";
 import {
@@ -112,7 +112,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       ...locationsData,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -212,7 +212,7 @@ const QRScanner = () => {
             triggerError();
             setErrorTitle("Barcode scanning disabled");
             setErrorMessage(
-              "Your workspace does not support scanning barcodes. Contact your workspace owner to activate this feature or try scanning a Shelf QR code."
+              "Your workspace does not support scanning barcodes. Contact your workspace owner to activate this feature or try scanning a EstoqueSoftSystem QR code."
             );
             setScanMessage("");
             isNavigating.current = false;
@@ -239,7 +239,7 @@ const QRScanner = () => {
               void navigate(`/assets/${assetId}`);
             })
             .catch((samError) => {
-              const reason = makeShelfError(
+              const reason = makeEstoqueSoftSystemError(
                 samError,
                 { samId: value, source: "scanner-samId" },
                 false

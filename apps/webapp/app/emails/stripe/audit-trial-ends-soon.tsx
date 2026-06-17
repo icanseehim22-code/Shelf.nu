@@ -9,7 +9,7 @@ import {
 } from "@react-email/components";
 import { config } from "~/config/shelf.config";
 import { SERVER_URL, SUPPORT_EMAIL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { LogoForEmail } from "../logo";
 import { sendEmail } from "../mail.server";
@@ -51,7 +51,7 @@ export const sendAuditTrialEndsSoonEmail = async ({
     });
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message:
           "Something went wrong while sending the audit trial ends soon email",
@@ -88,7 +88,7 @@ If you'd like to keep using Audits, no action is needed - everything will transi
 
 If you have any questions, feel free to reach out to us at ${SUPPORT_EMAIL}. We're happy to help!
 
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
   }
 
@@ -102,7 +102,7 @@ Don't worry - your audit data won't be deleted. Once you subscribe, everything w
 
 If you have any questions, feel free to reach out to us at ${SUPPORT_EMAIL}. We're happy to help!
 
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 };
 
@@ -222,7 +222,9 @@ function AuditTrialEndsSoonEmailTemplate({
             {SUPPORT_EMAIL}. We're happy to help!
           </Text>
 
-          <Text style={{ marginTop: "24px", ...styles.p }}>The Shelf Team</Text>
+          <Text style={{ marginTop: "24px", ...styles.p }}>
+            The EstoqueSoftSystem Team
+          </Text>
         </div>
       </Container>
     </Html>

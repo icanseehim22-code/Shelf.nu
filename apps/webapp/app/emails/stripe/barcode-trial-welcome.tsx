@@ -10,7 +10,7 @@ import {
 import { BARCODE_ADDON } from "~/config/addon-copy";
 import { config } from "~/config/shelf.config";
 import { SERVER_URL, SUPPORT_EMAIL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { LogoForEmail } from "../logo";
 import { sendEmail } from "../mail.server";
@@ -43,7 +43,7 @@ export const sendBarcodeTrialWelcomeEmail = async ({
     });
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message:
           "Something went wrong while sending the barcode trial welcome email",
@@ -78,7 +78,7 @@ ${
 If you have any questions, feel free to reach out to us at ${SUPPORT_EMAIL}. We're happy to help!
 
 Happy labeling,
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 
 function BarcodeTrialWelcomeEmailTemplate({
@@ -164,7 +164,7 @@ function BarcodeTrialWelcomeEmailTemplate({
 
           <Text style={{ marginTop: "24px", ...styles.p }}>
             Happy labeling, <br />
-            The Shelf Team
+            The EstoqueSoftSystem Team
           </Text>
         </div>
       </Container>

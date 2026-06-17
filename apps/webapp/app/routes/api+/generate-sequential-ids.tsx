@@ -5,7 +5,7 @@ import { generateBulkSequentialIdsEfficient } from "~/modules/asset/sequential-i
 import { getSelectedOrganization } from "~/modules/organization/context.server";
 import { updateOrganization } from "~/modules/organization/service.server";
 import { getUserByID } from "~/modules/user/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload } from "~/utils/http.server";
 
 export async function action({ context, request }: ActionFunctionArgs) {
@@ -69,7 +69,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(
       payload({
         success: false,

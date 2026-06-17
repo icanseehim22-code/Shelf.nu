@@ -8,7 +8,7 @@ import { BulkAddToKitSchema } from "~/components/assets/bulk-add-to-kit-dialog";
 import { db } from "~/database/db.server";
 import { updateKitAssets } from "~/modules/kit/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { assertIsPost, payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -43,7 +43,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
     return data(payload({ kits }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -87,7 +87,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     return data(payload({ success: true }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

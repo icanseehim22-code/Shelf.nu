@@ -15,7 +15,11 @@ import { setSelectedOrganizationIdCookie } from "~/modules/organization/context.
 import { claimQrCode } from "~/modules/qr/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import {
   payload,
@@ -52,7 +56,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           title: "Code not found",
           message:
@@ -76,7 +80,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       currentOrganizationId: currentOrganization.id,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -115,7 +119,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }

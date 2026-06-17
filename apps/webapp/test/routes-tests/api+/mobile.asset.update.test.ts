@@ -60,11 +60,11 @@ vi.mock("~/utils/custom-fields", () => ({
 
 // why: error utility — we mock to control error formatting in tests
 vi.mock("~/utils/error", () => ({
-  makeShelfError: vi.fn((cause: any) => ({
+  makeEstoqueSoftSystemError: vi.fn((cause: any) => ({
     message: cause?.message || "Unknown error",
     status: cause?.status || 500,
   })),
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     status: number;
     constructor(opts: any) {
       super(opts.message);
@@ -332,7 +332,7 @@ describe("POST /api/mobile/asset/update", () => {
       const result = await action(createActionArgs({ request }));
 
       expect(result instanceof Response).toBe(true);
-      // Zod parse throws ZodError → caught by the route → makeShelfError
+      // Zod parse throws ZodError → caught by the route → makeEstoqueSoftSystemError
       // wraps it. The mock at the top of this file (`vi.mock` for
       // ~/utils/error) doesn't extract a status from ZodError, so the
       // fallback `cause?.status || 500` returns 500. Assert that exact

@@ -3,7 +3,7 @@ import { BulkRemoveFromKitsSchema } from "~/components/assets/bulk-remove-from-k
 import { getAssetIndexSettings } from "~/modules/asset-index-settings/service.server";
 import { bulkRemoveAssetsFromKits } from "~/modules/kit/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { assertIsPost, payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -57,7 +57,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return data(payload({ success: true }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -3,7 +3,7 @@ import { data } from "react-router";
 import { z } from "zod";
 
 import { recordAuditScan } from "~/modules/audit/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, parseData, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -54,7 +54,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return data(payload({ success: true, ...result }));
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }

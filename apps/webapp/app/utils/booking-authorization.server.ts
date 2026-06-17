@@ -1,5 +1,5 @@
 import { OrganizationRoles } from "@prisma/client";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 
 interface ValidateBookingOwnershipParams {
   booking: {
@@ -31,7 +31,7 @@ interface ValidateBookingOwnershipParams {
  * - SELF_SERVICE users: Only allowed on bookings they own (creator OR custodian)
  * - ADMIN/OWNER users: Allowed on all bookings
  *
- * @throws {ShelfError} 403 if user is not authorized
+ * @throws {EstoqueSoftSystemError} 403 if user is not authorized
  */
 export function validateBookingOwnership({
   booking,
@@ -42,7 +42,7 @@ export function validateBookingOwnership({
   blockBaseEntirely = false,
 }: ValidateBookingOwnershipParams): void {
   if (role === OrganizationRoles.BASE && blockBaseEntirely) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       label: "Booking",
       message: `You are not authorized to ${action} this booking.`,
@@ -60,7 +60,7 @@ export function validateBookingOwnership({
       : booking.creatorId === userId || booking.custodianUserId === userId;
 
     if (!isBookingOwner) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Booking",
         message: `You are not authorized to ${action} this booking.`,

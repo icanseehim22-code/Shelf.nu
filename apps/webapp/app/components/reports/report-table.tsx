@@ -1,7 +1,7 @@
 /**
  * Report Table Component
  *
- * Data table built on TanStack Table with Shelf's design system.
+ * Data table built on TanStack Table with EstoqueSoftSystem's design system.
  * Optimized for reports: sortable columns, sticky header, compact rows.
  *
  * Features:

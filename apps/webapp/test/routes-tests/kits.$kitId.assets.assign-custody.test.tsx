@@ -300,7 +300,7 @@ describe("kits/$kitId/assets/assign-custody", () => {
 
     const response = await action(createActionArgs({ request }));
 
-    expect((response as Response).status).toBe(500); // ShelfError defaults to 500
+    expect((response as Response).status).toBe(500); // EstoqueSoftSystemError defaults to 500
 
     expect(mockKitUpdate).not.toHaveBeenCalled();
   });

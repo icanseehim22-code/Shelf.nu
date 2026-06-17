@@ -31,10 +31,10 @@ import {
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
 import {
-  ShelfError,
-  isLikeShelfError,
+  EstoqueSoftSystemError,
+  isLikeEstoqueSoftSystemError,
   isZodValidationError,
-  makeShelfError,
+  makeEstoqueSoftSystemError,
   notAllowedMethod,
 } from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
@@ -48,8 +48,9 @@ import {
 import { validEmail } from "~/utils/misc";
 
 export function loader({ context }: LoaderFunctionArgs) {
-  const title = "Log in";
-  const subHeading = "Welcome back! Enter your details below to log in.";
+  const title = "Entrar";
+  const subHeading =
+    "Bem-vindo de volta! Insira seus dados abaixo para entrar.";
   const { disableSignup, disableSSO } = config;
 
   if (context.isAuthenticated) {
@@ -64,9 +65,9 @@ const LoginFormSchema = z.object({
     .string()
     .transform((email) => email.toLowerCase())
     .refine(validEmail, () => ({
-      message: "Please enter a valid email",
+      message: "Insira um e-mail válido",
     })),
-  password: z.string().min(8, "Password is too short. Minimum 8 characters."),
+  password: z.string().min(8, "Senha muito curta. Mínimo de 8 caracteres."),
   redirectTo: z.string().optional(),
 });
 
@@ -84,7 +85,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         ) {
           return data(
             error(
-              new ShelfError({
+              new EstoqueSoftSystemError({
                 cause: null,
                 message: "Invalid request",
                 label: "Request validation",
@@ -103,7 +104,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         } catch (cause) {
           return data(
             error(
-              new ShelfError({
+              new EstoqueSoftSystemError({
                 cause,
                 message: "Invalid request body",
                 label: "Request validation",
@@ -152,10 +153,10 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(
+    const reason = makeEstoqueSoftSystemError(
       cause,
       undefined,
-      isLikeShelfError(cause)
+      isLikeEstoqueSoftSystemError(cause)
         ? cause.shouldBeCaptured
         : !isZodValidationError(cause)
     );
@@ -186,15 +187,15 @@ export default function IndexLoginForm() {
     <div className="w-full max-w-md">
       {acceptedInvite ? (
         <div className="mb-8 text-center text-success-600">
-          Successfully accepted workspace invite. Please login to see your new
-          workspace.
+          Convite para o workspace aceito com sucesso. Faça login para ver seu
+          novo workspace.
         </div>
       ) : null}
 
       {passwordReset ? (
         <div className="mb-8 text-center text-success-600">
-          You have successfully reset your password. You can now use your new
-          password to login.
+          Sua senha foi redefinida com sucesso. Agora você pode usar sua nova
+          senha para entrar.
         </div>
       ) : null}
       <Form ref={zo.ref} method="post" replace className="flex flex-col gap-5">
@@ -202,8 +203,8 @@ export default function IndexLoginForm() {
           <Input
             ref={emailInputRef}
             data-test-id="email"
-            label="Email address"
-            placeholder="zaans@huisje.com"
+            label="Endereço de e-mail"
+            placeholder="nome@exemplo.com"
             required
             name={zo.fields.email()}
             type="email"
@@ -214,7 +215,7 @@ export default function IndexLoginForm() {
           />
         </div>
         <PasswordInput
-          label="Password"
+          label="Senha"
           placeholder="**********"
           data-test-id="password"
           name={zo.fields.password()}
@@ -230,11 +231,11 @@ export default function IndexLoginForm() {
           data-test-id="login"
           disabled={disabled}
         >
-          Log In
+          Entrar
         </Button>
         <div className="flex flex-col items-center justify-center">
           <div className="text-center text-sm text-gray-500">
-            Don't remember your password?{" "}
+            Não lembra sua senha?{" "}
             <Button
               variant="link"
               to={{
@@ -242,7 +243,7 @@ export default function IndexLoginForm() {
                 search: searchParams.toString(),
               }}
             >
-              Reset password
+              Redefinir senha
             </Button>
           </div>
         </div>
@@ -250,7 +251,7 @@ export default function IndexLoginForm() {
       {!disableSSO && (
         <div className="mt-6 text-center">
           <Button variant="link" to="/sso-login">
-            Login with SSO
+            Entrar com SSO
           </Button>
         </div>
       )}
@@ -262,9 +263,9 @@ export default function IndexLoginForm() {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="bg-white px-2 text-gray-500">
-              Or use a{" "}
-              <strong title="One Time Password (OTP) is the most secure way to login. We will send you a code to your email.">
-                One Time Password
+              Ou use uma{" "}
+              <strong title="A Senha de Uso Único (OTP) é a forma mais segura de entrar. Enviaremos um código para o seu e-mail.">
+                Senha de Uso Único
               </strong>
             </span>
           </div>
@@ -274,7 +275,7 @@ export default function IndexLoginForm() {
         </div>
         {disableSignup ? null : (
           <div className="mt-6 text-center text-sm text-gray-500">
-            Don't have an account?{" "}
+            Não tem uma conta?{" "}
             <Button
               variant="link"
               data-test-id="signupButton"
@@ -283,7 +284,7 @@ export default function IndexLoginForm() {
                 search: searchParams.toString(),
               }}
             >
-              Sign up
+              Cadastre-se
             </Button>
           </div>
         )}

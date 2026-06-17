@@ -10,7 +10,7 @@ import { sendEmail } from "~/emails/mail.server";
 import { roleChangeTemplateString } from "~/emails/role-change-template";
 import { organizationRolesMap } from "~/routes/_layout+/settings.team";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { payload, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -84,7 +84,7 @@ export async function resolveUserAction(
           },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Failed to delete team member",
             additionalData: { teamMemberId, userId, organizationId },
@@ -124,7 +124,7 @@ export async function resolveUserAction(
           },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Organization not found",
             additionalData: { organizationId, targetUserId, userId },
@@ -176,7 +176,7 @@ export async function resolveUserAction(
           },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Failed to cancel invites",
             additionalData: { userId, organizationId, inviteeEmail },
@@ -221,7 +221,7 @@ export async function resolveUserAction(
       ) as OrganizationRoles | undefined;
 
       if (!role) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Invalid role",
           additionalData: { userFriendlyRole },
@@ -243,7 +243,7 @@ export async function resolveUserAction(
             },
           })
           .catch((cause) => {
-            throw new ShelfError({
+            throw new EstoqueSoftSystemError({
               cause,
               message: "Failed to invalidate previous invites",
               additionalData: { userId, organizationId, inviteeEmail },
@@ -304,7 +304,7 @@ export async function resolveUserAction(
       );
 
       if (targetUserId === userId) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "You cannot change your own role",
           label: "Team",
@@ -317,7 +317,7 @@ export async function resolveUserAction(
       });
 
       if (!targetUserOrg) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "User is not a member of this organization",
           label: "Team",
@@ -343,7 +343,7 @@ export async function resolveUserAction(
           });
 
           if (!recipientOrg) {
-            throw new ShelfError({
+            throw new EstoqueSoftSystemError({
               cause: null,
               message:
                 "Transfer recipient is not a member of this organization",
@@ -445,7 +445,7 @@ export async function resolveUserAction(
       return payload(null);
     }
     default: {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Invalid action",
         additionalData: { intent },
@@ -465,7 +465,7 @@ const MAX_USERNAME_ATTEMPTS = 5;
  * Generates a unique username for a new user with retry mechanism
  * @param email - User's email to base username on
  * @returns Unique username or throws if cannot generate after max attempts
- * @throws {ShelfError} If unable to generate unique username after max attempts
+ * @throws {EstoqueSoftSystemError} If unable to generate unique username after max attempts
  */
 export async function generateUniqueUsername(email: string): Promise<string> {
   // Generate all candidate usernames upfront and check in a single query
@@ -485,7 +485,7 @@ export async function generateUniqueUsername(email: string): Promise<string> {
     return availableUsername;
   }
 
-  throw new ShelfError({
+  throw new EstoqueSoftSystemError({
     cause: null,
     message: "Unable to generate unique username after maximum attempts",
     label: "User",

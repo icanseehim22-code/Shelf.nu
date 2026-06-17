@@ -3,7 +3,7 @@ import { data, redirect } from "react-router";
 
 import { SendOtpSchema } from "~/modules/auth/components/continue-with-email-form";
 import { sendOTP } from "~/modules/auth/service.server";
-import { makeShelfError, notAllowedMethod } from "~/utils/error";
+import { makeEstoqueSoftSystemError, notAllowedMethod } from "~/utils/error";
 import { error, getActionMethod, parseData } from "~/utils/http.server";
 import { validateNonSSOSignup } from "~/utils/sso.server";
 
@@ -32,7 +32,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }

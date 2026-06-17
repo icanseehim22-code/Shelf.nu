@@ -13,7 +13,7 @@ import { scheduleTrialEndsTomorrowEmail } from "~/modules/addon-trial/scheduler.
 import { handleAuditAddonWebhook } from "~/modules/audit/addon.server";
 import { handleBarcodeAddonWebhook } from "~/modules/barcode/addon.server";
 import { resetPersonalWorkspaceBranding } from "~/modules/organization/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import {
   customerHasPaymentMethod,
@@ -44,7 +44,7 @@ const OK = () => new Response(null, { status: 200 });
  * price or interval is unavailable/unrecognised rather than guessing.
  *
  * @param subscription - The Stripe subscription from the webhook event
- * @param tierId - The resolved Shelf tier for the subscription
+ * @param tierId - The resolved EstoqueSoftSystem tier for the subscription
  * @param via - How the paid conversion happened: `direct` (subscribed without a
  *   trial), `upgrade` (moved to a higher paid tier), or `trial_conversion`
  *   (a trial transitioned to an active paid subscription)
@@ -98,7 +98,7 @@ export async function handleCheckoutCompleted(
     .object as Stripe.Checkout.Session;
 
   if (!subscriptionId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "No subscription ID found",
       additionalData: { event },
@@ -147,7 +147,7 @@ export async function handleCheckoutCompleted(
       select: { id: true },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Failed to update user tier",
         additionalData: { customerId, tierId, event },
@@ -210,7 +210,7 @@ export async function handleSubscriptionCreated(
         select: { email: true, firstName: true, displayName: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to update user tier",
           additionalData: { customerId, tierId, event },
@@ -233,7 +233,7 @@ export async function handleSubscriptionCreated(
         select: { id: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to update user tier",
           additionalData: { customerId, tierId, event },
@@ -249,7 +249,7 @@ export async function handleSubscriptionCreated(
         select: { id: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to update user tier",
           additionalData: { customerId, tierId, event },
@@ -270,12 +270,12 @@ export async function handleSubscriptionCreated(
       customerId,
       user,
     });
-    const subscriptionName = product?.name || "Shelf Subscription";
+    const subscriptionName = product?.name || "EstoqueSoftSystem Subscription";
 
     for (const email of emailsToNotify) {
       sendEmail({
         to: email,
-        subject: "Your Shelf subscription is now active",
+        subject: "Your EstoqueSoftSystem subscription is now active",
         text: subscriptionGrantedText({ customerName, subscriptionName }),
       });
     }
@@ -335,7 +335,7 @@ export async function handleSubscriptionPaused(
         select: { id: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to update user tier",
           additionalData: { customerId, tierId, event },
@@ -413,7 +413,7 @@ export async function handleSubscriptionUpdated(
         select: { id: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to update user tier",
           additionalData: { customerId, tierId, event },
@@ -495,7 +495,7 @@ export async function handleSubscriptionDeleted(
         select: { id: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to delete user subscription",
           additionalData: { customerId, event },
@@ -544,7 +544,7 @@ export async function handleInvoicePaymentFailed(
       select: { id: true },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Failed to update unpaid invoice flag",
         additionalData: { customerId, event },
@@ -586,7 +586,8 @@ export async function handleInvoicePaymentFailed(
   for (const email of emailsToNotify) {
     sendEmail({
       to: email,
-      subject: "Action needed: Payment issue with your Shelf subscription",
+      subject:
+        "Action needed: Payment issue with your EstoqueSoftSystem subscription",
       text: unpaidInvoiceUserText({
         customerEmail: email,
         customerName,
@@ -618,7 +619,7 @@ export async function handleInvoicePaid(
       select: { id: true },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Failed to update unpaid invoice flag",
         additionalData: { customerId, event },
@@ -692,7 +693,7 @@ export async function handleInvoicePaid(
                 select: { id: true },
               })
               .catch((cause) => {
-                throw new ShelfError({
+                throw new EstoqueSoftSystemError({
                   cause,
                   message: "Failed to update user tier from paid invoice",
                   additionalData: { customerId, tierId, event },
@@ -735,7 +736,7 @@ export async function handleInvoiceResolved(
       select: { id: true },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Failed to update unpaid invoice flag",
         additionalData: { customerId, event },
@@ -771,7 +772,7 @@ export async function handleInvoiceOverdue(
       select: { id: true },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Failed to update unpaid invoice flag",
         additionalData: { customerId, event },
@@ -798,7 +799,7 @@ export async function handleInvoiceOverdue(
   for (const email of emailsToNotify) {
     sendEmail({
       to: email,
-      subject: "Action needed: Your Shelf invoice is overdue",
+      subject: "Action needed: Your EstoqueSoftSystem invoice is overdue",
       text: unpaidInvoiceUserText({
         customerEmail: email,
         customerName,
@@ -830,7 +831,7 @@ export async function handleInvoiceOverdue(
             select: { id: true },
           })
           .catch((cause) => {
-            throw new ShelfError({
+            throw new EstoqueSoftSystemError({
               cause,
               message: "Failed to downgrade user tier for overdue invoice",
               additionalData: { customerId, tierId, event },
@@ -912,7 +913,7 @@ export async function handleTrialWillEnd(
         }).catch((cause) => {
           // Log but don't fail the webhook — the 1-day email is best-effort
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message: "Failed to schedule trial ends tomorrow email",
               additionalData: {
@@ -937,7 +938,7 @@ export async function handleTrialWillEnd(
       firstName: user.firstName,
       email: user.email,
       hasPaymentMethod,
-      planName: product?.name || "Shelf",
+      planName: product?.name || "EstoqueSoftSystem",
       trialEndDate: new Date((subscription.trial_end as number) * 1000),
     });
   }
@@ -960,7 +961,7 @@ export async function handlePaymentMethodAttached(
       select: { id: true },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Failed to clear missing payment method warning",
         additionalData: { customerId, event: _event },
@@ -997,7 +998,7 @@ export async function handlePaymentMethodDetached(
           select: { id: true },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Failed to set missing payment method warning",
             additionalData: { customerId, event: _event },

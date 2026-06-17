@@ -1,6 +1,6 @@
 import type { AuditNote, User, AuditSession } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label = "Audit";
 
@@ -39,7 +39,7 @@ export async function createAuditNote({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating an audit note",
       additionalData: { type, userId, auditSessionId },
@@ -89,7 +89,7 @@ export async function getAuditNotes({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching audit notes",
       additionalData: { auditSessionId },

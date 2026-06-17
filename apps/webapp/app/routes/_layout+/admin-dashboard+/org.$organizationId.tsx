@@ -33,7 +33,10 @@ import { createDefaultWorkingHours } from "~/modules/working-hours/service.serve
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 
 import { csvDataFromRequest } from "~/utils/csv.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { getParams, payload, error, parseData } from "~/utils/http.server";
 import { extractCSVDataFromContentImport } from "~/utils/import.server";
@@ -70,7 +73,7 @@ export const loader = async ({ context, params }: LoaderFunctionArgs) => {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           title: "Organization not found",
           message:
@@ -86,7 +89,10 @@ export const loader = async ({ context, params }: LoaderFunctionArgs) => {
 
     return payload({ organization });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, organizationId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      organizationId,
+    });
     throw data(error(reason), { status: reason.status });
   }
 };
@@ -235,7 +241,7 @@ export const action = async ({
       case "content": {
         const csvData = await csvDataFromRequest({ request });
         if (csvData.length < 2) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "CSV file is empty",
             additionalData: { intent },
@@ -255,7 +261,7 @@ export const action = async ({
         return payload(null);
       }
       default:
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "Invalid intent",
           message: "The intent provided is not valid",
@@ -264,7 +270,10 @@ export const action = async ({
         });
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, organizationId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      organizationId,
+    });
     return data(error(reason), { status: reason.status });
   }
 };

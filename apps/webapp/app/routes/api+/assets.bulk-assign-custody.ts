@@ -6,10 +6,10 @@ import { getAssetIndexSettings } from "~/modules/asset-index-settings/service.se
 import { getTeamMember } from "~/modules/team-member/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
 import {
-  isLikeShelfError,
+  isLikeEstoqueSoftSystemError,
   isNotFoundError,
-  makeShelfError,
-  ShelfError,
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
 } from "~/utils/error";
 import { assertIsPost, payload, error, parseData } from "~/utils/http.server";
 import {
@@ -54,7 +54,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       organizationId,
       select: { id: true },
     }).catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         title: "Team member not found",
         message: "The selected team member could not be found.",
@@ -64,7 +64,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         // `getTeamMember` already classifies its errors — forward that
         // decision so DB / connectivity failures inside it still reach
         // Sentry. Fall back to the Prisma not-found check otherwise.
-        shouldBeCaptured: isLikeShelfError(cause)
+        shouldBeCaptured: isLikeEstoqueSoftSystemError(cause)
           ? cause.shouldBeCaptured
           : !isNotFoundError(cause),
       });
@@ -93,7 +93,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return data(payload({ success: true }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

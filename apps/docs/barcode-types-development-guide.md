@@ -1,10 +1,10 @@
 # Barcode Types Development Guide
 
-This guide provides comprehensive instructions for developers on how to add new barcode types to the Shelf.nu application. Due to the distributed nature of barcode handling across multiple layers of the application, this guide ensures all necessary changes are made systematically.
+This guide provides comprehensive instructions for developers on how to add new barcode types to the EstoqueSoftSystem application. Due to the distributed nature of barcode handling across multiple layers of the application, this guide ensures all necessary changes are made systematically.
 
 ## Overview
 
-The barcode system in Shelf.nu is implemented across multiple layers:
+The barcode system in EstoqueSoftSystem is implemented across multiple layers:
 
 - **Database Schema** - Type definitions and storage
 - **Validation Layer** - Type-specific validation rules
@@ -278,7 +278,7 @@ const columnToTypeMap: Record<string, BarcodeType> = {
 
 #### 6.3 Update CSV Template
 
-**File:** `public/static/shelf.nu-example-asset-import-from-content-with-barcodes.csv`
+**File:** `public/static/estoquesoftsystem.com-example-asset-import-from-content-with-barcodes.csv`
 
 ```csv
 title,description,barcode_Code128,barcode_Code39,barcode_DataMatrix,barcode_YourNewType

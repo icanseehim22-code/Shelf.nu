@@ -6,7 +6,7 @@ import { Card } from "~/components/shared/card";
 import { UpdateForm } from "~/components/update/update-form";
 import { createUpdate } from "~/modules/update/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import { requireAdmin } from "~/utils/roles.server";
 
@@ -21,7 +21,7 @@ export const loader = async ({ context }: LoaderFunctionArgs) => {
 
     return payload(null);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 };
@@ -69,7 +69,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
     return redirect("/admin-dashboard/updates");
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 };

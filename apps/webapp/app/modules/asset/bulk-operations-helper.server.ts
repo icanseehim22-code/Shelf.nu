@@ -1,7 +1,7 @@
 import type { Asset, AssetIndexSettings } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { getParamsValues, ALL_SELECTED_KEY } from "~/utils/list";
 import { generateWhereClause, parseFiltersWithHierarchy } from "./query.server";
 import { getAssetsWhereInput } from "./utils.server";
@@ -74,7 +74,7 @@ async function getAdvancedFilteredAssetIds({
     const results = await db.$queryRaw<Array<{ id: string }>>(query);
     return results.map((r) => r.id);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching asset IDs",
       additionalData: { organizationId, filters, availableToBookOnly },

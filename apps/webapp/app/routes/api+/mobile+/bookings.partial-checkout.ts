@@ -7,7 +7,7 @@ import {
 } from "~/modules/api/mobile-auth.server";
 import { partialCheckoutBooking } from "~/modules/booking/service.server";
 import { getClientHint, type ClientHint } from "~/utils/client-hints";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -28,7 +28,7 @@ import {
  * @returns JSON `{ success, checkedOutCount, remainingCount, isComplete, booking }`
  *   on success, or `{ error: { message } }` with the appropriate status on failure.
  * @throws Never throws to the caller — errors are normalized via
- *   {@link makeShelfError} into the JSON error response.
+ *   {@link makeEstoqueSoftSystemError} into the JSON error response.
  */
 export async function action({ request }: ActionFunctionArgs) {
   try {
@@ -80,7 +80,7 @@ export async function action({ request }: ActionFunctionArgs) {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

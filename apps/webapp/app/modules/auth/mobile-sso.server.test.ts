@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import {
   createMobileAuthCode,
   deleteExpiredMobileAuthCodes,
@@ -164,7 +164,7 @@ describe("redeemMobileAuthCode", () => {
     });
 
     await expect(redeemMobileAuthCode("good-code")).rejects.toBeInstanceOf(
-      ShelfError
+      EstoqueSoftSystemError
     );
     expect(supabaseMocks.verifyOtp).not.toHaveBeenCalled();
   });

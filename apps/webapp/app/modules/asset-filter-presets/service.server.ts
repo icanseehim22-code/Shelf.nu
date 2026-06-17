@@ -1,6 +1,6 @@
 import { db } from "~/database/db.server";
 import { cleanParamsForCookie } from "~/hooks/search-params";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import { MAX_SAVED_FILTER_PRESETS } from "./constants";
 
@@ -8,7 +8,7 @@ function normalizeName(name: string): string {
   const trimmed = name.trim();
 
   if (!trimmed) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       label: "Assets",
       message: "Name is required.",
@@ -33,7 +33,7 @@ async function assertPresetOwnership({
   });
 
   if (!preset) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       label: "Assets",
       message: "We couldn't find that saved filter.",
@@ -87,7 +87,7 @@ export async function createPreset({
     });
 
     if (existingCount >= MAX_SAVED_FILTER_PRESETS) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Assets",
         message: `You can only save up to ${MAX_SAVED_FILTER_PRESETS} filter presets. Please delete one before creating a new one.`,
@@ -101,7 +101,7 @@ export async function createPreset({
     });
 
     if (existingByName) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Assets",
         message:
@@ -148,7 +148,7 @@ export async function renamePreset({
     });
 
     if (!preset) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Assets",
         message: "We couldn't find that saved filter.",
@@ -172,7 +172,7 @@ export async function renamePreset({
     });
 
     if (duplicate) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Assets",
         message:

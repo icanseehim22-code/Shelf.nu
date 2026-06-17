@@ -9,7 +9,7 @@ import {
 import { createAuditImageEvidenceNote } from "~/modules/audit/helpers.server";
 import { uploadAuditImage } from "~/modules/audit/image.service.server";
 import { requireAuditAssetInSession } from "~/modules/audit/mobile-evidence.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -35,7 +35,7 @@ import {
  * @param args - Remix action args; `request` carries bearer auth, the
  *   query params, and the multipart body
  * @returns JSON `{ image }` on success, else `{ error: { message } }` 4xx
- * @throws Never — failures are caught and returned via `makeShelfError`
+ * @throws Never — failures are caught and returned via `makeEstoqueSoftSystemError`
  */
 export async function action({ request }: ActionFunctionArgs) {
   try {
@@ -127,7 +127,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return data({ image });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

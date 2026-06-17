@@ -1,5 +1,5 @@
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { USER_CONTACT_SELECT } from "./constants";
 
 const label = "User Contact";
@@ -17,7 +17,7 @@ export async function getUserContactById(userId: string) {
     });
     return userContact;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to retrieve user contact information",
       additionalData: { userId },
@@ -52,7 +52,7 @@ export async function updateUserContact(payload: UpdateUserContactPayload) {
 
     return userContact;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update user contact information",
       additionalData: { userId: payload.userId },

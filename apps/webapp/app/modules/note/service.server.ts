@@ -22,7 +22,7 @@ import type {
   LoadUserForNotesFn,
 } from "~/modules/note/load-user-for-notes.server";
 export type { BasicUserName } from "~/modules/note/load-user-for-notes.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import {
   wrapKitsWithDataForNote,
   wrapLinkForNote,
@@ -62,7 +62,7 @@ export type TagSummary = Pick<Tag, "id" | "name">;
  * where a caller supplies an asset ID from another tenant.
  *
  * @param params.organizationId - Caller's validated organization ID
- * @throws {ShelfError} 400 if the asset is not in `organizationId`
+ * @throws {EstoqueSoftSystemError} 400 if the asset is not in `organizationId`
  */
 export async function createNote({
   content,
@@ -98,7 +98,7 @@ export async function createNote({
       data,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating a note",
       additionalData: { type, userId, assetId },
@@ -118,7 +118,7 @@ export async function createNote({
  *   inside a `db.$transaction`, pass it so the org guard and the note write
  *   commit atomically with the surrounding mutation (and roll back together).
  *   Defaults to the global `db`.
- * @throws {ShelfError} 400 if any asset is not in `organizationId`
+ * @throws {EstoqueSoftSystemError} 400 if any asset is not in `organizationId`
  */
 export async function createNotes(
   {
@@ -151,7 +151,7 @@ export async function createNotes(
       data,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating notes",
       additionalData: { type, userId, assetIds },
@@ -169,7 +169,7 @@ export async function deleteNote({
       where: { id, userId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while deleting the note",
       additionalData: { id, userId },
@@ -203,7 +203,7 @@ export async function createBulkKitChangeNotes({
         select: { firstName: true, lastName: true, displayName: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "User not found",
           additionalData: { userId },
@@ -231,7 +231,7 @@ export async function createBulkKitChangeNotes({
       }
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating bulk kit change notes",
       additionalData: {
@@ -319,7 +319,7 @@ export async function createKitChangeNote({
       organizationId,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating a kit change note. Please try again or contact support",
@@ -609,7 +609,7 @@ export async function createAssetNotesForAuditAddition({
       organizationId,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating asset notes for audit addition",
@@ -663,7 +663,7 @@ export async function createAssetNotesForAuditRemoval({
       organizationId,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating asset notes for audit removal",

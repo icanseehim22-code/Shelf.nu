@@ -18,7 +18,10 @@ import Header from "~/components/layout/header";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 import { csvDataFromRequest } from "~/utils/csv.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
   buildUpdatePreview,
@@ -61,7 +64,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
     // Validate file presence before parsing
     const file = clonedFormData.get("file");
     if (!file || !(file instanceof File) || file.size === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Please select a CSV file to upload.",
         label: "Assets",
@@ -71,7 +74,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
     const csvData = await csvDataFromRequest({ request });
     if (csvData.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "CSV file is empty or contains only whitespace.",
         label: "Assets",
@@ -79,7 +82,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
       });
     }
     if (csvData.length === 1) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "CSV contains a header row but no data rows. Add at least one asset row below the headers.",
@@ -100,7 +103,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
       case "apply-update": {
         const confirmation = clonedFormData.get("confirmation");
         if (confirmation !== "I AGREE") {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: 'You must type "I AGREE" to confirm the bulk update.',
             label: "Assets",
@@ -120,7 +123,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
         checkExhaustiveSwitch(intent);
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 };
@@ -145,7 +148,7 @@ export const loader = async ({ context, request }: LoaderFunctionArgs) => {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 };

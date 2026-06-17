@@ -9,7 +9,7 @@ import {
 } from "@react-email/components";
 import { config } from "~/config/shelf.config";
 import { SERVER_URL, SUPPORT_EMAIL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { LogoForEmail } from "../logo";
 import { sendEmail } from "../mail.server";
@@ -32,8 +32,8 @@ export const sendTrialEndsSoonEmail = async ({
 }: TrialEndsSoonProps) => {
   try {
     const subject = hasPaymentMethod
-      ? `Your Shelf ${planName} trial ends in 3 days — auto-charge reminder`
-      : `Your Shelf ${planName} trial is ending soon`;
+      ? `Your EstoqueSoftSystem ${planName} trial ends in 3 days — auto-charge reminder`
+      : `Your EstoqueSoftSystem ${planName} trial is ending soon`;
     const html = await trialEndsSoonEmailHtml({
       firstName,
       hasPaymentMethod,
@@ -55,7 +55,7 @@ export const sendTrialEndsSoonEmail = async ({
     });
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Something went wrong while sending the trial ends soon email",
         additionalData: { email },
@@ -87,25 +87,25 @@ export const trialEndsSoonEmailText = ({
 
 ACTION REQUIRED: You will be automatically charged when your trial ends.
 
-Your Shelf ${planName} trial ends on ${dateStr}. Because you have a payment method on file, you will be automatically charged at the regular subscription rate when the trial ends. To avoid being charged, cancel from your subscription settings before the trial ends: ${SERVER_URL}/account-details/subscription
+Your EstoqueSoftSystem ${planName} trial ends on ${dateStr}. Because you have a payment method on file, you will be automatically charged at the regular subscription rate when the trial ends. To avoid being charged, cancel from your subscription settings before the trial ends: ${SERVER_URL}/account-details/subscription
 
-If you'd like to keep your Shelf ${planName} plan, no action is needed - everything will transition seamlessly.
+If you'd like to keep your EstoqueSoftSystem ${planName} plan, no action is needed - everything will transition seamlessly.
 
 If you have any questions, feel free to reach out to us at ${SUPPORT_EMAIL}. We're happy to help!
 
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
   }
 
   return `Hey${firstName ? ` ${firstName}` : ""},
 
-Your Shelf ${planName} trial ends on ${dateStr}. To keep access to your premium features, upgrade to a paid plan before the trial expires: ${SERVER_URL}/account-details/subscription
+Your EstoqueSoftSystem ${planName} trial ends on ${dateStr}. To keep access to your premium features, upgrade to a paid plan before the trial expires: ${SERVER_URL}/account-details/subscription
 
 Don't worry - your data won't be deleted. Once you subscribe, everything will be right where you left it.
 
 If you have any questions, feel free to reach out to us at ${SUPPORT_EMAIL}. We're happy to help!
 
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 };
 
@@ -131,7 +131,7 @@ function TrialEndsSoonEmailTemplate({
   return (
     <Html>
       <Head>
-        <title>Your Shelf {planName} trial is ending soon</title>
+        <title>Your EstoqueSoftSystem {planName} trial is ending soon</title>
       </Head>
 
       <Container style={{ padding: "32px 16px", maxWidth: "100%" }}>
@@ -156,10 +156,11 @@ function TrialEndsSoonEmailTemplate({
                 <strong>
                   Action required if you don't want to be charged.
                 </strong>{" "}
-                Your Shelf {planName} trial ends on <strong>{dateStr}</strong>.
-                Because you have a payment method on file, you will be
-                automatically charged at the regular subscription rate when the
-                trial ends. To avoid being charged, cancel from your{" "}
+                Your EstoqueSoftSystem {planName} trial ends on{" "}
+                <strong>{dateStr}</strong>. Because you have a payment method on
+                file, you will be automatically charged at the regular
+                subscription rate when the trial ends. To avoid being charged,
+                cancel from your{" "}
                 <Link
                   href={`${SERVER_URL}/account-details/subscription`}
                   style={{ color: emailPrimaryColor }}
@@ -182,14 +183,14 @@ function TrialEndsSoonEmailTemplate({
               </Button>
 
               <Text style={{ ...styles.p }}>
-                If you'd like to keep your Shelf {planName} plan, no action is
-                needed — everything will transition seamlessly.
+                If you'd like to keep your EstoqueSoftSystem {planName} plan, no
+                action is needed — everything will transition seamlessly.
               </Text>
             </>
           ) : (
             <>
               <Text style={{ ...styles.p }}>
-                Your <strong>Shelf {planName} trial</strong> ends on{" "}
+                Your <strong>EstoqueSoftSystem {planName} trial</strong> ends on{" "}
                 <strong>{dateStr}</strong>.
               </Text>
 
@@ -222,7 +223,9 @@ function TrialEndsSoonEmailTemplate({
             {SUPPORT_EMAIL}. We're happy to help!
           </Text>
 
-          <Text style={{ marginTop: "24px", ...styles.p }}>The Shelf Team</Text>
+          <Text style={{ marginTop: "24px", ...styles.p }}>
+            The EstoqueSoftSystem Team
+          </Text>
         </div>
       </Container>
     </Html>

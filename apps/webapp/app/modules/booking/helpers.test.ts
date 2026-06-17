@@ -260,11 +260,19 @@ describe("groupAndSortAssetsByKit — location", () => {
   it("places assets with no location at the end regardless of direction", () => {
     const assets = [
       createAsset("1", "NoLoc", "AVAILABLE"),
-      createAsset("2", "HasLoc", "AVAILABLE", null, null, null, "Shelf 1"),
+      createAsset(
+        "2",
+        "HasLoc",
+        "AVAILABLE",
+        null,
+        null,
+        null,
+        "EstoqueSoftSystem 1"
+      ),
     ];
 
     const ascResult = groupAndSortAssetsByKit(assets, "location", "asc");
-    expect(ascResult[0].location?.name).toBe("Shelf 1");
+    expect(ascResult[0].location?.name).toBe("EstoqueSoftSystem 1");
     expect(ascResult[1].location).toBeNull();
 
     const descResult = groupAndSortAssetsByKit(assets, "location", "desc");

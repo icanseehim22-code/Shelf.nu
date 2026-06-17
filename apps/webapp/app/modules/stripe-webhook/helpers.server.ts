@@ -8,7 +8,7 @@ import {
   CUSTOM_INSTALL_CUSTOMERS,
   STRIPE_WEBHOOK_ENDPOINT_SECRET,
 } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { stripe } from "~/utils/stripe.server";
 
 /** The user shape returned by the webhook's initial DB query */
@@ -34,7 +34,7 @@ export const subscriptionTiersPriority: Record<TierId, number> = {
  *
  * @returns true if it's an add-on (caller should return early with 200)
  * @returns false if tierId exists (caller should continue processing)
- * @throws ShelfError if no tierId and not an add-on product
+ * @throws EstoqueSoftSystemError if no tierId and not an add-on product
  */
 export function isAddonSubscription({
   tierId,
@@ -50,7 +50,7 @@ export function isAddonSubscription({
   if (tierId) return false;
   if (productType === "addon") return true;
 
-  throw new ShelfError({
+  throw new EstoqueSoftSystemError({
     cause: null,
     message: "No tier ID found for non-addon product",
     additionalData: { event, productType, ...additionalData },
@@ -114,7 +114,7 @@ export function sendAdminInvoiceEmail({
  * and custom install customer check.
  *
  * @returns `{ event, customerId, user }` where `user` is null for custom install customers
- * @throws ShelfError on validation failure
+ * @throws EstoqueSoftSystemError on validation failure
  */
 export async function constructVerifiedWebhookEvent(request: Request): Promise<{
   event: Stripe.Event;
@@ -125,7 +125,7 @@ export async function constructVerifiedWebhookEvent(request: Request): Promise<{
   const sig = request.headers.get("stripe-signature");
 
   if (!sig) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Missing stripe-signature header",
       label: "Stripe webhook",
@@ -135,7 +135,7 @@ export async function constructVerifiedWebhookEvent(request: Request): Promise<{
   }
 
   if (!STRIPE_WEBHOOK_ENDPOINT_SECRET) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "STRIPE_WEBHOOK_ENDPOINT_SECRET is not configured",
       label: "Stripe webhook",
@@ -145,7 +145,7 @@ export async function constructVerifiedWebhookEvent(request: Request): Promise<{
   }
 
   if (!stripe) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "Stripe client is not initialized. Check that STRIPE_SECRET_KEY is configured and premium features are enabled.",
@@ -163,7 +163,7 @@ export async function constructVerifiedWebhookEvent(request: Request): Promise<{
       STRIPE_WEBHOOK_ENDPOINT_SECRET
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         cause instanceof Stripe.errors.StripeSignatureVerificationError
@@ -206,7 +206,7 @@ export async function constructVerifiedWebhookEvent(request: Request): Promise<{
       throw new PaymentMethodWithoutCustomerResponse();
     }
     // For other events, customerId is required
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "No customer ID found in event",
       additionalData: { event: event.type },
@@ -229,7 +229,7 @@ export async function constructVerifiedWebhookEvent(request: Request): Promise<{
       },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "No user found",
         additionalData: { customerId },

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import {
   createPreset,
@@ -116,7 +116,7 @@ describe("asset-filter-presets service", () => {
           name: "Latest",
           query: "status=AVAILABLE",
         })
-      ).rejects.toBeInstanceOf(ShelfError);
+      ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     });
 
     it("throws when a preset with the same name already exists", async () => {
@@ -130,7 +130,7 @@ describe("asset-filter-presets service", () => {
           name: "My preset",
           query: "status=AVAILABLE",
         })
-      ).rejects.toBeInstanceOf(ShelfError);
+      ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     });
 
     it("throws when name is empty", async () => {
@@ -141,7 +141,7 @@ describe("asset-filter-presets service", () => {
           name: "   ",
           query: "status=AVAILABLE",
         })
-      ).rejects.toBeInstanceOf(ShelfError);
+      ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     });
   });
 
@@ -156,7 +156,7 @@ describe("asset-filter-presets service", () => {
           ownerId: "user-2",
           name: "New name",
         })
-      ).rejects.toBeInstanceOf(ShelfError);
+      ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     });
 
     it("updates preset name with trimmed value", async () => {
@@ -222,7 +222,7 @@ describe("asset-filter-presets service", () => {
           organizationId: "org-1",
           ownerId: "user-2",
         })
-      ).rejects.toBeInstanceOf(ShelfError);
+      ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     });
   });
 });

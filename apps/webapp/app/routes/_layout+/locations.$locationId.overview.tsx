@@ -12,7 +12,7 @@ import {
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { getClientHint } from "~/utils/client-hints";
 import { formatCurrency } from "~/utils/currency";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -59,7 +59,10 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       header,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId: id });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId,
+      locationId: id,
+    });
     throw data(error(reason), { status: reason.status });
   }
 }

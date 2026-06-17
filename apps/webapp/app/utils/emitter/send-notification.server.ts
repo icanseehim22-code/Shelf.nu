@@ -1,6 +1,6 @@
 import type { NotificationType } from "~/atoms/notifications";
 import { emitter } from "./emitter.server";
-import { ShelfError } from "../error";
+import { EstoqueSoftSystemError } from "../error";
 import { getTabId } from "../tab-id.server";
 
 export function sendNotification(notification: Omit<NotificationType, "open">) {
@@ -17,7 +17,7 @@ export function sendNotification(notification: Omit<NotificationType, "open">) {
       })
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to send notification",
       additionalData: { notification },

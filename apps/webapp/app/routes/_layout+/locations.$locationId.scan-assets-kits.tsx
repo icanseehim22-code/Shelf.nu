@@ -23,7 +23,7 @@ import {
 } from "~/modules/location/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import {
@@ -71,7 +71,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     return payload({ title, header, location });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, locationId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -129,7 +129,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/locations/${locationId}/assets`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, locationId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -1,7 +1,7 @@
 /**
  * Bar Chart Component
  *
- * Categorical bar chart built on Recharts with Shelf's design tokens.
+ * Categorical bar chart built on Recharts with EstoqueSoftSystem's design tokens.
  * Supports both vertical and horizontal orientations.
  *
  * Features:
@@ -29,14 +29,14 @@ import type { ChartSeries } from "~/modules/reports/types";
 
 /** Color palette for multi-series charts */
 const SERIES_COLORS = [
-  "#EF6820", // primary-500 (Shelf orange)
+  "#EF6820", // primary-500 (EstoqueSoftSystem orange)
   "#22c55e", // green-500
   "#3b82f6", // blue-500
   "#a855f7", // purple-500
   "#f59e0b", // amber-500
 ];
 
-/** Shelf's color palette for charts */
+/** EstoqueSoftSystem's color palette for charts */
 const CHART_COLORS = {
   grid: "#F2F4F7", // gray-100
   axis: "#667085", // gray-500

@@ -9,7 +9,7 @@ import { useUserRoleHelper } from "~/hooks/user-user-role-helper";
 import { getLocation } from "~/modules/location/service.server";
 import { getLocationNotes } from "~/modules/location-note/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -63,7 +63,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       header,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { locationId, userId });
+    const reason = makeEstoqueSoftSystemError(cause, { locationId, userId });
     throw data(error(reason), { status: reason.status });
   }
 }

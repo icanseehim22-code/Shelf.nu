@@ -12,7 +12,7 @@ import { useDisabled } from "~/hooks/use-disabled";
 import { duplicateBooking, getBooking } from "~/modules/booking/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -49,7 +49,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
       booking,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw reason;
   }
 }
@@ -83,7 +83,7 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
 
     return redirect(`/bookings/${newBooking.id}`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

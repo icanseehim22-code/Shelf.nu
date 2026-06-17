@@ -12,7 +12,10 @@ import { getKit, releaseCustody } from "~/modules/kit/service.server";
 import styles from "~/styles/layout/custom-modal.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import {
@@ -62,7 +65,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       kit: kitWithCustody,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -95,7 +98,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       });
 
       if (custody?.custodian?.userId !== userId) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "Action not allowed",
           message: "Self user can release custody of themselves only.",
@@ -130,7 +133,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/kits/${kitId}/assets`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     return data(error(reason), { status: reason.status });
   }
 }

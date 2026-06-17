@@ -54,7 +54,10 @@ import {
 } from "~/modules/working-hours/zod-utils";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -75,7 +78,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     });
 
     if (currentOrganization.type === OrganizationType.PERSONAL) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Not allowed",
         message:
@@ -103,7 +106,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       ...notifyData,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -153,7 +156,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         "deleteOverride",
       ].includes(intent)
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Invalid action",
         additionalData: { intent },
@@ -299,7 +302,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         const validation = WeeklyScheduleSchema.safeParse(weeklyScheduleData);
 
         if (!validation.success) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: validation.error,
             title: "Invalid Schedule",
             message: "Please check your working hours schedule for errors",
@@ -363,7 +366,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         const overrideId = formData.get("overrideId") as string;
 
         if (!overrideId) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "Override ID is required",
             additionalData: { intent },
@@ -453,7 +456,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       case "updateExplicitCheckin": {
         // Only workspace owners can change explicit check-in settings
         if (role !== OrganizationRoles.OWNER) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             title: "Not allowed",
             message:
@@ -520,7 +523,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
 
       default: {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Invalid action",
           additionalData: { intent },
@@ -529,7 +532,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

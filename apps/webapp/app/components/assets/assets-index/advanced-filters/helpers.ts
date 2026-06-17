@@ -246,11 +246,11 @@ export function getAvailableColumns(
 }
 
 /**
- * Extracts the QR ID from a Shelf QR URL or returns the full value for external QR codes
+ * Extracts the QR ID from a EstoqueSoftSystem QR URL or returns the full value for external QR codes
  *
- * For Shelf QR codes, extracts the ID:
+ * For EstoqueSoftSystem QR codes, extracts the ID:
  * - localhost:3000/qr/abc123?hello=world -> abc123
- * - https://shelf.nu/qr/abc123 -> abc123
+ * - https://estoquesoftsystem.com/qr/abc123 -> abc123
  * - https://eam.sh/abc123 -> abc123
  * - abc123 -> abc123
  *
@@ -259,10 +259,10 @@ export function getAvailableColumns(
  * - Any other QR content -> original value
  *
  * @param value - The input value (URL or QR ID)
- * @returns The extracted QR ID for Shelf QRs or full value for external QRs
+ * @returns The extracted QR ID for EstoqueSoftSystem QRs or full value for external QRs
  */
 export function extractQrIdFromValue(value: string): string {
-  // First check if it's a Shelf QR code
+  // First check if it's a EstoqueSoftSystem QR code
   if (isShelfQrCode(value)) {
     try {
       // Try to parse as URL first

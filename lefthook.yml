@@ -37,7 +37,11 @@ pre-commit:
     prettier:
       priority: 3
       glob: "**/*.{ts,tsx,js,jsx,json,md,css,yaml,yml}"
-      exclude: "pnpm-lock.yaml"
+      # Exclude pnpm-lock.yaml and remix flat-route files with escaped
+      # extensions (e.g. foo[.csv].ts): the square brackets are glob
+      # metacharacters that make Prettier exit 2 ("ignored due to negative
+      # glob patterns") in --write mode when such files are passed explicitly.
+      exclude: 'pnpm-lock\.yaml|\[.*\]'
       run: >
         npx prettier
         --write

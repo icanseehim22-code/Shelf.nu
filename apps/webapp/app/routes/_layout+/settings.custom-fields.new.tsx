@@ -13,7 +13,7 @@ import { getCategoriesForCreateAndEdit } from "~/modules/asset/service.server";
 import { createCustomField } from "~/modules/custom-field/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 
 import {
@@ -60,7 +60,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       totalCategories,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
 
     throw data(error(reason), { status: reason.status });
   }
@@ -120,7 +120,7 @@ export async function action({ context, request }: LoaderFunctionArgs) {
 
     return redirect(`/settings/custom-fields`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

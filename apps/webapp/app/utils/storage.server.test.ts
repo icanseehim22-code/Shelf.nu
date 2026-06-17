@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import {
-  findShelfErrorInCause,
+  findEstoqueSoftSystemErrorInCause,
   isSupabaseRateLimitError,
   isSupabaseServerError,
 } from "./storage.server";
@@ -169,9 +169,9 @@ describe("isSupabaseServerError", () => {
   });
 });
 
-describe("findShelfErrorInCause", () => {
-  it("returns the ShelfError when it is the top-level error", () => {
-    const shelfError = new ShelfError({
+describe("findEstoqueSoftSystemErrorInCause", () => {
+  it("returns the EstoqueSoftSystemError when it is the top-level error", () => {
+    const shelfError = new EstoqueSoftSystemError({
       cause: null,
       message: "Unsupported image format",
       title: "Bad format",
@@ -179,7 +179,7 @@ describe("findShelfErrorInCause", () => {
       shouldBeCaptured: false,
     });
 
-    const result = findShelfErrorInCause(shelfError);
+    const result = findEstoqueSoftSystemErrorInCause(shelfError);
 
     expect(result).toBe(shelfError);
     expect(result?.message).toBe("Unsupported image format");
@@ -187,8 +187,8 @@ describe("findShelfErrorInCause", () => {
     expect(result?.shouldBeCaptured).toBe(false);
   });
 
-  it("finds a ShelfError nested one level deep in the cause chain", () => {
-    const shelfError = new ShelfError({
+  it("finds a EstoqueSoftSystemError nested one level deep in the cause chain", () => {
+    const shelfError = new EstoqueSoftSystemError({
       cause: null,
       message: "Unsupported image format",
       title: "Bad format",
@@ -196,11 +196,11 @@ describe("findShelfErrorInCause", () => {
       shouldBeCaptured: false,
     });
 
-    // Simulates FormDataParseError wrapping a ShelfError
+    // Simulates FormDataParseError wrapping a EstoqueSoftSystemError
     const wrapper = new Error("Cannot parse form data");
     wrapper.cause = shelfError;
 
-    const result = findShelfErrorInCause(wrapper);
+    const result = findEstoqueSoftSystemErrorInCause(wrapper);
 
     expect(result).toBe(shelfError);
     expect(result?.message).toBe("Unsupported image format");
@@ -208,8 +208,8 @@ describe("findShelfErrorInCause", () => {
     expect(result?.shouldBeCaptured).toBe(false);
   });
 
-  it("finds a ShelfError nested multiple levels deep", () => {
-    const shelfError = new ShelfError({
+  it("finds a EstoqueSoftSystemError nested multiple levels deep", () => {
+    const shelfError = new EstoqueSoftSystemError({
       cause: null,
       message: "Original error",
       label: "File storage",
@@ -222,22 +222,22 @@ describe("findShelfErrorInCause", () => {
     const outerWrapper = new Error("Outer wrapper");
     outerWrapper.cause = innerWrapper;
 
-    const result = findShelfErrorInCause(outerWrapper);
+    const result = findEstoqueSoftSystemErrorInCause(outerWrapper);
 
     expect(result).toBe(shelfError);
   });
 
-  it("returns null when no ShelfError exists in the cause chain", () => {
+  it("returns null when no EstoqueSoftSystemError exists in the cause chain", () => {
     const plainError = new Error("Something went wrong");
 
-    expect(findShelfErrorInCause(plainError)).toBeNull();
+    expect(findEstoqueSoftSystemErrorInCause(plainError)).toBeNull();
   });
 
   it("returns null for null input", () => {
-    expect(findShelfErrorInCause(null)).toBeNull();
+    expect(findEstoqueSoftSystemErrorInCause(null)).toBeNull();
   });
 
   it("returns null for undefined input", () => {
-    expect(findShelfErrorInCause(undefined)).toBeNull();
+    expect(findEstoqueSoftSystemErrorInCause(undefined)).toBeNull();
   });
 });

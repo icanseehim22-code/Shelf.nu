@@ -23,7 +23,7 @@ import { resolveDisplayCode } from "~/modules/barcode/display";
 import { getAssetsForKits } from "~/modules/kit/service.server";
 import type { ListItemForKitPage } from "~/modules/kit/types";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -70,7 +70,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       modelName,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     throw data(error(reason), { status: reason.status });
   }
 }

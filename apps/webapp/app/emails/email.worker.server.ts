@@ -1,12 +1,12 @@
 import { transporter } from "~/emails/transporter.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { QueueNames, scheduler } from "~/utils/scheduler.server";
 import type { EmailPayloadType } from "./types";
 import { SMTP_FROM, SUPPORT_EMAIL } from "../utils/env";
 
 /** Domain used for soft-deleted user email addresses */
-export const SOFT_DELETED_EMAIL_DOMAIN = "@deleted.shelf.nu";
+export const SOFT_DELETED_EMAIL_DOMAIN = "@deleted.estoquesoftsystem.com";
 
 // every node will execute 5 jobs(teamSize) every 3 minutes(newJobCheckIntervalSeconds),
 // increase teamSize if you need better concurrency
@@ -27,7 +27,7 @@ export const registerEmailWorkers = async () => {
 
         if (isLastRetry) {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message: "Email permanently failed after exhausting all retries",
               additionalData: {
@@ -64,7 +64,7 @@ export const triggerEmail = async ({
   try {
     // send mail with defined transport object
     await transporter.sendMail({
-      from: from || SMTP_FROM || `"Shelf" <hello@example.com>`, // sender address
+      from: from || SMTP_FROM || `"EstoqueSoftSystem" <hello@example.com>`, // sender address
       replyTo: replyTo || SUPPORT_EMAIL, // reply to
       to, // list of receivers
       subject, // Subject line
@@ -72,7 +72,7 @@ export const triggerEmail = async ({
       html: html || "", // html body
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Unable to send email",
       additionalData: { to, subject, from },

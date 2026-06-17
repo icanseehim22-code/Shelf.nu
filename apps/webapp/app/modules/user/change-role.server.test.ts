@@ -2,7 +2,7 @@
 import { OrganizationRoles } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { changeUserRole } from "./service.server";
 
 // why: testing role change validation logic without actual database operations
@@ -49,7 +49,7 @@ describe("changeUserRole", () => {
         newRole: OrganizationRoles.OWNER,
         callerRole: OrganizationRoles.OWNER,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     await expect(
       changeUserRole({

@@ -57,8 +57,8 @@ vitest.mock("~/modules/barcode/service.server", () => ({
 }));
 
 vitest.mock("~/utils/error", () => ({
-  makeShelfError: vitest.fn(),
-  ShelfError: class ShelfError extends Error {
+  makeEstoqueSoftSystemError: vitest.fn(),
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     status: number;
     constructor(opts: any) {
       super(opts.message);
@@ -73,7 +73,7 @@ import {
 } from "~/modules/api/mobile-auth.server";
 import { db } from "~/database/db.server";
 import { getBarcodeByValue } from "~/modules/barcode/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 
 const mockUser = {
   id: "user-1",
@@ -264,7 +264,7 @@ describe("GET /api/mobile/barcode/:value", () => {
     const authError = new Error("Invalid or expired token");
     (authError as any).status = 401;
     (requireMobileAuth as any).mockRejectedValue(authError);
-    (makeShelfError as any).mockReturnValue({
+    (makeEstoqueSoftSystemError as any).mockReturnValue({
       message: "Invalid or expired token",
       status: 401,
     });

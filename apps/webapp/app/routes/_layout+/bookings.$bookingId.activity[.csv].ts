@@ -2,7 +2,7 @@ import { data, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { db } from "~/database/db.server";
 import { exportBookingNotesToCsv } from "~/utils/csv.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { buildContentDisposition, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -55,7 +55,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

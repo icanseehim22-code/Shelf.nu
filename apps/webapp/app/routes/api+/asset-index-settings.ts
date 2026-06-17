@@ -14,7 +14,7 @@ import {
 import { getActiveCustomFields } from "~/modules/custom-field/service.server";
 import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -151,7 +151,9 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId: authSession.userId });
+    const reason = makeEstoqueSoftSystemError(cause, {
+      userId: authSession.userId,
+    });
     return data(error(reason), { status: reason.status });
   }
 }

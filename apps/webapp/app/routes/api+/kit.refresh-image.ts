@@ -1,7 +1,10 @@
 import { data, type ActionFunctionArgs } from "react-router";
 import { z } from "zod";
 import { updateKit } from "~/modules/kit/service.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import { oneDayFromNow } from "~/utils/one-week-from-now";
 import {
@@ -41,7 +44,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     const filename = start !== -1 ? path.slice(start + "/kits/".length) : null;
 
     if (!filename) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Cannot find kit filename",
         additionalData: { userId, kitId, image },
@@ -61,7 +64,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return data(payload({ kit }));
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }

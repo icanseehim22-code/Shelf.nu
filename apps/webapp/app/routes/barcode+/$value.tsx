@@ -7,7 +7,10 @@ import { getBarcodeByValue } from "~/modules/barcode/service.server";
 import { setSelectedOrganizationIdCookie } from "~/modules/organization/context.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -35,10 +38,10 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     // Check if organization has barcode permissions enabled
     if (!canUseBarcodes) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
-          "Your workspace does not support scanning barcodes. Contact your workspace owner to activate this feature or try scanning a Shelf QR code.",
+          "Your workspace does not support scanning barcodes. Contact your workspace owner to activate this feature or try scanning a EstoqueSoftSystem QR code.",
         additionalData: { value, shouldSendNotification: false },
         label: "Barcode",
         shouldBeCaptured: false,
@@ -56,7 +59,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
      * If the barcode doesn't exist, getBarcodeByValue will return null
      */
     if (!barcode) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Barcode not found",
         message:
@@ -78,7 +81,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
     ) as Pick<Organization, "id">;
 
     if (!organizationsIds.includes(barcode.organizationId)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "You don't have permission to access this barcode.",
         additionalData: { value, shouldSendNotification: false },
@@ -101,7 +104,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
      * This shouldn't normally happen with our current barcode system.
      */
     if (!barcode.assetId && !barcode.kitId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "This barcode is not linked to any asset or kit.",
         additionalData: { value, shouldSendNotification: false },
@@ -127,7 +130,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         }
       );
     } else {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Something went wrong with handling this barcode. This should not happen. Please try again or contact support.",
@@ -135,7 +138,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       });
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, value });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, value });
     throw data(error(reason), { status: reason.status });
   }
 }

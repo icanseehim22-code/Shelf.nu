@@ -2,7 +2,7 @@ import { data, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { getKit } from "~/modules/kit/service.server";
 import { generateQrObj } from "~/modules/qr/utils.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -54,7 +54,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     return data(error(reason), { status: reason.status });
   }
 }

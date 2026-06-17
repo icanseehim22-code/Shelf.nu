@@ -1,5 +1,5 @@
 import { data } from "react-router";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error } from "~/utils/http.server";
 
 export async function loader() {
@@ -15,7 +15,7 @@ export async function loader() {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }

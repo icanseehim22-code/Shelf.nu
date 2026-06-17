@@ -23,7 +23,10 @@ import { useUserRoleHelper } from "~/hooks/user-user-role-helper";
 import { getPaginatedAndFilterableSettingTeamMembers } from "~/modules/settings/service.server";
 import { getOrganizationTierLimit } from "~/modules/tier/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, parseData, payload } from "~/utils/http.server";
 import { isPersonalOrg as checkIsPersonalOrg } from "~/utils/organization";
 import {
@@ -82,7 +85,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       isPersonalOrg: checkIsPersonalOrg(currentOrganization),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -143,7 +146,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
             },
           })
           .catch((cause) => {
-            throw new ShelfError({
+            throw new EstoqueSoftSystemError({
               cause,
               message: "Failed to delete team member",
               additionalData: { teamMemberId, userId, organizationId },
@@ -154,7 +157,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         return redirect(`/settings/team/nrm`);
       }
       default: {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Invalid action",
           additionalData: { intent },
@@ -163,7 +166,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -125,7 +125,7 @@ describe("bookings.$bookingId.activity action — organization scoping", () => {
       })
     );
 
-    // Response shape: the route `makeShelfError`s and returns data(error(...), { status })
+    // Response shape: the route `makeEstoqueSoftSystemError`s and returns data(error(...), { status })
     expect((response as any).init?.status).toBe(404);
 
     // Cross-org bookingId must not reach the service

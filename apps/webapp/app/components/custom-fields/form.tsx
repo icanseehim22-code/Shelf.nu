@@ -264,7 +264,7 @@ export const CustomFieldForm = ({
                 Select asset categories for which you want to use this custom
                 field.{" "}
                 <Link
-                  to="https://www.shelf.nu/knowledge-base/linking-custom-fields-to-categories"
+                  to="https://www.estoquesoftsystem.com/knowledge-base/linking-custom-fields-to-categories"
                   target="_blank"
                 >
                   Read more

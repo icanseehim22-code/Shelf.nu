@@ -2,7 +2,7 @@ import type { Location, LocationNote, Prisma, User } from "@prisma/client";
 
 import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label: ErrorLabel = "Location";
 
@@ -35,7 +35,7 @@ export async function createLocationNote({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating the location note.",
       additionalData: { locationId, userId },
@@ -67,7 +67,7 @@ export async function createSystemLocationNote({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while creating the location update.",
       additionalData: { locationId },
@@ -89,7 +89,7 @@ export async function getLocationNotes({
     });
 
     if (!location) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Location not found or access denied",
         additionalData: { locationId, organizationId },
@@ -113,11 +113,11 @@ export async function getLocationNotes({
       },
     });
   } catch (cause) {
-    if (cause instanceof ShelfError) {
+    if (cause instanceof EstoqueSoftSystemError) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the location notes.",
       additionalData: { locationId, organizationId },
@@ -135,7 +135,7 @@ export async function deleteLocationNote({
       where: { id, userId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while deleting the location note.",
       additionalData: { id, userId },

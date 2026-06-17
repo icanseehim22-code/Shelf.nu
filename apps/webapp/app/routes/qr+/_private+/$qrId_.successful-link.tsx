@@ -9,7 +9,10 @@ import { Button } from "~/components/shared/button";
 
 import { db } from "~/database/db.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -61,7 +64,7 @@ export const loader = async ({
     });
 
     if (!qr) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "The QR you are trying to access does not exist.",
         title: "QR not found",
@@ -77,7 +80,7 @@ export const loader = async ({
       qr,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, qrId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, qrId });
     throw data(error(reason), { status: reason.status });
   }
 };

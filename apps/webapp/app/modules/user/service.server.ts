@@ -34,7 +34,11 @@ import {
 import { DEFAULT_MAX_IMAGE_UPLOAD_SIZE } from "~/utils/constants";
 import { dateTimeInUnix } from "~/utils/date-time-in-unix";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError, isLikeShelfError, isNotFoundError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  isLikeEstoqueSoftSystemError,
+  isNotFoundError,
+} from "~/utils/error";
 import { getRedirectUrlFromRequest, type ValidationError } from "~/utils/http";
 import { getCurrentSearchParams } from "~/utils/http.server";
 import { id as generateId } from "~/utils/id/id.server";
@@ -87,7 +91,7 @@ export async function getUserByID(
     const include = options?.include;
 
     if (select && include) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Cannot use both select and include in getUserByID. Please choose one.",
@@ -107,7 +111,7 @@ export async function getUserByID(
 
     return user;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "User not found",
       message: "The user you are trying to access does not exist.",
@@ -155,7 +159,7 @@ export async function getUserWithContact<T extends Prisma.UserInclude>(
       contact,
     } as ReturnType;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to retrieve user with contact information",
       additionalData: { id },
@@ -168,7 +172,7 @@ export async function findUserByEmail(email: User["email"]) {
   try {
     return await db.user.findUnique({ where: { email: email.toLowerCase() } });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to find user",
       additionalData: { email },
@@ -211,7 +215,7 @@ async function createUserOrgAssociation(
       )
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to create user organization association",
       additionalData: { payload },
@@ -258,7 +262,7 @@ export async function createUserOrAttachOrg({
       }
 
       if (!authAccount) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "We are facing some issue with your account. " +
@@ -302,9 +306,9 @@ export async function createUserOrAttachOrg({
 
     return shelfUser;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : `There was an issue with creating/attaching user with email: ${email}`,
       additionalData: { email, organizationId, roles, firstName },
@@ -330,7 +334,7 @@ export async function createUserOrAttachOrg({
  * @param userData.groups - Array of group IDs the user belongs to in the IDP
  *
  * @returns Object containing the created/updated user and their first organization (if any)
- * @throws ShelfError if user creation/update fails
+ * @throws EstoqueSoftSystemError if user creation/update fails
  */
 
 export async function createUserFromSSO(
@@ -407,7 +411,7 @@ export async function createUserFromSSO(
     // null so the OAuth callback redirects to the "pending assignment" page.
     return { user, org: firstMatchedOrg };
   } catch (cause: any) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: `Failed to create SSO user: ${cause.message}`,
       additionalData: {
@@ -501,7 +505,7 @@ async function handleSCIMTransition(
 
     return transition;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to handle SCIM transition",
       additionalData: {
@@ -630,10 +634,10 @@ export async function updateUserFromSSO(
   } catch (cause) {
     let message = `Failed to update SSO user: ${email}.`;
 
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       message = message + ` ${cause.message}`;
     }
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: {
@@ -796,7 +800,7 @@ export async function createUser(
     const isUniqueViolation =
       cause instanceof PrismaClientKnownRequestError && cause.code === "P2002";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "We had trouble while creating your account. Please try again.",
       additionalData: {
@@ -869,7 +873,7 @@ export async function updateUser<T extends Prisma.UserInclude>(
       };
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while updating your profile. Please try again or contact support.",
@@ -905,7 +909,7 @@ export async function updateUserEmail({
     );
 
     if (error) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: error,
         message:
           "Failed to update email in auth. Please try again and if the issue persists, contact support",
@@ -927,9 +931,9 @@ export async function updateUserEmail({
         });
 
         // Unique email constraint is being handled automatically by `getSupabaseAdmin().auth.admin.generateLink`
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
-          message: "Failed to update email in shelf",
+          message: "Failed to update email in EstoqueSoftSystem",
           additionalData: { userId, newEmail, currentEmail },
           label,
         });
@@ -937,7 +941,7 @@ export async function updateUserEmail({
 
     return updatedUser;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update email",
       additionalData: { userId, currentEmail, newEmail },
@@ -974,7 +978,7 @@ export const getPaginatedAndFilterableUsers = async ({
       totalPages,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get paginated and filterable users",
       additionalData: { page, search, tierId },
@@ -1058,7 +1062,7 @@ async function getUsers({
 
     return { users, totalUsers };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get users",
       additionalData: { page, perPage, search, tierId },
@@ -1109,9 +1113,9 @@ export async function updateProfilePicture({
         : undefined,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while updating your profile picture. Please try again or contact support.",
       additionalData: { userId, field: "profile-picture" },
@@ -1125,7 +1129,7 @@ export async function updateProfilePicture({
  * To comply with regulations, we will destroy all personal data related to the user
  *
  * To soft delete the user we do the following:
- * 1. Update the user email to: deleted+{randomId}@deleted.shelf.nu
+ * 1. Update the user email to: deleted+{randomId}@deleted.estoquesoftsystem.com
  * 2. Update the user username to: deleted+{randomId}
  * 3. Update the user firstName to: Deleted
  * 4. Update the user lastName to: User
@@ -1233,7 +1237,7 @@ export async function softDeleteUser(id: User["id"]) {
     void sendEmail({
       to: user.email,
       subject: "Your account has been deleted",
-      text: `Your shelf account has been deleted. \n\n Kind regards, \n Shelf Team\n\n`,
+      text: `Your EstoqueSoftSystem account has been deleted. \n\n Kind regards, \n EstoqueSoftSystem Team\n\n`,
     });
 
     if (error) {
@@ -1244,7 +1248,7 @@ export async function softDeleteUser(id: User["id"]) {
         ("code" in error && error.code === "user_not_found");
 
       if (!isUserNotFound) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: error,
           message: "Failed to delete Auth user",
           additionalData: { id, error },
@@ -1260,7 +1264,7 @@ export async function softDeleteUser(id: User["id"]) {
       // eslint-disable-next-line no-console
       console.log("User not found, so no need to delete");
     } else {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Unable to delete user",
         additionalData: { id },
@@ -1368,7 +1372,7 @@ export async function revokeAccessToOrganization({
 
     return result;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to revoke user access to organization",
       additionalData: { userId, organizationId },
@@ -1404,7 +1408,7 @@ export async function changeUserRole({
 }) {
   try {
     if (newRole === OrganizationRoles.OWNER) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Cannot assign Owner role directly. Use ownership transfer instead.",
@@ -1421,7 +1425,7 @@ export async function changeUserRole({
     });
 
     if (!userOrg) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "User is not a member of this organization",
         additionalData: { userId, organizationId },
@@ -1433,7 +1437,7 @@ export async function changeUserRole({
     const currentRole = userOrg.roles[0];
 
     if (currentRole === OrganizationRoles.OWNER) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Cannot change the Owner's role. Use ownership transfer instead.",
@@ -1447,7 +1451,7 @@ export async function changeUserRole({
       newRole === OrganizationRoles.ADMIN &&
       callerRole !== OrganizationRoles.OWNER
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Insufficient permissions",
         message: "Only the workspace owner can promote users to Administrator.",
@@ -1462,7 +1466,7 @@ export async function changeUserRole({
       currentRole === OrganizationRoles.ADMIN &&
       callerRole !== OrganizationRoles.OWNER
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Insufficient permissions",
         message: "Only the workspace owner can change an Administrator's role.",
@@ -1486,14 +1490,14 @@ export async function changeUserRole({
 
     return { ...updated, previousRole: currentRole };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Failed to change user role",
       additionalData: { userId, organizationId, newRole },
       label,
-      status: isLikeShelfError(cause) ? cause.status : undefined,
+      status: isLikeEstoqueSoftSystemError(cause) ? cause.status : undefined,
     });
   }
 }
@@ -1727,7 +1731,7 @@ export async function getUserFromOrg<T extends Prisma.UserInclude | undefined>({
           ? getRedirectUrlFromRequest(request)
           : undefined;
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "User not found",
         message: "",
@@ -1743,7 +1747,7 @@ export async function getUserFromOrg<T extends Prisma.UserInclude | undefined>({
 
     return user;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "User not found.",
       message:
@@ -1751,7 +1755,7 @@ export async function getUserFromOrg<T extends Prisma.UserInclude | undefined>({
       additionalData: {
         id,
         organizationId,
-        ...(isLikeShelfError(cause) ? cause.additionalData : {}),
+        ...(isLikeEstoqueSoftSystemError(cause) ? cause.additionalData : {}),
       },
       label,
       shouldBeCaptured: !isNotFoundError(cause),

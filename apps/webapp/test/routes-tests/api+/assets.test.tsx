@@ -1,5 +1,5 @@
 import { db } from "~/database/db.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { requirePermission } from "~/utils/roles.server";
 import { loader } from "~/routes/api+/assets";
 import { createLoaderArgs } from "@mocks/remix";
@@ -43,7 +43,7 @@ vitest.mock("~/utils/roles.server", () => ({
 }));
 
 vitest.mock("~/utils/error", () => ({
-  makeShelfError: vitest.fn(),
+  makeEstoqueSoftSystemError: vitest.fn(),
 }));
 
 const mockContext = {
@@ -276,7 +276,7 @@ describe("/api/assets", () => {
       (requirePermission as any).mockRejectedValue(permissionError);
 
       const shelfError = { status: 403, message: "Permission denied" };
-      (makeShelfError as any).mockReturnValue(shelfError);
+      (makeEstoqueSoftSystemError as any).mockReturnValue(shelfError);
 
       const result = await loader(
         createLoaderArgs({
@@ -286,7 +286,7 @@ describe("/api/assets", () => {
         })
       );
 
-      expect(makeShelfError).toHaveBeenCalledWith(permissionError, {
+      expect(makeEstoqueSoftSystemError).toHaveBeenCalledWith(permissionError, {
         userId: "user-1",
       });
 
@@ -310,7 +310,7 @@ describe("/api/assets", () => {
       (db.asset.findMany as any).mockRejectedValue(dbError);
 
       const shelfError = { status: 500, message: "Database error" };
-      (makeShelfError as any).mockReturnValue(shelfError);
+      (makeEstoqueSoftSystemError as any).mockReturnValue(shelfError);
 
       const result = await loader(
         createLoaderArgs({
@@ -320,7 +320,7 @@ describe("/api/assets", () => {
         })
       );
 
-      expect(makeShelfError).toHaveBeenCalledWith(dbError, {
+      expect(makeEstoqueSoftSystemError).toHaveBeenCalledWith(dbError, {
         userId: "user-1",
       });
 

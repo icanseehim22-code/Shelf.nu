@@ -4,7 +4,7 @@ import {
   deleteAuditImage,
   getAuditImages,
 } from "~/modules/audit/image.service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getParams, parseData, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -44,7 +44,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
 
     return data(payload({ images }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -82,7 +82,7 @@ export async function action({ request, context, params }: LoaderFunctionArgs) {
 
     throw new Error("Invalid intent");
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

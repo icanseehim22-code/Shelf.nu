@@ -21,7 +21,7 @@ import {
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { FIELD_TYPE_NAME } from "~/utils/custom-fields";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -81,7 +81,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       totalCategories,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -141,7 +141,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return payload(null);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     return data(error(reason), { status: reason.status });
   }
 }

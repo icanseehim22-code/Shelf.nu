@@ -39,7 +39,10 @@ import {
 } from "~/modules/audit/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { getClientHint } from "~/utils/client-hints";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getParams, parseData, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -148,7 +151,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, auditId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, auditId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -210,7 +213,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       const auditAssetId = formData.get("auditAssetId") as string;
 
       if (!auditAssetId) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Audit asset ID is required",
           additionalData: { intent },
@@ -244,7 +247,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       const auditAssetIds = auditAssets.map((aa) => aa.id);
 
       if (auditAssetIds.length === 0) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "No matching assets found in audit",
           additionalData: { intent, assetIds },
@@ -263,7 +266,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       return data(payload({ success: true }));
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Invalid action intent",
       additionalData: { intent },
@@ -271,7 +274,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       status: 400,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, auditId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, auditId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -10,7 +10,7 @@ import {
 import { AUDIT_ADDON } from "~/config/addon-copy";
 import { config } from "~/config/shelf.config";
 import { SERVER_URL, SUPPORT_EMAIL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { LogoForEmail } from "../logo";
 import { sendEmail } from "../mail.server";
@@ -49,7 +49,7 @@ export const sendAuditTrialWelcomeEmail = async ({
     });
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message:
           "Something went wrong while sending the audit trial welcome email",
@@ -84,7 +84,7 @@ ${
 If you have any questions, feel free to reach out to us at ${SUPPORT_EMAIL}. We're happy to help!
 
 Happy auditing,
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 
 function AuditTrialWelcomeEmailTemplate({
@@ -170,7 +170,7 @@ function AuditTrialWelcomeEmailTemplate({
 
           <Text style={{ marginTop: "24px", ...styles.p }}>
             Happy auditing, <br />
-            The Shelf Team
+            The EstoqueSoftSystem Team
           </Text>
         </div>
       </Container>

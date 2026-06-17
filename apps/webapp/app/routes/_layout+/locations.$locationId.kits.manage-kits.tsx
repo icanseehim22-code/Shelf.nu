@@ -55,7 +55,10 @@ import { LOCATION_WITH_HIERARCHY } from "~/modules/asset/fields";
 import { getPaginatedAndFilterableKits } from "~/modules/kit/service.server";
 import { updateLocationKits } from "~/modules/location/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import { isSelectingAllItems } from "~/utils/list";
@@ -91,7 +94,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           title: "Location not found",
           message:
@@ -133,7 +136,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       location,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, locationId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -183,7 +186,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/locations/${locationId}/kits`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, locationId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, locationId });
     return data(error(reason), { status: reason.status });
   }
 }

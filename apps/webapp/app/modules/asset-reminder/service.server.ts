@@ -1,7 +1,11 @@
 import type { AssetReminder, Prisma, TeamMember } from "@prisma/client";
 import { db } from "~/database/db.server";
 import { updateCookieWithPerPage } from "~/utils/cookies.server";
-import { isLikeShelfError, isNotFoundError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  isNotFoundError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { getCurrentSearchParams } from "~/utils/http.server";
 import { getParamsValues } from "~/utils/list";
 import { wrapLinkForNote, wrapUserLinkForNote } from "~/utils/markdoc-wrappers";
@@ -88,9 +92,9 @@ export async function createAssetReminder({
 
     return assetReminder;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while creating asset reminder.",
       label,
@@ -115,7 +119,7 @@ async function validateTeamMembersForReminder(
     // Stale form state: a team member the user selected has since been
     // removed, lost their linked user account, or never belonged to this
     // workspace. This is a 4xx, not a 5xx — surface it without paging.
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       label,
       message:
@@ -221,7 +225,7 @@ export async function getPaginatedAndFilterableReminders({
       search,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while getting asset reminders.",
       label,
@@ -250,7 +254,7 @@ export async function editAssetReminder({
 
     const now = new Date();
     if (now > reminder.alertDateTime) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Edit is not allowed for this reminder.",
         label: "Asset Reminder",
@@ -292,20 +296,20 @@ export async function editAssetReminder({
       message = "Reminder not found or you are viewing in wrong organization.";
     }
 
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       message = cause.message;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       label,
-      // Forward the inner ShelfError's decision when the cause is already
-      // a ShelfError — otherwise this wrapper re-captures intentional 4xx
+      // Forward the inner EstoqueSoftSystemError's decision when the cause is already
+      // a EstoqueSoftSystemError — otherwise this wrapper re-captures intentional 4xx
       // throws like the stale-team-member validator (`shouldBeCaptured:
       // false`) or the "Edit is not allowed" guard above. Fall back to the
       // Prisma not-found check for raw causes.
-      shouldBeCaptured: isLikeShelfError(cause)
+      shouldBeCaptured: isLikeEstoqueSoftSystemError(cause)
         ? cause.shouldBeCaptured
         : !isNotFoundError(cause),
     });
@@ -325,15 +329,15 @@ export async function deleteAssetReminder({
 
     return deletedReminder;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: isNotFoundError(cause)
         ? "Reminder not found or you are viewing in wrong organization."
         : "Something went wrong while deleting reminder.",
       label,
-      // Forward the inner ShelfError's decision when present so this
+      // Forward the inner EstoqueSoftSystemError's decision when present so this
       // wrapper does not re-capture intentional 4xx throws.
-      shouldBeCaptured: isLikeShelfError(cause)
+      shouldBeCaptured: isLikeEstoqueSoftSystemError(cause)
         ? cause.shouldBeCaptured
         : !isNotFoundError(cause),
     });
@@ -362,7 +366,7 @@ export async function getUpcomingRemindersForHomePage({
 
     return reminders;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while getting upcoming reminders.",
       label,
@@ -393,7 +397,7 @@ export async function getRemindersForOverviewPage({
 
     return reminders;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while getting asset reminders.",
       label,

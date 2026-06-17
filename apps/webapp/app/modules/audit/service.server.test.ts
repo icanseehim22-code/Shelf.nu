@@ -2,7 +2,7 @@ import { AuditStatus } from "@prisma/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import { sendAuditCancelledEmails } from "./email-helpers";
 import {
@@ -306,7 +306,7 @@ describe("audit service", () => {
   it("throws when no assets are provided", async () => {
     await expect(
       createAuditSession({ ...defaultInput, assetIds: [] })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
   });
 
   it("throws when assets are missing", async () => {
@@ -314,7 +314,7 @@ describe("audit service", () => {
       { id: "asset-1", title: "Camera A" },
     ]);
     await expect(createAuditSession(defaultInput)).rejects.toBeInstanceOf(
-      ShelfError
+      EstoqueSoftSystemError
     );
   });
 
@@ -512,7 +512,7 @@ describe("audit service", () => {
           organizationId: "org-1",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
     });
 
     it("throws error when audit is not PENDING", async () => {
@@ -529,7 +529,7 @@ describe("audit service", () => {
           organizationId: "org-1",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
     });
   });
 
@@ -606,7 +606,7 @@ describe("audit service", () => {
           organizationId: "org-1",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
     });
 
     it("throws error when audit is not PENDING", async () => {
@@ -621,7 +621,7 @@ describe("audit service", () => {
           organizationId: "org-1",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
     });
 
     it("throws error when audit asset not found", async () => {
@@ -637,7 +637,7 @@ describe("audit service", () => {
           organizationId: "org-1",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
     });
   });
 
@@ -711,7 +711,7 @@ describe("audit service", () => {
           organizationId: "org-1",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
     });
 
     it("throws error when audit is not PENDING", async () => {
@@ -728,7 +728,7 @@ describe("audit service", () => {
           organizationId: "org-1",
           userId: "user-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
     });
   });
 
@@ -887,7 +887,7 @@ describe("audit service", () => {
         });
       });
 
-      it("rejects with ShelfError when no archivable audits are found", async () => {
+      it("rejects with EstoqueSoftSystemError when no archivable audits are found", async () => {
         mockDb.auditSession.findMany.mockResolvedValue([]);
 
         await expect(
@@ -969,7 +969,7 @@ describe("audit service", () => {
         expect(userCallOrder).toBeLessThan(transactionCallOrder);
       });
 
-      it("wraps unknown causes in a 500 ShelfError", async () => {
+      it("wraps unknown causes in a 500 EstoqueSoftSystemError", async () => {
         mockDb.auditSession.findMany.mockRejectedValue(new Error("boom"));
 
         await expect(
@@ -1184,7 +1184,7 @@ describe("audit service", () => {
         expect(removePublicFile).not.toHaveBeenCalled();
       });
 
-      it("wraps unknown causes in a 500 ShelfError", async () => {
+      it("wraps unknown causes in a 500 EstoqueSoftSystemError", async () => {
         mockDb.auditSession.findFirst.mockRejectedValue(new Error("boom"));
 
         await expect(deleteAuditSession(baseInput)).rejects.toMatchObject({
@@ -1385,7 +1385,7 @@ describe("audit service", () => {
         expect(removePublicFile).not.toHaveBeenCalled();
       });
 
-      it("wraps unknown causes in a 500 ShelfError", async () => {
+      it("wraps unknown causes in a 500 EstoqueSoftSystemError", async () => {
         mockDb.auditSession.findMany.mockRejectedValue(new Error("boom"));
 
         await expect(
@@ -1584,7 +1584,7 @@ describe("audit service", () => {
       expect(result.newSession).toMatchObject({ id: "audit-copy" });
     });
 
-    it("throws a 400 ShelfError when no original assets remain", async () => {
+    it("throws a 400 EstoqueSoftSystemError when no original assets remain", async () => {
       mockDb.asset.findMany.mockResolvedValueOnce([]);
 
       await expect(duplicateAuditSession(baseInput)).rejects.toMatchObject({
@@ -1596,7 +1596,7 @@ describe("audit service", () => {
       expect(mockDb.auditSession.create).not.toHaveBeenCalled();
     });
 
-    it("throws a 404 ShelfError when the source audit is not found", async () => {
+    it("throws a 404 EstoqueSoftSystemError when the source audit is not found", async () => {
       mockDb.auditSession.findFirst.mockResolvedValueOnce(null);
 
       await expect(duplicateAuditSession(baseInput)).rejects.toMatchObject({
@@ -1620,7 +1620,7 @@ describe("audit service", () => {
       });
     });
 
-    it("wraps unknown causes in a 500 ShelfError", async () => {
+    it("wraps unknown causes in a 500 EstoqueSoftSystemError", async () => {
       mockDb.auditSession.findFirst.mockRejectedValueOnce(
         new Error("DB exploded")
       );

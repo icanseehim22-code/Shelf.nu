@@ -7,7 +7,7 @@ import {
   Text,
 } from "@react-email/components";
 import { SUPPORT_EMAIL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { LogoForEmail } from "../logo";
 import { sendEmail } from "../mail.server";
@@ -64,7 +64,7 @@ export const sendFeedbackEmail = async ({
     });
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Something went wrong while sending the feedback email",
         additionalData: { userEmail, type },

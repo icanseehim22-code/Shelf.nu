@@ -10,7 +10,10 @@ import { getSupabaseAdmin } from "~/integrations/supabase/client";
 import { SERVER_URL } from "~/utils/env";
 
 import type { ErrorLabel } from "~/utils/error";
-import { isLikeShelfError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { mapAuthSession } from "./mappers.server";
 
@@ -32,7 +35,7 @@ export async function createEmailAuthAccount(email: string, password: string) {
 
     return user;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to create email auth account",
       additionalData: { email },
@@ -81,7 +84,7 @@ export async function confirmExistingAuthAccount(
 
     return data.user;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to confirm existing auth account",
       additionalData: { email },
@@ -109,7 +112,7 @@ export async function signUpWithEmailPass(email: string, password: string) {
     const { user } = data;
 
     if (!user) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "The user returned by Supabase is null",
         label,
@@ -130,7 +133,7 @@ export async function signUpWithEmailPass(email: string, password: string) {
     const message = isRateLimitError
       ? "You're trying too fast. Please wait a few seconds and try again."
       : "Something went wrong, refresh page and try to signup again.";
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: { email },
@@ -157,7 +160,7 @@ export async function resendVerificationEmail(email: string) {
   } catch (cause) {
     // @ts-expect-error
     const isRateLimitError = cause?.code === "over_email_send_rate_limit";
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while resending the verification email. Please try again later or contact support.",
@@ -201,7 +204,7 @@ export async function signInWithEmail(email: string, password: string) {
       ? "Incorrect email or password"
       : "Something went wrong. Please try again later or contact support.";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       label,
@@ -254,7 +257,7 @@ export async function signInWithSSO(
       shouldBeCaptured = false;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       label,
@@ -267,7 +270,7 @@ export async function signInWithSSO(
 /**
  * Helper function to check if user is SSO-only and throw appropriate error
  * @param email User's email address
- * @throws ShelfError if user exists and is SSO-only
+ * @throws EstoqueSoftSystemError if user exists and is SSO-only
  */
 async function validateNonSSOUser(email: string) {
   const user = await db.user.findUnique({
@@ -276,7 +279,7 @@ async function validateNonSSOUser(email: string) {
   });
 
   if (user?.sso) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "SSO User",
       message:
@@ -323,7 +326,7 @@ export async function sendOTP(email: string) {
       isAuthApiError(cause) && cause.message.includes("Database error");
     // SSO-mismatch / similar `validateNonSSOUser` rejections already opt out
     // via their own `shouldBeCaptured: false` — preserve that decision.
-    const inheritedShouldBeCaptured = isLikeShelfError(cause)
+    const inheritedShouldBeCaptured = isLikeEstoqueSoftSystemError(cause)
       ? cause.shouldBeCaptured
       : undefined;
 
@@ -333,12 +336,12 @@ export async function sendOTP(email: string) {
     // AuthRetryableFetchError (e.g. from 504 timeout) can have "{}" as message,
     // so we validate the message is actually useful before showing it to users
     const hasUsableMessage =
-      (cause instanceof AuthError || isLikeShelfError(cause)) &&
+      (cause instanceof AuthError || isLikeEstoqueSoftSystemError(cause)) &&
       cause.message &&
       cause.message !== "{}" &&
       !cause.message.startsWith("{");
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: hasUsableMessage ? cause.message : fallbackMessage,
       additionalData: { email },
@@ -357,7 +360,7 @@ export async function sendResetPasswordLink(email: string) {
 
     await getSupabaseAdmin().auth.resetPasswordForEmail(email);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while sending the reset password link. Please try again later or contact support.",
@@ -380,7 +383,7 @@ export async function updateAccountPassword(
       },
     });
     if (user?.sso) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "You cannot update the password of an SSO user.",
         label,
@@ -399,7 +402,7 @@ export async function updateAccountPassword(
       throw error;
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while updating the password. Please try again later or contact support.",
@@ -418,7 +421,7 @@ export async function deleteAuthAccount(userId: string) {
     }
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message:
           "Something went wrong while deleting the auth account. Please manually delete the user account in the Supabase dashboard.",
@@ -442,7 +445,7 @@ export async function getAuthUserById(userId: string) {
 
     return user;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while getting the auth user by id. Please try again later or contact support.",
@@ -456,7 +459,7 @@ export async function getAuthResponseByAccessToken(accessToken: string) {
   try {
     return await getSupabaseAdmin().auth.getUser(accessToken);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while getting the auth response by access token. Please try again later or contact support.",
@@ -482,7 +485,7 @@ export async function validateSession(token: string) {
     if (result.length === 0) {
       //logging for debug
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: "Refresh token is invalid or has been revoked",
           label,
@@ -493,7 +496,7 @@ export async function validateSession(token: string) {
     return result.length > 0;
   } catch (_err) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: null,
         message: "Something went wrong while valdiating the session",
         label,
@@ -509,7 +512,7 @@ export async function refreshAccessToken(
 ): Promise<AuthSession> {
   try {
     if (!refreshToken) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Refresh token is required",
         label,
@@ -527,7 +530,7 @@ export async function refreshAccessToken(
     const { session } = data;
 
     if (!session) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "The session returned by Supabase is null",
         label,
@@ -540,7 +543,7 @@ export async function refreshAccessToken(
     // additionalData — if this error is ever captured it would be spread into
     // the Sentry event's `extra`. `makeSentryContext` also redacts secret-ish
     // keys as a backstop, but the credential should not be in the error at all.
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Unable to refresh access token. Please try again. If the issue persists, contact support",
@@ -557,7 +560,7 @@ export async function verifyAuthSession(authSession: AuthSession) {
 
     return Boolean(authAccount);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while verifying the auth session. Please try again later or contact support.",
@@ -581,7 +584,7 @@ export async function verifyOtpAndSignin(email: string, otp: string) {
     const { session } = data;
 
     if (!session) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "The session returned by Supabase is null",
         label,
@@ -599,7 +602,7 @@ export async function verifyOtpAndSignin(email: string, otp: string) {
       shouldBeCaptured = false;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       label,

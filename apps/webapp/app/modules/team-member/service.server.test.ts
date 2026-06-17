@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTeamMember } from "@factories";
 
 import { getTeamMember } from "~/modules/team-member/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const dbMocks = vi.hoisted(() => ({
   teamMember: {
@@ -44,7 +44,7 @@ describe("getTeamMember", () => {
       });
     });
 
-    it("should throw ShelfError when team member not found", async () => {
+    it("should throw EstoqueSoftSystemError when team member not found", async () => {
       const dbError = new Error("Record not found");
       mockTeamMemberFindUniqueOrThrow.mockRejectedValue(dbError);
 
@@ -53,7 +53,7 @@ describe("getTeamMember", () => {
           id: "nonexistent-id",
           organizationId: "org-789",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         getTeamMember({
@@ -169,7 +169,7 @@ describe("getTeamMember", () => {
           select: { id: true },
           include: { user: true },
         } as any) // Type assertion needed since TypeScript prevents this at compile time
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         getTeamMember({
@@ -203,8 +203,8 @@ describe("getTeamMember", () => {
   });
 
   describe("error handling", () => {
-    it("should re-throw ShelfError when database throws ShelfError", async () => {
-      const originalError = new ShelfError({
+    it("should re-throw EstoqueSoftSystemError when database throws EstoqueSoftSystemError", async () => {
+      const originalError = new EstoqueSoftSystemError({
         cause: null,
         message: "Custom error",
         additionalData: {},
@@ -221,7 +221,7 @@ describe("getTeamMember", () => {
       ).rejects.toBe(originalError);
     });
 
-    it("should wrap generic database errors in ShelfError", async () => {
+    it("should wrap generic database errors in EstoqueSoftSystemError", async () => {
       const dbError = new Error("Database connection failed");
       mockTeamMemberFindUniqueOrThrow.mockRejectedValue(dbError);
 
@@ -230,7 +230,7 @@ describe("getTeamMember", () => {
           id: "team-member-123",
           organizationId: "org-789",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       try {
         await getTeamMember({
@@ -238,16 +238,16 @@ describe("getTeamMember", () => {
           organizationId: "org-789",
         });
       } catch (error) {
-        expect(error).toBeInstanceOf(ShelfError);
-        expect((error as ShelfError).cause).toBe(dbError);
-        expect((error as ShelfError).additionalData).toEqual({
+        expect(error).toBeInstanceOf(EstoqueSoftSystemError);
+        expect((error as EstoqueSoftSystemError).cause).toBe(dbError);
+        expect((error as EstoqueSoftSystemError).additionalData).toEqual({
           id: "team-member-123",
           organizationId: "org-789",
         });
       }
     });
 
-    it("should include correct error details in ShelfError", async () => {
+    it("should include correct error details in EstoqueSoftSystemError", async () => {
       const dbError = new Error("Record not found");
       mockTeamMemberFindUniqueOrThrow.mockRejectedValue(dbError);
 
@@ -257,8 +257,8 @@ describe("getTeamMember", () => {
           organizationId: "test-org",
         });
       } catch (error) {
-        expect(error).toBeInstanceOf(ShelfError);
-        const shelfError = error as ShelfError;
+        expect(error).toBeInstanceOf(EstoqueSoftSystemError);
+        const shelfError = error as EstoqueSoftSystemError;
         expect(shelfError.title).toBe("Team member not found");
         expect(shelfError.message).toBe(
           "The selected team member could not be found."

@@ -7,7 +7,7 @@
  * expected on small screens.
  *
  * Replaces ~20 duplicated `<style>` blocks across action-dropdown
- * components (see PR https://github.com/Shelf-nu/shelf.nu/pull/304 for
+ * components (see PR https://github.com/EstoqueSoftSystem-nu/estoquesoftsystem.com/pull/304 for
  * history). Only renders when `open` is true, matching the prior
  * call-site pattern.
  *

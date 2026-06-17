@@ -4,7 +4,10 @@ import type { LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { db } from "~/database/db.server";
 import { getBarcodeByValue } from "~/modules/barcode/service.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -49,10 +52,10 @@ export async function loader({ request, params, context }: LoaderFunctionArgs) {
 
     // Check if organization has barcode permissions enabled
     if (!canUseBarcodes) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
-          "Your workspace does not support scanning barcodes. Contact your workspace owner to activate this feature or try scanning a Shelf QR code.",
+          "Your workspace does not support scanning barcodes. Contact your workspace owner to activate this feature or try scanning a EstoqueSoftSystem QR code.",
         additionalData: { shouldSendNotification: false },
         label: "Barcode",
         shouldBeCaptured: false,
@@ -132,7 +135,7 @@ export async function loader({ request, params, context }: LoaderFunctionArgs) {
     });
 
     if (!barcode) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "This barcode doesn't exist or it doesn't belong to your current organization.",
@@ -143,7 +146,7 @@ export async function loader({ request, params, context }: LoaderFunctionArgs) {
     }
 
     if (!barcode.assetId && !barcode.kitId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Barcode is not linked to any asset or kit",
         additionalData: { value, shouldSendNotification: false },
@@ -202,7 +205,7 @@ export async function loader({ request, params, context }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     const sendNotification = reason.additionalData?.shouldSendNotification;
     const shouldSendNotification =
       typeof sendNotification === "boolean" && sendNotification;

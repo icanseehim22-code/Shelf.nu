@@ -4,7 +4,7 @@ import { getBooking } from "~/modules/booking/service.server";
 import { validateBookingOwnership } from "~/utils/booking-authorization.server";
 import { formatDateForICal } from "~/utils/date-fns";
 import { SERVER_URL } from "~/utils/env";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getParams } from "~/utils/http.server";
 import { escapeICalText, foldLine } from "~/utils/ics";
 import {
@@ -85,7 +85,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
     const lines = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Shelf.nu//Shelf Calendar 1.0//EN",
+      "PRODID:-//EstoqueSoftSystem//EstoqueSoftSystem Calendar 1.0//EN",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
       "BEGIN:VEVENT",
@@ -97,7 +97,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
       `DTSTART:${formattedFromDate}`,
       `DTEND:${formattedToDate}`,
       `DTSTAMP:${formattedDTSTAMP}`,
-      "CATEGORIES:Shelf.nu booking",
+      "CATEGORIES:EstoqueSoftSystem booking",
       `DESCRIPTION:${description}`,
       `URL:${bookingUrl}`,
       "BEGIN:VALARM",
@@ -115,9 +115,9 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
     // RFC 5987 filename* for non-ASCII booking names (e.g. Thai, Chinese)
     const safeFilename = `${booking.name
       .replace(/[^\x20-\x7E]/g, "_")
-      .replace(/["\\]/g, "_")} - shelf.nu.ics`;
+      .replace(/["\\]/g, "_")} - estoquesoftsystem.com.ics`;
     const encodedFilename = `UTF-8''${encodeURIComponent(
-      `${booking.name} - shelf.nu.ics`
+      `${booking.name} - estoquesoftsystem.com.ics`
     )}`;
 
     return new Response(ics, {
@@ -127,7 +127,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -23,18 +23,18 @@
 import { db } from "~/database/db.server";
 import { getMobileUserContext } from "~/modules/api/mobile-auth.server";
 import { requireAuditAssignee } from "~/modules/audit/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 /**
  * Asserts the caller may write evidence to `auditAssetId` within
- * `auditSessionId`. Resolves on success; throws a `ShelfError` (404 for a
+ * `auditSessionId`. Resolves on success; throws a `EstoqueSoftSystemError` (404 for a
  * missing/cross-tenant session or asset, 403 for a non-assignee) otherwise.
  *
  * @param args.auditSessionId - The audit session id from the request
  * @param args.auditAssetId - The scanned AuditAsset id from the request
  * @param args.organizationId - The caller's resolved organization id
  * @param args.userId - The authenticated user id
- * @throws {ShelfError} 404 if session not in org or asset not in session;
+ * @throws {EstoqueSoftSystemError} 404 if session not in org or asset not in session;
  *   403 if a BASE/SELF_SERVICE caller is not an assignee
  */
 export async function requireAuditAssetInSession({
@@ -53,7 +53,7 @@ export async function requireAuditAssetInSession({
     select: { id: true },
   });
   if (!session) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Audit session not found",
       additionalData: { auditSessionId, organizationId },
@@ -67,7 +67,7 @@ export async function requireAuditAssetInSession({
     select: { id: true },
   });
   if (!auditAsset) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Audit asset not found in this session",
       additionalData: { auditAssetId, auditSessionId },

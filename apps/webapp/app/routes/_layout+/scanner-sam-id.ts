@@ -1,4 +1,7 @@
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import type { DataResponse } from "~/utils/http.server";
 
 type ScannedItemResponse = DataResponse<{
@@ -29,7 +32,7 @@ export async function resolveAssetIdFromSamId({
   try {
     response = await fetcher(url);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Scan",
       message:
@@ -45,7 +48,7 @@ export async function resolveAssetIdFromSamId({
   try {
     payload = (await response.json()) as ScannedItemResponse;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Scan",
       message:
@@ -57,7 +60,7 @@ export async function resolveAssetIdFromSamId({
   }
 
   if (!response.ok) {
-    const reason = makeShelfError(
+    const reason = makeEstoqueSoftSystemError(
       payload?.error ?? {
         cause: null,
         label: "Scan" as const,
@@ -77,7 +80,7 @@ export async function resolveAssetIdFromSamId({
   const assetId = payload?.qr?.asset?.id;
 
   if (!assetId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       label: "Scan",
       message: DEFAULT_SAM_ID_ERROR_MESSAGE,

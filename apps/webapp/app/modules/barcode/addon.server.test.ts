@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 // why: Stripe SDK makes external API calls
 const { mockStripe } = vi.hoisted(() => ({
@@ -56,7 +56,7 @@ beforeEach(() => {
 const baseCheckoutParams = {
   priceId: "price_123",
   userId: "user_1",
-  domainUrl: "https://app.shelf.nu",
+  domainUrl: "https://app.estoquesoftsystem.com",
   customerId: "cus_123",
   organizationId: "org_1",
 };
@@ -119,8 +119,10 @@ describe("createBarcodeAddonCheckoutSession", () => {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: "price_123", quantity: 1 }],
-      success_url: "https://app.shelf.nu/assets?success=true&addon=barcodes",
-      cancel_url: "https://app.shelf.nu/assets?canceled=true&addon=barcodes",
+      success_url:
+        "https://app.estoquesoftsystem.com/assets?success=true&addon=barcodes",
+      cancel_url:
+        "https://app.estoquesoftsystem.com/assets?canceled=true&addon=barcodes",
       client_reference_id: "user_1",
       customer: "cus_123",
       subscription_data: {
@@ -129,7 +131,7 @@ describe("createBarcodeAddonCheckoutSession", () => {
     });
   });
 
-  it("throws ShelfError when stripe is not initialized", async () => {
+  it("throws EstoqueSoftSystemError when stripe is not initialized", async () => {
     const stripeMod = await import("~/utils/stripe.server");
     const original = stripeMod.stripe;
     (stripeMod as any).stripe = null;
@@ -138,20 +140,20 @@ describe("createBarcodeAddonCheckoutSession", () => {
       await createBarcodeAddonCheckoutSession(baseCheckoutParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
     } finally {
       (stripeMod as any).stripe = original;
     }
   });
 
-  it("throws ShelfError when session URL is null", async () => {
+  it("throws EstoqueSoftSystemError when session URL is null", async () => {
     mockStripe.checkout.sessions.create.mockResolvedValue({ url: null });
 
     try {
       await createBarcodeAddonCheckoutSession(baseCheckoutParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
     }
   });
 });
@@ -210,7 +212,7 @@ describe("createBarcodeAddonTrialSubscription", () => {
     expect(result.hasPaymentMethod).toBe(false);
   });
 
-  it("throws ShelfError when stripe is not initialized", async () => {
+  it("throws EstoqueSoftSystemError when stripe is not initialized", async () => {
     const stripeMod = await import("~/utils/stripe.server");
     const original = stripeMod.stripe;
     (stripeMod as any).stripe = null;
@@ -219,7 +221,7 @@ describe("createBarcodeAddonTrialSubscription", () => {
       await createBarcodeAddonTrialSubscription(baseTrialParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
     } finally {
       (stripeMod as any).stripe = original;
     }
@@ -422,11 +424,11 @@ describe("linkBarcodeAddonToOrganization", () => {
       await linkBarcodeAddonToOrganization(linkParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
     }
   });
 
-  it("throws ShelfError when stripe is not initialized", async () => {
+  it("throws EstoqueSoftSystemError when stripe is not initialized", async () => {
     const stripeMod = await import("~/utils/stripe.server");
     const original = stripeMod.stripe;
     (stripeMod as any).stripe = null;
@@ -435,7 +437,7 @@ describe("linkBarcodeAddonToOrganization", () => {
       await linkBarcodeAddonToOrganization(linkParams);
       expect.fail("Should have thrown");
     } catch (e) {
-      expect(e).toBeInstanceOf(ShelfError);
+      expect(e).toBeInstanceOf(EstoqueSoftSystemError);
     } finally {
       (stripeMod as any).stripe = original;
     }

@@ -6,7 +6,7 @@ import {
   action,
   loader,
 } from "~/routes/_layout+/assets.$assetId.overview.assign-custody";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { requirePermission } from "~/utils/roles.server";
 import { getAsset } from "~/modules/asset/service.server";
 import { getUserByID } from "~/modules/user/service.server";
@@ -183,7 +183,7 @@ describe("assets.$assetId.overview.assign-custody loader", () => {
       userOrganizations: [{ organizationId: "org-1" }],
     } as any);
 
-    const unauthorizedError = new ShelfError({
+    const unauthorizedError = new EstoqueSoftSystemError({
       cause: null,
       label: "Assets",
       message: "Asset not found",
@@ -221,7 +221,7 @@ describe("assets.$assetId.overview.assign-custody action", () => {
     });
 
     // Mock asset update to fail due to organization mismatch
-    const unauthorizedError = new ShelfError({
+    const unauthorizedError = new EstoqueSoftSystemError({
       cause: null,
       label: "Assets",
       message: "Asset not found",
@@ -413,7 +413,7 @@ describe("assets.$assetId.overview.assign-custody action", () => {
 
     const response = await action(createActionArgs({ request }));
 
-    expect((response as Response).status).toBe(500); // ShelfError defaults to 500
+    expect((response as Response).status).toBe(500); // EstoqueSoftSystemError defaults to 500
 
     expect(mockAssetUpdate).not.toHaveBeenCalled();
     expect(createNoteMock).not.toHaveBeenCalled();

@@ -121,7 +121,7 @@ export function AssetCodeBadge({
 }: AssetCodeBadgeProps) {
   if (!value) return null;
 
-  // QR_ID and SAM_ID share the QR-ish icon (both are Shelf-native identifiers).
+  // QR_ID and SAM_ID share the QR-ish icon (both are EstoqueSoftSystem-native identifiers).
   // All BarcodeType-derived values get the barcode icon.
   const Icon =
     type === "QR_ID" || type === "SAM_ID" ? ScanQRIcon : ScanBarcodeIcon;

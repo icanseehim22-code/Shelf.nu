@@ -2,7 +2,7 @@ import type { AuthSession } from "@server/session";
 import type { SupabaseAuthSession } from "~/integrations/supabase/types";
 
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label: ErrorLabel = "Auth";
 
@@ -10,7 +10,7 @@ export function mapAuthSession(
   supabaseAuthSession: SupabaseAuthSession
 ): AuthSession {
   if (!supabaseAuthSession.user.email) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "User should have an email",
       additionalData: {

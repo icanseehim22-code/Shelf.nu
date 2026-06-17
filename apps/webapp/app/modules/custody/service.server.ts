@@ -2,7 +2,7 @@ import type { Asset, User } from "@prisma/client";
 import { AssetStatus, OrganizationRoles } from "@prisma/client";
 import { db } from "~/database/db.server";
 import { recordEvent } from "~/modules/activity-event/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 /**
  * Releases custody of an asset.
@@ -44,7 +44,7 @@ export async function releaseCustody({
       select: { custodian: { select: { userId: true } } },
     });
     if (current?.custodian?.userId !== userId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Action not allowed",
         message:
@@ -100,7 +100,7 @@ export async function releaseCustody({
       return asset;
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while releasing the custody. Please try again or contact support.",
@@ -170,7 +170,7 @@ export async function assignCustody({
       return asset;
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while assigning custody. Please try again or contact support.",

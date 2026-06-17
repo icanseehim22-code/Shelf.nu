@@ -5,7 +5,7 @@ import {
   exportAssetsBackupToCsv,
   exportAssetsFromIndexToCsv,
 } from "~/utils/csv.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getCurrentSearchParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -67,7 +67,7 @@ export const loader = async ({ context, request }: LoaderFunctionArgs) => {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 };

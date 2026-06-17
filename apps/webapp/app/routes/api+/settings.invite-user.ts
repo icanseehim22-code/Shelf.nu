@@ -3,7 +3,10 @@ import { InviteUserFormSchema } from "~/components/settings/invite-user-dialog";
 import { db } from "~/database/db.server";
 import { createInvite } from "~/modules/invite/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -39,7 +42,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
           where: { deletedAt: null, id: teamMemberId, organizationId },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             message: "Failed to get team member",
             additionalData: { teamMemberId, userId },
@@ -61,7 +64,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     });
 
     if (existingInvites.length) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "User already has a pending invite. Either resend it or cancel it in order to be able to send a new one.",
@@ -96,7 +99,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return data(payload({ success: true }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

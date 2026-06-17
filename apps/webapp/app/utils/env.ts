@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import { isBrowser } from "./is-browser";
 
 declare global {
@@ -100,7 +100,7 @@ export function getEnv<K extends keyof NodeJS.ProcessEnv>(
   // Otherwise, keep current behavior (treats empty string as "not set")
   if (allowEmpty) {
     if ((value === undefined || value === null) && isRequired) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         message: `${name} is not set`,
         cause: null,
         label: "Environment",
@@ -108,7 +108,7 @@ export function getEnv<K extends keyof NodeJS.ProcessEnv>(
     }
   } else {
     if (!value && isRequired) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         message: `${name} is not set`,
         cause: null,
         label: "Environment",
@@ -152,7 +152,7 @@ export const URL_SHORTENER = getEnv("URL_SHORTENER", {
 
 /**
  * Cookie domain for cross-subdomain cookie sharing.
- * Set to ".shelf.nu" in production so the marketing site can read
+ * Set to ".estoquesoftsystem.com" in production so the marketing site can read
  * the user-prefs cookie to detect signed-in users.
  * Trimmed and coerced to undefined if empty/whitespace.
  */

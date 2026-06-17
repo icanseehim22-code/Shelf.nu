@@ -35,7 +35,10 @@ import { DEFAULT_MAX_IMAGE_UPLOAD_SIZE } from "~/utils/constants";
 import { setCookie } from "~/utils/cookies.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
 import { ADMIN_EMAIL } from "~/utils/env";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { assertIsPost, payload, error, parseData } from "~/utils/http.server";
 import { Logger } from "~/utils/logger";
 import { getOrCreateCustomerId } from "~/utils/stripe.server";
@@ -63,7 +66,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       curriences: Object.keys(Currency),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -105,7 +108,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       });
     } catch (parseError) {
       if (parseError instanceof MaxFileSizeExceededError) {
-        const reason = new ShelfError({
+        const reason = new EstoqueSoftSystemError({
           cause: parseError,
           message: `Image size exceeds maximum allowed size of ${
             DEFAULT_MAX_IMAGE_UPLOAD_SIZE / (1024 * 1024)
@@ -118,7 +121,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         return data(error(reason), { status: reason.status });
       }
 
-      const reason = makeShelfError(parseError, { userId });
+      const reason = makeEstoqueSoftSystemError(parseError, { userId });
       return data(error(reason), { status: reason.status });
     }
 
@@ -128,7 +131,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     // Validate file size
     if (file && file.size > DEFAULT_MAX_IMAGE_UPLOAD_SIZE) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Image size exceeds maximum allowed size of ${
           DEFAULT_MAX_IMAGE_UPLOAD_SIZE / (1024 * 1024)
@@ -175,7 +178,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         auditLinkFailed = true;
 
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause,
             message:
               "Failed to link audit addon to new organization during workspace creation",
@@ -228,7 +231,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         barcodeLinkFailed = true;
 
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause,
             message:
               "Failed to link barcode addon to new organization during workspace creation",
@@ -271,7 +274,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       headers: [setCookie(await setSelectedOrganizationIdCookie(newOrg.id))],
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     // File size errors are now handled in the validation above
     return data(error(reason), { status: reason.status });
   }

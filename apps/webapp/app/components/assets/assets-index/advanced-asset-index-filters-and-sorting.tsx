@@ -366,7 +366,7 @@ function AdvancedFilter() {
                   variant="block-link-gray"
                   size="xs"
                   className="ml-1"
-                  to="mailto:nikolay@shelf.nu?subject=Advanced filtering suggestions"
+                  to="mailto:nikolay@estoquesoftsystem.com?subject=Advanced filtering suggestions"
                 >
                   Need more filtering options?
                 </Button>

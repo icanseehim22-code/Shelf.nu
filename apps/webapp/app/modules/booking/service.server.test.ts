@@ -8,7 +8,7 @@ import {
 import { db } from "~/database/db.server";
 import { createSystemBookingNote } from "~/modules/booking-note/service.server";
 import * as noteService from "~/modules/note/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { wrapBookingStatusForNote } from "~/utils/markdoc-wrappers";
 import { scheduler } from "~/utils/scheduler.server";
 import { sendBookingUpdatedEmail } from "./email-helpers";
@@ -386,14 +386,14 @@ describe("createBooking", () => {
     });
   });
 
-  it("should throw ShelfError when creation fails", async () => {
+  it("should throw EstoqueSoftSystemError when creation fails", async () => {
     expect.assertions(1);
     const error = new Error("Database error");
     //@ts-expect-error missing vitest type
     db.booking.create.mockRejectedValue(error);
 
     await expect(createBooking(mockCreateBookingParams)).rejects.toThrow(
-      ShelfError
+      EstoqueSoftSystemError
     );
   });
 });
@@ -638,7 +638,7 @@ describe("partialCheckinBooking", () => {
         ...mockPartialCheckinParams,
         assetIds: ["asset-2", "asset-unrelated"],
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     // Must not have completed or recorded anything.
     expect(db.partialBookingCheckin.create).not.toHaveBeenCalled();
@@ -662,7 +662,7 @@ describe("partialCheckinBooking", () => {
 
     await expect(
       partialCheckinBooking(mockPartialCheckinParams)
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should handle kit check-in when all kit assets are scanned", async () => {
@@ -976,7 +976,7 @@ describe("updateBasicBooking", () => {
     expect(result).toEqual(updatedBooking);
   });
 
-  it("should throw ShelfError when booking status is COMPLETE", async () => {
+  it("should throw EstoqueSoftSystemError when booking status is COMPLETE", async () => {
     expect.assertions(1);
 
     // Mock finding booking with COMPLETE status
@@ -988,11 +988,11 @@ describe("updateBasicBooking", () => {
     });
 
     await expect(updateBasicBooking(mockUpdateBookingParams)).rejects.toThrow(
-      ShelfError
+      EstoqueSoftSystemError
     );
   });
 
-  it("should throw ShelfError when booking status is ARCHIVED", async () => {
+  it("should throw EstoqueSoftSystemError when booking status is ARCHIVED", async () => {
     expect.assertions(1);
 
     // Mock finding booking with ARCHIVED status
@@ -1004,11 +1004,11 @@ describe("updateBasicBooking", () => {
     });
 
     await expect(updateBasicBooking(mockUpdateBookingParams)).rejects.toThrow(
-      ShelfError
+      EstoqueSoftSystemError
     );
   });
 
-  it("should throw ShelfError when booking status is CANCELLED", async () => {
+  it("should throw EstoqueSoftSystemError when booking status is CANCELLED", async () => {
     expect.assertions(1);
 
     // Mock finding booking with CANCELLED status
@@ -1020,11 +1020,11 @@ describe("updateBasicBooking", () => {
     });
 
     await expect(updateBasicBooking(mockUpdateBookingParams)).rejects.toThrow(
-      ShelfError
+      EstoqueSoftSystemError
     );
   });
 
-  it("should throw ShelfError when booking is not found", async () => {
+  it("should throw EstoqueSoftSystemError when booking is not found", async () => {
     expect.assertions(1);
 
     // Mock booking not found
@@ -1034,7 +1034,7 @@ describe("updateBasicBooking", () => {
     );
 
     await expect(updateBasicBooking(mockUpdateBookingParams)).rejects.toThrow(
-      ShelfError
+      EstoqueSoftSystemError
     );
   });
 
@@ -1420,7 +1420,7 @@ describe("updateBookingAssets", () => {
     expect(db.kit.updateMany).not.toHaveBeenCalled();
   });
 
-  it("should throw ShelfError when booking lookup fails", async () => {
+  it("should throw EstoqueSoftSystemError when booking lookup fails", async () => {
     expect.assertions(1);
 
     //@ts-expect-error missing vitest type
@@ -1428,10 +1428,10 @@ describe("updateBookingAssets", () => {
 
     await expect(
       updateBookingAssets(mockUpdateBookingAssetsParams)
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
-  it("should throw 400 ShelfError when all assets have been deleted", async () => {
+  it("should throw 400 EstoqueSoftSystemError when all assets have been deleted", async () => {
     expect.assertions(2);
 
     const mockBooking = {
@@ -1459,7 +1459,7 @@ describe("updateBookingAssets", () => {
     expect(db.$executeRaw).not.toHaveBeenCalled();
   });
 
-  it("should throw 400 ShelfError when some assets have been deleted", async () => {
+  it("should throw 400 EstoqueSoftSystemError when some assets have been deleted", async () => {
     expect.assertions(2);
 
     const mockBooking = {
@@ -2249,7 +2249,7 @@ describe("archiveBooking", () => {
 
     await expect(
       archiveBooking({ id: "booking-1", organizationId: "org-1" })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should cancel pending auto-archive job on manual archive", async () => {
@@ -2339,7 +2339,7 @@ describe("cancelBooking", () => {
         organizationId: "org-1",
         hints: mockClientHints,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 });
 
@@ -2494,7 +2494,7 @@ describe("revertBookingToDraft", () => {
 
     await expect(
       revertBookingToDraft({ id: "booking-1", organizationId: "org-1" })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 });
 
@@ -2562,7 +2562,7 @@ describe("extendBooking", () => {
         userId: "user-1",
         role: OrganizationRoles.ADMIN,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should allow self service user to extend their own booking", async () => {
@@ -2619,7 +2619,7 @@ describe("extendBooking", () => {
         userId: "user-1",
         role: OrganizationRoles.SELF_SERVICE,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should prevent base user from extending any booking", async () => {
@@ -2642,7 +2642,7 @@ describe("extendBooking", () => {
         userId: "user-1",
         role: OrganizationRoles.BASE,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should allow owner to extend any booking", async () => {
@@ -3380,7 +3380,7 @@ describe("getOngoingBookingForAsset", () => {
     });
   });
 
-  it("should throw ShelfError when database query fails", async () => {
+  it("should throw EstoqueSoftSystemError when database query fails", async () => {
     expect.assertions(1);
 
     const dbError = new Error("Database connection error");
@@ -3392,7 +3392,7 @@ describe("getOngoingBookingForAsset", () => {
         assetId: "asset-7",
         organizationId: "org-1",
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should handle scenario where asset is checked in one booking but checked out in another", async () => {
@@ -3495,6 +3495,6 @@ describe("bulkArchiveBookings", () => {
 
     await expect(
       bulkArchiveBookings({ bookingIds: ["b1"], organizationId: "org-1" })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 });

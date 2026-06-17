@@ -7,7 +7,7 @@ import { useSearchParams } from "~/hooks/search-params";
 import { usePosition } from "~/hooks/use-position";
 import { getQrOrganizationLookup } from "~/modules/qr/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, payload, getParams } from "~/utils/http.server";
 
 export const meta = () => [{ title: appendToMetaTitle("QR not logged in") }];
@@ -20,7 +20,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
     return data(payload({ qrId, canContactOwner: Boolean(qr.organizationId) }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { qrId });
+    const reason = makeEstoqueSoftSystemError(cause, { qrId });
     throw data(error(reason), { status: reason.status });
   }
 }

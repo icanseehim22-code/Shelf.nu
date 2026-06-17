@@ -295,7 +295,7 @@ describe("bookings/new - custodian assignment", () => {
 
     const response = await action(createActionArgs({ request }));
 
-    expect((response as Response).status).toBe(500); // ShelfError defaults to 500
+    expect((response as Response).status).toBe(500); // EstoqueSoftSystemError defaults to 500
 
     expect(mockBookingCreate).not.toHaveBeenCalled();
   });
@@ -367,7 +367,7 @@ describe("bookings/new - custodian assignment", () => {
 
     const response = await action(createActionArgs({ request }));
 
-    expect((response as Response).status).toBe(500); // ShelfError for self-assignment restriction
+    expect((response as Response).status).toBe(500); // EstoqueSoftSystemError for self-assignment restriction
 
     expect(mockBookingCreate).not.toHaveBeenCalled();
   });

@@ -1,7 +1,10 @@
 import { data, redirect } from "react-router";
 import type { ActionFunctionArgs } from "react-router";
 import { db } from "~/database/db.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -37,7 +40,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "Something went wrong fetching the user. Please try again or contact support.",
@@ -57,7 +60,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return redirect(url);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

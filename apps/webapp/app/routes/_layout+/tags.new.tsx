@@ -15,7 +15,7 @@ import { useDisabled } from "~/hooks/use-disabled";
 import { createTag } from "~/modules/tag/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { getRandomColor } from "~/utils/get-random-color";
 import { assertIsPost, payload, error, parseData } from "~/utils/http.server";
 import { formatEnum } from "~/utils/misc";
@@ -69,7 +69,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       })),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -111,7 +111,7 @@ export async function action({ context, request }: LoaderFunctionArgs) {
 
     return redirect(`/tags`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

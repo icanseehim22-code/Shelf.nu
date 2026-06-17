@@ -36,7 +36,10 @@ import type {
   DistributionBreakdown,
   MonthlyBookingTrendRow,
 } from "~/modules/reports/types";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getCurrentSearchParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -64,7 +67,7 @@ export const loader = async ({
     const reportId = searchParams.get("reportId");
 
     if (!reportId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Report ID is required for export",
         label: "Report",
@@ -75,7 +78,7 @@ export const loader = async ({
     // Validate report exists and supports export
     const reportDef = getReportById(reportId);
     if (!reportDef) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Report "${reportId}" not found`,
         label: "Report",
@@ -84,7 +87,7 @@ export const loader = async ({
     }
 
     if (!reportDef.exportable) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Report "${reportDef.title}" does not support export`,
         label: "Report",
@@ -232,7 +235,7 @@ export const loader = async ({
       }
 
       default:
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `Export not implemented for report "${reportId}"`,
           label: "Report",
@@ -252,7 +255,7 @@ export const loader = async ({
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 };

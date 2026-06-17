@@ -12,7 +12,10 @@ import { sendEmail } from "~/emails/mail.server";
 import { DEFAULT_MAX_IMAGE_UPLOAD_SIZE } from "~/utils/constants";
 import { ADMIN_EMAIL } from "~/utils/env";
 import type { ErrorLabel } from "~/utils/error";
-import { isLikeShelfError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   createStripeCustomer,
   customerHasPaymentMethod,
@@ -41,7 +44,7 @@ export async function getOrganizationById<T extends Prisma.OrganizationInclude>(
       include: extraIncludes,
     })) as Prisma.OrganizationGetPayload<{ include: T }>;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "No organization found with this ID",
       additionalData: { id },
@@ -75,7 +78,7 @@ export const getOrganizationByUserId = async ({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "No organization found for this user.",
       additionalData: {
@@ -96,7 +99,7 @@ export const getOrganizationByUserId = async ({
 export async function getOrganizationsBySsoDomain(emailDomain: string) {
   try {
     if (!emailDomain) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Email domain is required",
         additionalData: { emailDomain },
@@ -132,7 +135,7 @@ export async function getOrganizationsBySsoDomain(emailDomain: string) {
         : false
     );
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get organizations by SSO domain",
       additionalData: { emailDomain },
@@ -245,7 +248,7 @@ export async function createOrganization({
 
     return org;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating the organization. Please try again or contact support.",
@@ -301,7 +304,7 @@ export async function updateOrganization({
 
     if (image?.size && image?.size > 0) {
       if (image.size > DEFAULT_MAX_IMAGE_UPLOAD_SIZE) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `Image size exceeds maximum allowed size of ${
             DEFAULT_MAX_IMAGE_UPLOAD_SIZE / (1024 * 1024)
@@ -385,9 +388,9 @@ export async function updateOrganization({
 
     return updated;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while updating the organization. Please try again or contact support.",
       additionalData: { id, userId, name },
@@ -447,7 +450,7 @@ export async function getUserOrganizations({ userId }: { userId: string }) {
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching user organizations. Please try again or contact support.",
@@ -481,7 +484,7 @@ export async function getOrganizationAdminsEmails({
 
     return admins.map((a) => a.user.email);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching organization admins emails. Please try again or contact support.",
@@ -532,7 +535,7 @@ export async function getOrganizationAdminsForNotification({
 
     return admins.map((a) => a.user);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching organization admins for notification. Please try again or contact support.",
@@ -557,7 +560,7 @@ export async function toggleOrganizationSso({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while toggling organization SSO. Please try again or contact support.",
@@ -582,7 +585,7 @@ export async function toggleWorkspaceDisabled({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while toggling workspace disabled. Please try again or contact support.",
@@ -608,7 +611,7 @@ export async function toggleBarcodeEnabled({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while toggling barcode functionality. Please try again or contact support.",
@@ -634,7 +637,7 @@ export async function toggleAuditEnabled({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while toggling audit functionality. Please try again or contact support.",
@@ -746,7 +749,7 @@ export async function getOrganizationAdmins({
 
     return admins.map((a) => a.user);
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching organization admins.",
       label,
@@ -768,7 +771,7 @@ export async function transferOwnership({
 }) {
   try {
     if (currentOrganization.type === OrganizationType.PERSONAL) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Personal workspaces cannot be transferred.",
         label,
@@ -781,7 +784,7 @@ export async function transferOwnership({
         select: { id: true, roles: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Something went wrong while fetching current user.",
           label,
@@ -830,7 +833,7 @@ export async function transferOwnership({
     );
     /** Validate if the current user is a member of the organization */
     if (!currentOwnerUserOrg) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Current user is not a member of the organization.",
         label,
@@ -839,13 +842,13 @@ export async function transferOwnership({
 
     /**
      * Validate if the current user is the owner of organization
-     * or is a Shelf admin
+     * or is a EstoqueSoftSystem admin
      */
     if (
       !currentOwnerUserOrg.roles.includes(OrganizationRoles.OWNER) &&
       !isCurrentUserShelfAdmin
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Current user is not the owner of the organization.",
         label,
@@ -856,7 +859,7 @@ export async function transferOwnership({
       (userOrg) => userOrg.user.id === newOwnerId
     );
     if (!newOwnerUserOrg) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "New owner is not a member of the organization.",
         label,
@@ -865,7 +868,7 @@ export async function transferOwnership({
 
     /** Validate if the new owner is ADMIN in the current organization */
     if (!newOwnerUserOrg.roles.includes(OrganizationRoles.ADMIN)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "New owner is not an admin of the organization.",
         label,
@@ -879,7 +882,7 @@ export async function transferOwnership({
       const newOwnerActiveSubscription =
         await getUserActiveSubscription(newOwnerId);
       if (newOwnerActiveSubscription) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "Cannot transfer ownership to a user who already has an active subscription.",
@@ -996,7 +999,7 @@ export async function transferOwnership({
 
     /** Send email to new owner */
     sendEmail({
-      subject: `🎉 You're now the Owner of ${currentOrganization.name} - Shelf`,
+      subject: `🎉 You're now the Owner of ${currentOrganization.name} - EstoqueSoftSystem`,
       to: newOwnerUserOrg.user.email,
       text: newOwnerEmailText({
         newOwnerName: resolveUserDisplayName(newOwnerUserOrg.user),
@@ -1059,9 +1062,9 @@ ${
       subscriptionTransferError: subscriptionTransferError?.message,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while transferring ownership. Please try again or contact support.",
       additionalData: { currentOrganization, newOwnerId },
@@ -1089,7 +1092,7 @@ export async function resetPersonalWorkspaceBranding(userId: User["id"]) {
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while resetting personal workspace branding.",

@@ -7,7 +7,7 @@ import { recordEvents } from "~/modules/activity-event/service.server";
 import { getCategory } from "~/modules/category/service.server";
 import { getActiveCustomFields } from "~/modules/custom-field/service.server";
 import { getQr } from "~/modules/qr/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { createSignedUrl } from "~/utils/storage.server";
 import {
   bulkAssignAssetTags,
@@ -187,7 +187,7 @@ describe("relinkAssetQrCode (asset)", () => {
         organizationId: "org-1",
         userId: "user-1",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
   });
 
   it("relinks when QR is available", async () => {
@@ -327,7 +327,7 @@ describe("uploadDuplicateAssetMainImage", () => {
         "asset-1",
         "user-1"
       )
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
 
     expect(upload).not.toHaveBeenCalled();
   });
@@ -426,7 +426,7 @@ describe("refreshExpiredAssetImages", () => {
 
   it("logs error and applies backoff when createSignedUrl fails", async () => {
     mockCreateSignedUrl.mockRejectedValue(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: new Error("rate limited"),
         message: "Failed to create signed URL",
         label: "Assets",
@@ -484,7 +484,7 @@ describe("updateAsset cross-org guards", () => {
 
   it("rejects categoryId from a different organization", async () => {
     (getCategory as ReturnType<typeof vitest.fn>).mockRejectedValue(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: null,
         title: "Category not found",
         message:
@@ -549,7 +549,7 @@ describe("updateAsset cross-org guards", () => {
         organizationId: "org-A",
         customFieldsValues: [{ id: "cf-from-org-B", value: { raw: "x" } }],
       } as any)
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     expect(db.customField.findMany).toHaveBeenCalledWith({
       where: { id: { in: ["cf-from-org-B"] }, organizationId: "org-A" },
@@ -578,7 +578,7 @@ describe("createAsset cross-org guards", () => {
         organizationId: "org-A",
         customFieldsValues: [{ id: "cf-from-org-B", value: { raw: "x" } }],
       } as any)
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
 
     expect(db.customField.findMany).toHaveBeenCalledWith({
       where: { id: { in: ["cf-from-org-B"] }, organizationId: "org-A" },
@@ -680,7 +680,7 @@ describe("parseAssetValuation", () => {
     expect(parseAssetValuation("-10")).toBe(-10);
   });
 
-  it("throws ShelfError 400 for non-numeric input", () => {
+  it("throws EstoqueSoftSystemError 400 for non-numeric input", () => {
     expect(() => parseAssetValuation("abc")).toThrowError(
       expect.objectContaining({
         status: 400,
@@ -689,12 +689,16 @@ describe("parseAssetValuation", () => {
     );
   });
 
-  it("throws ShelfError 400 for Infinity", () => {
-    expect(() => parseAssetValuation("Infinity")).toThrow(ShelfError);
+  it("throws EstoqueSoftSystemError 400 for Infinity", () => {
+    expect(() => parseAssetValuation("Infinity")).toThrow(
+      EstoqueSoftSystemError
+    );
   });
 
-  it("throws ShelfError 400 for -Infinity", () => {
-    expect(() => parseAssetValuation("-Infinity")).toThrow(ShelfError);
+  it("throws EstoqueSoftSystemError 400 for -Infinity", () => {
+    expect(() => parseAssetValuation("-Infinity")).toThrow(
+      EstoqueSoftSystemError
+    );
   });
 });
 
@@ -733,7 +737,7 @@ describe("getActiveCustomFieldsForAsset", () => {
     expect(result).toEqual([{ id: "cf-1", name: "Serial", required: false }]);
   });
 
-  it("throws a 404 ShelfError when the asset does not exist in this org", async () => {
+  it("throws a 404 EstoqueSoftSystemError when the asset does not exist in this org", async () => {
     const assetFindUniqueMock = vi.mocked(db.asset.findUnique);
     assetFindUniqueMock.mockResolvedValue(null);
     const getActiveCustomFieldsMock = vi.mocked(getActiveCustomFields);
@@ -863,7 +867,7 @@ describe("bulkUpdateAssetCategory", () => {
         // @ts-expect-error settings not relevant for this test
         settings: {},
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 });
 
@@ -941,7 +945,7 @@ describe("bulkAssignAssetTags", () => {
         // @ts-expect-error settings not relevant for this test
         settings: {},
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   // Regression: the per-asset `update` loop runs inside the interactive tx, so

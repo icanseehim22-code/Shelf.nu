@@ -81,9 +81,9 @@ vitest.mock("~/utils/logger", () => ({
   },
 }));
 
-// why: preventing ShelfError from interfering with test assertions
+// why: preventing EstoqueSoftSystemError from interfering with test assertions
 vitest.mock("~/utils/error", () => ({
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     constructor(opts: {
       cause: unknown;
       message: string;

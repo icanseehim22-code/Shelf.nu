@@ -56,7 +56,10 @@ import { getPaginatedAndFilterableAssets } from "~/modules/asset/service.server"
 import type { AssetsFromViewItem } from "~/modules/asset/types";
 import { updateKitAssets } from "~/modules/kit/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import { isSelectingAllItems } from "~/utils/list";
@@ -122,7 +125,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
           },
         })
         .catch((cause) => {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause,
             title: "Kit not found!",
             message:
@@ -170,7 +173,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       modelName,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -209,7 +212,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/kits/${kitId}/assets`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     return data(error(reason), { status: reason.status });
   }
 }

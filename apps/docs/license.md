@@ -1,6 +1,6 @@
 ---
 title: License
-description: Shelf.nu is licensed under AGPL-3.0
+description: EstoqueSoftSystem is licensed under AGPL-3.0
 ---
 
                     GNU AFFERO GENERAL PUBLIC LICENSE

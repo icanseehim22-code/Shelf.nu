@@ -8,7 +8,7 @@ import { UserSubheading } from "~/components/user/user-subheading";
 import { useUserRoleHelper } from "~/hooks/user-user-role-helper";
 import { getUserWithContact } from "~/modules/user/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -30,7 +30,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
 
     return payload({ header, user, userName });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }

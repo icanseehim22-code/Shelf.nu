@@ -22,7 +22,10 @@ import { updateCookieWithPerPage } from "~/utils/cookies.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
 import { INVITE_TOKEN_SECRET } from "~/utils/env";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError, isLikeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  isLikeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { getCurrentSearchParams } from "~/utils/http.server";
 import { getParamsValues } from "~/utils/list";
 import { checkDomainSSOStatus, doesSSOUserExist } from "~/utils/sso.server";
@@ -43,7 +46,7 @@ const INVITE_EMAIL_SPACING_MS = Math.ceil(
  * Validates invite based on SSO configuration, considering target organization
  * @param email - Email of the user being invited
  * @param organizationId - ID of the organization the user is being invited to
- * @throws ShelfError with appropriate message if invite is not allowed
+ * @throws EstoqueSoftSystemError with appropriate message if invite is not allowed
  */
 async function validateInvite(
   email: string,
@@ -58,7 +61,7 @@ async function validateInvite(
 
   // Case 2: Check if the target organization is the one with SCIM. If it is, don't allow invite as the user needs to be managed via the IDP
   if (domainStatus.linkedOrganization?.id === organizationId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "This email domain uses SCIM SSO for this workspace. Users are managed automatically through your identity provider.",
@@ -72,7 +75,7 @@ async function validateInvite(
   if (domainStatus.isConfiguredForSSO) {
     const ssoUserExists = await doesSSOUserExist(email);
     if (!ssoUserExists) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "This email domain uses SSO authentication. The user needs to sign up via SSO to get access to the organization.",
@@ -104,7 +107,7 @@ export async function getExistingActiveInvite({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong with fetching existing invite. Please try again or contact support.",
@@ -143,7 +146,7 @@ export async function createInvite(
     // Validate and sanitize invitation message
     const messageResult = processInvitationMessage(extraMessage);
     if (!messageResult.success) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: messageResult.error || "The invitation message is invalid",
         additionalData: { userId, organizationId },
@@ -274,7 +277,7 @@ export async function createInvite(
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to create invite in database",
           additionalData: { data },
@@ -299,10 +302,10 @@ export async function createInvite(
 
     return invite;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
-        cause instanceof ShelfError
+        cause instanceof EstoqueSoftSystemError
           ? cause.message
           : "Something went wrong with creating your invite. Please try again. If the problem persists, please contact support",
       additionalData: { payload },
@@ -352,7 +355,7 @@ export async function updateInviteStatus({
           "The invitation you are trying to accept is expired. Please ask your administrator to send you a new invite.";
       }
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message,
         title,
@@ -423,9 +426,9 @@ export async function updateInviteStatus({
 
     return updatedInvite;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong with updating your invite. Please try again",
       additionalData: { id, status },
@@ -460,7 +463,7 @@ export async function checkUserAndInviteMatch({
     .catch(() => null);
 
   if (user?.email !== invite?.inviteeEmail) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Wrong user",
       message:
@@ -578,7 +581,7 @@ export async function getPaginatedAndFilterableSettingInvites({
       totalItems,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while getting registered users",
       additionalData: { organizationId },
@@ -610,7 +613,7 @@ export async function bulkInviteUsers({
         icon: { name: "x", variant: "error" },
         senderId: userId,
       });
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: messageResult.error || "Invalid invitation message",
         additionalData: { extraMessage },
@@ -909,7 +912,7 @@ export async function bulkInviteUsers({
   } catch (cause) {
     let message = "Something went wrong while inviting users.";
 
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       message = cause.message;
     }
 
@@ -920,7 +923,7 @@ export async function bulkInviteUsers({
       message = "Received invalid teamMemberId in csv";
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       label,

@@ -14,7 +14,7 @@
  *
  * @see {@link file://./context-helpers.server.ts}
  */
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import {
   resolveAssetIdsForKitSelection,
@@ -97,7 +97,7 @@ describe("resolveAssetIdsForLocationSelection", () => {
       locationIds: ["l1", "l2-foreign"],
     }).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     // the asset query must never run for a tampered selection
     expect(assetFindMany).not.toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe("resolveAssetIdsForLocationSelection", () => {
       locationIds: ["l1", "l2"],
     }).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(err.message).toMatch(/contain assets/i);
   });
@@ -177,7 +177,7 @@ describe("resolveAssetIdsForKitSelection", () => {
       kitIds: ["k1", "k2-foreign"],
     }).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     // the asset query must never run for a tampered selection
     expect(assetFindMany).not.toHaveBeenCalled();
@@ -232,7 +232,7 @@ describe("resolveAssetIdsForKitSelection", () => {
       kitIds: ["k1", "k2"],
     }).catch((e) => e);
 
-    expect(err).toBeInstanceOf(ShelfError);
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
     expect(err.status).toBe(400);
     expect(err.message).toMatch(/contain assets/i);
   });

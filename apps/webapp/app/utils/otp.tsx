@@ -14,44 +14,44 @@ export type OtpPageData = Record<
 
 export const OTP_PAGE_MAP: OtpPageData = {
   login: {
-    title: "Fill your code",
+    title: "Digite seu código",
     SubHeading: ({ email }) => (
       <SubHeading className="-mt-4 text-center">
-        We have sent a code to{" "}
-        <span className="font-bold text-gray-900">{email}</span>. Fill the code
-        below to log in.
+        Enviamos um código para{" "}
+        <span className="font-bold text-gray-900">{email}</span>. Digite o
+        código abaixo para entrar.
       </SubHeading>
     ),
-    buttonTitle: "Log In",
+    buttonTitle: "Entrar",
   },
   signup: {
-    title: "Create an account",
+    title: "Criar uma conta",
     SubHeading: () => (
       <SubHeading className="-mt-4 text-center">
-        Start your journey with Shelf.
+        Comece sua jornada com o EstoqueSoftSystem.
       </SubHeading>
     ),
-    buttonTitle: "Create Account",
+    buttonTitle: "Criar conta",
   },
   confirm_signup: {
-    title: "Confirm your email",
+    title: "Confirme seu e-mail",
     SubHeading: ({ email }) => (
       <SubHeading className="-mt-4 text-center">
-        We have sent a code to{" "}
-        <span className="font-bold text-gray-900">{email}</span>. Fill the code
-        below to confirm you email.
+        Enviamos um código para{" "}
+        <span className="font-bold text-gray-900">{email}</span>. Digite o
+        código abaixo para confirmar seu e-mail.
       </SubHeading>
     ),
-    buttonTitle: "Confirm",
+    buttonTitle: "Confirmar",
   },
 };
 
 export const DEFAULT_PAGE_DATA: OtpPageData["login"] = {
-  title: "One Time Password",
-  buttonTitle: "Continue",
+  title: "Senha de Uso Único",
+  buttonTitle: "Continuar",
   SubHeading: () => (
     <SubHeading className="-mt-4 text-center">
-      Please confirm your OTP to continue
+      Confirme seu código OTP para continuar
     </SubHeading>
   ),
 };

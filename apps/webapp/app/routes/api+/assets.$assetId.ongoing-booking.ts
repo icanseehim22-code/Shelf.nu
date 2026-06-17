@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import { data } from "react-router";
 import { z } from "zod";
 import { getOngoingBookingForAsset } from "~/modules/booking/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -29,7 +29,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     return data(payload(booking));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, assetId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, assetId });
     throw data(error(reason), { status: reason.status });
   }
 }

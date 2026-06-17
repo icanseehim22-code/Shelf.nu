@@ -22,7 +22,7 @@ export function loader(){
 		// Do something
 		return payload({name: 'John'});
 	} catch (cause) {
-		const reason = makeShelfError(cause);
+		const reason = makeEstoqueSoftSystemError(cause);
 		throw data(error(reason));
 	}
 }
@@ -49,7 +49,7 @@ export function action(){
 		// Do something
 		return payload({name: 'John'});
 	} catch (cause) {
-		const reason = makeShelfError(cause);
+		const reason = makeEstoqueSoftSystemError(cause);
 		return data(error(reason));
 	}
 }
@@ -84,15 +84,15 @@ export default Route() {
 
 > [!IMPORTANT]
 >
-> Only throw `ShelfError`, never a `payload` or `Response`
+> Only throw `EstoqueSoftSystemError`, never a `payload` or `Response`
 
-- ✅ Always use a `try/catch` block to catch errors and send a proper `ShelfError`.
+- ✅ Always use a `try/catch` block to catch errors and send a proper `EstoqueSoftSystemError`.
 - Everything that can throw an error should be inside the `try` block.
 - Everything thrown error will be caught and handled in the `catch` block.
 
 ## DB queries
 
-- ✅ Always try to use a `try/catch` block, in a dedicated function, to catch errors and send a proper `ShelfError`.
+- ✅ Always try to use a `try/catch` block, in a dedicated function, to catch errors and send a proper `EstoqueSoftSystemError`.
 - If you don't want to extract your db query in a function, use `.catch()` to handle any error.
 
 ```ts
@@ -106,7 +106,7 @@ async function loader({ params }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "An error occurred while fetching the user main organization",
@@ -120,7 +120,7 @@ async function loader({ params }: LoaderFunctionArgs) {
 
     return payload({ user, userMainOrg });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -136,20 +136,20 @@ Two layers handle these errors automatically:
 
 The Prisma client extension retries any transient error up to **2 times** with linear backoff (500ms, 1000ms). This is transparent to service code — no changes needed in loaders, actions, or service functions.
 
-### 2. Error classification (`makeShelfError`)
+### 2. Error classification (`makeEstoqueSoftSystemError`)
 
-If retries are exhausted and the transient error propagates up wrapped inside one or more `ShelfError` layers, `makeShelfError` walks the entire cause chain via `hasTransientCause`. When it detects a buried transient error it returns a **503 Service Unavailable** with a generic connectivity message instead of copying the misleading domain-level message (e.g. "User not found").
+If retries are exhausted and the transient error propagates up wrapped inside one or more `EstoqueSoftSystemError` layers, `makeEstoqueSoftSystemError` walks the entire cause chain via `hasTransientCause`. When it detects a buried transient error it returns a **503 Service Unavailable** with a generic connectivity message instead of copying the misleading domain-level message (e.g. "User not found").
 
 ### What this means for service code
 
 No changes are required in service-level `catch` blocks. Both layers are centralized:
 
 - `db.server.ts` handles the retry loop
-- `makeShelfError` (called in every route catch block) handles the final classification
+- `makeEstoqueSoftSystemError` (called in every route catch block) handles the final classification
 
 ## Utils
 
-### `ShelfError` class
+### `EstoqueSoftSystemError` class
 
 > [Source](/apps/webapp/app/utils/error.ts)
 
@@ -159,7 +159,7 @@ This class is used to create a custom error object that can be used to throw err
 > If you don't want an error to be captured by Sentry, you can set the `shouldBeCaptured` property to `false`.
 
 ```ts
-throw new ShelfError({
+throw new EstoqueSoftSystemError({
   cause,
   message: "An error occurred while fetching the user main organization",
   additionalData: {
@@ -177,11 +177,11 @@ throw new ShelfError({
 
 These functions are used to build the payload response returned by `payload()`. The `payload()` function is used to send a successful response, while the `error()` function is used to send an error response.
 
-### `makeShelfError()` function
+### `makeEstoqueSoftSystemError()` function
 
 > [Source](/apps/webapp/app/utils/error.ts)
 
-This function is used to create a `ShelfError` object from a caught error. It is used to standardize the error object and make sure that the error is properly formatted before being sent to the client.
+This function is used to create a `EstoqueSoftSystemError` object from a caught error. It is used to standardize the error object and make sure that the error is properly formatted before being sent to the client.
 
 It pairs with the [`error()`](/apps/webapp/app/utils/http.server.ts).
 
@@ -190,7 +190,7 @@ It can take an optional `additionalData` parameter to add more context to the er
 ```ts
 ...
 } catch (cause) {
-	const reason = makeShelfError(cause, {userId});
+	const reason = makeEstoqueSoftSystemError(cause, {userId});
 	throw data(error(reason), { status: reason.status });
 }
 
@@ -206,7 +206,7 @@ It can take an optional `additionalData` parameter to add more context to the er
 
 This function is used to parse the data coming from a `FormData`, `URLSearchParams` or an object and validate it against a Zod schema.
 
-It throws a `ShelfError` (`badRequest()`) if the data is invalid.
+It throws a `EstoqueSoftSystemError` (`badRequest()`) if the data is invalid.
 
 > [!IMPORTANT]
 > By default, errors are not captured by Sentry. If you want to capture the error, you can set the `shouldBeCaptured` property to `true`.

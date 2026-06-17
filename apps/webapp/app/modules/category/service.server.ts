@@ -4,7 +4,7 @@ import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
 import {
   isNotFoundError,
-  ShelfError,
+  EstoqueSoftSystemError,
   maybeUniqueConstraintViolation,
 } from "~/utils/error";
 import { getRandomColor } from "~/utils/get-random-color";
@@ -92,7 +92,7 @@ export async function getCategories(params: {
 
     return { categories, totalCategories };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the categories",
       additionalData: { ...params },
@@ -110,7 +110,7 @@ export async function deleteCategory({
       where: { id, organizationId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while deleting the category. Please try again or contact support.",
@@ -174,7 +174,7 @@ export async function createCategoriesIfNotExists({
 
     return Object.fromEntries(Array.from(categories));
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating categories. Seems like some of the category data in your import file is invalid. Please check and try again.",
@@ -194,7 +194,7 @@ export async function getCategory({
       where: { id, organizationId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Category not found",
       message:
@@ -249,7 +249,7 @@ export async function bulkDeleteCategories({
         : { id: { in: categoryIds }, organizationId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while bulk deleting categories.",
       additionalData: { categoryIds, organizationId },

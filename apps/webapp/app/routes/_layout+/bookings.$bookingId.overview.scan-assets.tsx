@@ -26,7 +26,10 @@ import scannerCss from "~/styles/scanner.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { canUserManageBookingAssets } from "~/utils/bookings";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import {
   assertIsPost,
@@ -76,7 +79,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
     const canManageAssets = canUserManageBookingAssets(booking, isSelfService);
 
     if (!canManageAssets) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "You are not allowed to add assets for this booking at the moment.",
@@ -91,7 +94,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     return payload({ title, header, booking });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -136,7 +139,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/bookings/${bookingId}`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     return data(error(reason), { status: reason.status });
   }
 }

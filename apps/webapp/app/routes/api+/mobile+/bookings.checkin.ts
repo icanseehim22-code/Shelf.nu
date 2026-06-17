@@ -7,7 +7,7 @@ import {
 } from "~/modules/api/mobile-auth.server";
 import { checkinBooking } from "~/modules/booking/service.server";
 import { getClientHint, type ClientHint } from "~/utils/client-hints";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -66,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

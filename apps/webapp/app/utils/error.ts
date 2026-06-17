@@ -160,7 +160,7 @@ export type ErrorLabel = FailureReason["label"];
 /**
  * A custom error class to normalize the error handling in our app.
  */
-export class ShelfError extends Error {
+export class EstoqueSoftSystemError extends Error {
   readonly cause: FailureReason["cause"];
   readonly label: FailureReason["label"];
   readonly title: FailureReason["title"];
@@ -181,17 +181,19 @@ export class ShelfError extends Error {
     traceId,
   }: FailureReason) {
     super();
-    this.name = "ShelfError";
+    this.name = "EstoqueSoftSystemError";
     this.cause = cause;
     this.label = label;
     this.message = message;
-    this.title = isLikeShelfError(cause) ? title || cause.title : title;
+    this.title = isLikeEstoqueSoftSystemError(cause)
+      ? title || cause.title
+      : title;
     this.additionalData = additionalData;
     this.shouldBeCaptured =
-      (isLikeShelfError(cause)
+      (isLikeEstoqueSoftSystemError(cause)
         ? shouldBeCaptured ?? cause.shouldBeCaptured
         : shouldBeCaptured) ?? true;
-    this.status = isLikeShelfError(cause)
+    this.status = isLikeEstoqueSoftSystemError(cause)
       ? status || cause.status || 500
       : isNotFoundError(cause)
       ? 404
@@ -201,11 +203,13 @@ export class ShelfError extends Error {
 }
 
 /**
- * This helper function is used to check if an error is an instance of `ShelfError` or an object that looks like an `ShelfError`.
+ * This helper function is used to check if an error is an instance of `EstoqueSoftSystemError` or an object that looks like an `EstoqueSoftSystemError`.
  */
-export function isLikeShelfError(cause: unknown): cause is ShelfError {
+export function isLikeEstoqueSoftSystemError(
+  cause: unknown
+): cause is EstoqueSoftSystemError {
   return (
-    cause instanceof ShelfError ||
+    cause instanceof EstoqueSoftSystemError ||
     (typeof cause === "object" &&
       cause !== null &&
       "label" in cause &&
@@ -214,21 +218,21 @@ export function isLikeShelfError(cause: unknown): cause is ShelfError {
 }
 
 /**
- * A "handled client error": a `ShelfError` whose HTTP status is in the 4xx
+ * A "handled client error": a `EstoqueSoftSystemError` whose HTTP status is in the 4xx
  * range. These are expected, user-facing outcomes (failed validation, business
  * rule violations, not-found, forbidden) — not server faults. We deliberately
  * keep them OUT of the Sentry error pipeline (they'd burn the small error
  * quota and alert on non-issues) and instead record them as low-severity
  * Sentry **logs** (separate quota) so there's still a searchable trail.
  *
- * Note: `ShelfError.status` defaults to 500, so anything without an explicit
+ * Note: `EstoqueSoftSystemError.status` defaults to 500, so anything without an explicit
  * 4xx status is treated as a server error (captured normally).
  *
  * @see {@link file://./../../server/instrument.server.ts} beforeSend — drops these from errors
  * @see {@link file://./logger.ts} Logger.handledClientError — emits the log trail
  */
 export function isHandledClientError(cause: unknown): boolean {
-  if (!isLikeShelfError(cause)) {
+  if (!isLikeEstoqueSoftSystemError(cause)) {
     return false;
   }
   const status = cause.status ?? 500;
@@ -238,7 +242,7 @@ export function isHandledClientError(cause: unknown): boolean {
 /**
  * Detects whether an error (or any error in its `cause` chain) represents a
  * cancelled / aborted request. Used to suppress noise from client disconnects
- * and stream-handler aborts both in `makeShelfError` and in the Sentry
+ * and stream-handler aborts both in `makeEstoqueSoftSystemError` and in the Sentry
  * `beforeSend` hook on the server.
  */
 export function isAbortError(cause: unknown) {
@@ -289,7 +293,7 @@ export function isAbortError(cause: unknown) {
 }
 
 /**
- * This helper function is used to check if an error is an instance of `ShelfError` or an object that looks like an `ShelfError`.
+ * This helper function is used to check if an error is an instance of `EstoqueSoftSystemError` or an object that looks like an `EstoqueSoftSystemError`.
  */
 export function isNotFoundError(
   cause: unknown
@@ -335,7 +339,7 @@ export function isPrismaTransientError(cause: unknown): boolean {
 
 /**
  * Walks the cause chain of an error to detect if a transient
- * Prisma error is buried inside ShelfError wrappers.
+ * Prisma error is buried inside EstoqueSoftSystemError wrappers.
  */
 function hasTransientCause(error: unknown): boolean {
   if (isPrismaTransientError(error)) return true;
@@ -347,10 +351,10 @@ function hasTransientCause(error: unknown): boolean {
 
 /**
  * Walks the cause chain of an error to detect if a Prisma `P2025`
- * (record-not-found) error is buried inside ShelfError wrappers. Used by
- * `makeShelfError` so that a `prisma.x.update()` failure on a
+ * (record-not-found) error is buried inside EstoqueSoftSystemError wrappers. Used by
+ * `makeEstoqueSoftSystemError` so that a `prisma.x.update()` failure on a
  * deleted-since-load record collapses to a 404 even when a service-layer
- * `try/catch` already re-wrapped it as a generic 5xx ShelfError.
+ * `try/catch` already re-wrapped it as a generic 5xx EstoqueSoftSystemError.
  */
 function hasNotFoundCause(error: unknown): boolean {
   if (isNotFoundError(error)) return true;
@@ -364,20 +368,20 @@ function hasNotFoundCause(error: unknown): boolean {
  * This function is used to check if the error is a zod validation error.
  */
 export function isZodValidationError(cause: unknown) {
-  if (!isLikeShelfError(cause)) {
+  if (!isLikeEstoqueSoftSystemError(cause)) {
     return false;
   }
 
   return cause.additionalData && "validationErrors" in cause.additionalData;
 }
 
-export function makeShelfError(
+export function makeEstoqueSoftSystemError(
   cause: unknown,
   additionalData?: AdditionalData,
   shouldBeCaptured?: boolean
 ) {
   if (isAbortError(cause)) {
-    return new ShelfError({
+    return new EstoqueSoftSystemError({
       cause,
       label: "Request aborted",
       message: "The request was cancelled before it could complete.",
@@ -386,11 +390,11 @@ export function makeShelfError(
     });
   }
 
-  // Detect transient DB errors buried in ShelfError wrappers.
+  // Detect transient DB errors buried in EstoqueSoftSystemError wrappers.
   // This prevents misleading messages like "User not found" when the
   // real issue is a connection pool timeout (P2024).
   if (hasTransientCause(cause)) {
-    return new ShelfError({
+    return new EstoqueSoftSystemError({
       cause,
       message:
         "We're experiencing temporary database connectivity issues. Please try again in a moment.",
@@ -403,15 +407,15 @@ export function makeShelfError(
 
   // Detect Prisma `P2025` (record not found) anywhere in the cause chain —
   // even when a service-layer `try/catch` already re-wrapped it as a generic
-  // 5xx ShelfError. Race conditions like "asset deleted between form load
+  // 5xx EstoqueSoftSystemError. Race conditions like "asset deleted between form load
   // and submit" surface here, and they belong as 404s, not as paged 5xxs.
   // We preserve the wrapper's user-facing message + label when present so
   // the toast still says "Booking not found, are you sure …" rather than
   // a generic message; only the status and capture decision change.
   // Callers can force capture with an explicit `shouldBeCaptured: true`.
   if (hasNotFoundCause(cause)) {
-    const wrapper = isLikeShelfError(cause) ? cause : null;
-    return new ShelfError({
+    const wrapper = isLikeEstoqueSoftSystemError(cause) ? cause : null;
+    return new EstoqueSoftSystemError({
       cause,
       message: wrapper?.message ?? "The requested resource could not be found.",
       label: wrapper?.label ?? "Unknown",
@@ -424,9 +428,9 @@ export function makeShelfError(
     });
   }
 
-  if (isLikeShelfError(cause)) {
+  if (isLikeEstoqueSoftSystemError(cause)) {
     // copy the original error and fill in the maybe missing fields like status or traceId
-    return new ShelfError({
+    return new EstoqueSoftSystemError({
       ...cause,
       additionalData: {
         ...cause.additionalData,
@@ -440,7 +444,7 @@ export function makeShelfError(
   // 🤷‍♂️ We don't know what this error is, so we create a new default one.
   // Default to `true` for the unknown-error path: an unrecognised throw
   // really should reach Sentry unless a caller explicitly opts out.
-  return new ShelfError({
+  return new EstoqueSoftSystemError({
     cause,
     message: "Sorry, something went wrong.",
     additionalData,
@@ -468,7 +472,7 @@ export type Options = Partial<
  * If you want to capture the error, you can set the `shouldBeCaptured` option to `true`.
  */
 export function notAllowedMethod(method: string, options?: Options) {
-  return new ShelfError({
+  return new EstoqueSoftSystemError({
     shouldBeCaptured: false,
     ...options,
     // Must come after the spread so that callers who pass
@@ -492,7 +496,7 @@ export function badRequest(
   message: string,
   options?: Omit<Options, "message">
 ) {
-  return new ShelfError({
+  return new EstoqueSoftSystemError({
     shouldBeCaptured: false,
     ...options,
     cause: null,
@@ -553,7 +557,7 @@ export function maybeUniqueConstraintViolation(
     validationErrors[failedField] = { message };
   }
 
-  return new ShelfError({
+  return new EstoqueSoftSystemError({
     cause,
     shouldBeCaptured,
     ...options,

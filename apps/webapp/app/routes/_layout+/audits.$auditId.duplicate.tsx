@@ -23,7 +23,10 @@ import {
 } from "~/modules/audit/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -50,7 +53,7 @@ export const meta = () => [{ title: appendToMetaTitle("Duplicate audit") }];
  *
  * @param args - React Router loader args (request, context, params).
  * @returns Payload with the audit name + asset counts for the dialog.
- * @throws {ShelfError} 404 if the audit isn't found, 400 if it's not in a
+ * @throws {EstoqueSoftSystemError} 404 if the audit isn't found, 400 if it's not in a
  *   terminal status, or whatever {@link requirePermission} throws on auth.
  */
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
@@ -76,7 +79,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
     });
 
     if (!audit) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit not found.",
         additionalData: { auditId },
@@ -94,7 +97,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
         audit.status as (typeof DUPLICATE_AUDIT_ALLOWED_STATUSES)[number]
       )
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Only completed, cancelled, or archived audits can be duplicated.",
@@ -129,7 +132,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
       droppedAssetCount,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw reason;
   }
 }
@@ -139,7 +142,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
  *
  * Performs the duplication via {@link duplicateAuditSession}, fires a
  * success notification, and redirects to the new audit's overview page.
- * Errors are normalised through {@link makeShelfError} and returned as
+ * Errors are normalised through {@link makeEstoqueSoftSystemError} and returned as
  * the route's `actionData.error` so the dialog can display them.
  *
  * @param args - React Router action args (request, context, params).
@@ -172,7 +175,7 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
 
     return redirect(`/audits/${newSession.id}/overview`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

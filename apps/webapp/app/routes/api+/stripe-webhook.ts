@@ -44,7 +44,10 @@ import {
   constructVerifiedWebhookEvent,
   PaymentMethodWithoutCustomerResponse,
 } from "~/modules/stripe-webhook/helpers.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
@@ -83,7 +86,7 @@ export async function action({ request }: ActionFunctionArgs) {
       case "payment_method.detached":
         return await handlePaymentMethodDetached(event, user, customerId);
       default:
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "Unhandled event. Maybe you forgot to handle this event type? Check the Stripe dashboard.",
@@ -98,9 +101,9 @@ export async function action({ request }: ActionFunctionArgs) {
     if (cause instanceof PaymentMethodWithoutCustomerResponse) {
       return new Response(null, { status: 200 });
     }
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     // Return minimal body to avoid leaking sensitive Stripe event data
-    // from additionalData. The ShelfError is still captured server-side.
+    // from additionalData. The EstoqueSoftSystemError is still captured server-side.
     return new Response(null, { status: reason.status });
   }
 }

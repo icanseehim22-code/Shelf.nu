@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { locationDescendantsMock } from "@mocks/location-descendants";
 import type { Filter } from "~/components/assets/assets-index/advanced-filters/schema";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import {
   assetQueryFragment,
   generateCustomFieldSelect,
@@ -40,7 +40,7 @@ describe("parseSortingOptions", () => {
     it("rejects SQL injection payloads in the direction", () => {
       expect(() =>
         parseSortingOptions(["updatedAt:asc; DROP TABLE Asset; --"])
-      ).toThrow(ShelfError);
+      ).toThrow(EstoqueSoftSystemError);
     });
 
     // Regression test using the exact PoC shape from the GHSA-69xv-wmgg-3qp3
@@ -51,12 +51,12 @@ describe("parseSortingOptions", () => {
         parseSortingOptions([
           "createdAt:asc,(SELECT CASE WHEN 1=2 THEN 1 ELSE 1/0 END)",
         ])
-      ).toThrow(ShelfError);
+      ).toThrow(EstoqueSoftSystemError);
     });
 
     it("throws on an unrecognized direction string", () => {
       expect(() => parseSortingOptions(["updatedAt:foobar"])).toThrow(
-        ShelfError
+        EstoqueSoftSystemError
       );
     });
 
@@ -65,8 +65,8 @@ describe("parseSortingOptions", () => {
         parseSortingOptions(["updatedAt:nope"]);
         throw new Error("expected parseSortingOptions to throw");
       } catch (err) {
-        expect(err).toBeInstanceOf(ShelfError);
-        expect((err as ShelfError).status).toBe(400);
+        expect(err).toBeInstanceOf(EstoqueSoftSystemError);
+        expect((err as EstoqueSoftSystemError).status).toBe(400);
       }
     });
 
@@ -233,18 +233,18 @@ describe("generateCustomFieldSelect", () => {
   // Defense-in-depth: even though parseSortingOptions already validates
   // aliases, generateCustomFieldSelect must not trust its input. A future
   // refactor or alternate caller must not be able to inject SQL via cf.alias.
-  it("throws ShelfError when an alias contains unsafe characters", () => {
+  it("throws EstoqueSoftSystemError when an alias contains unsafe characters", () => {
     expect(() =>
       generateCustomFieldSelect([
         { name: "x", valueKey: "raw", alias: "cf_x; DROP--" },
       ])
-    ).toThrow(ShelfError);
+    ).toThrow(EstoqueSoftSystemError);
   });
 
-  it("throws ShelfError when an alias is empty", () => {
+  it("throws EstoqueSoftSystemError when an alias is empty", () => {
     expect(() =>
       generateCustomFieldSelect([{ name: "x", valueKey: "raw", alias: "" }])
-    ).toThrow(ShelfError);
+    ).toThrow(EstoqueSoftSystemError);
   });
 });
 

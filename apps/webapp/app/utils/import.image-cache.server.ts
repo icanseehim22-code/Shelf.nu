@@ -1,6 +1,6 @@
 import type { LRUCache } from "lru-cache";
 import { getSupabaseAdmin } from "~/integrations/supabase/client";
-import { isLikeShelfError, ShelfError } from "./error";
+import { isLikeEstoqueSoftSystemError, EstoqueSoftSystemError } from "./error";
 import { Logger } from "./logger";
 
 // 100MB total cache size for the import operation
@@ -30,7 +30,7 @@ export async function cacheOptimizedImage(
 
     if (error || !data) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: error,
           message: "Failed to download optimized image from Supabase",
           additionalData: { path },
@@ -54,11 +54,11 @@ export async function cacheOptimizedImage(
 
     return image;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
-        message: isShelfError
+        message: isEstoqueSoftSystemError
           ? cause.message
           : "Failed to cache optimized image",
         additionalData: { path },

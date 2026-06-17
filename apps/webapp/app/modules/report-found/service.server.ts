@@ -2,7 +2,7 @@ import type { Asset, Kit, Prisma, ReportFound, User } from "@prisma/client";
 import { db } from "~/database/db.server";
 import { sendEmail } from "~/emails/mail.server";
 import type { QR_SELECT_FOR_REPORT } from "~/routes/qr+/_public+/$qrId_.contact-owner";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { normalizeQrData } from "~/utils/qr";
 
 export async function createReport({
@@ -37,7 +37,7 @@ export async function createReport({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating the report. Please try again or contact support.",
@@ -73,8 +73,8 @@ export function sendReportEmails({
       to: ownerEmail,
       subject,
       text: item
-        ? `Your ${type} ${normalizedName} has been reported found. The reason is: \n\n| ${message} \n\n For contact use this email: ${reporterEmail}\n\nEmail sent via shelf.nu\n\n`
-        : `The QR code own (${qr.id}) has been reported found. The reason is: \n\n| ${message} \n\n For contact use this email: ${reporterEmail}\n\nEmail sent via shelf.nu\n\n`,
+        ? `Your ${type} ${normalizedName} has been reported found. The reason is: \n\n| ${message} \n\n For contact use this email: ${reporterEmail}\n\nEmail sent via estoquesoftsystem.com\n\n`
+        : `The QR code own (${qr.id}) has been reported found. The reason is: \n\n| ${message} \n\n For contact use this email: ${reporterEmail}\n\nEmail sent via estoquesoftsystem.com\n\n`,
     });
 
     /** Send email to reporter */
@@ -82,13 +82,13 @@ export function sendReportEmails({
       to: reporterEmail,
       subject,
       text: item
-        ? `Thank you for contacting the owner of the ${type} you found. They have been notified of your message and will contact you if they are interested.\n\nEmail sent via shelf.nu\n\n`
-        : `Thank you for contacting the owner of the QR code you found. They have been notified of your message and will contact you if they are interested.\n\nEmail sent via shelf.nu\n\n`,
+        ? `Thank you for contacting the owner of the ${type} you found. They have been notified of your message and will contact you if they are interested.\n\nEmail sent via estoquesoftsystem.com\n\n`
+        : `Thank you for contacting the owner of the QR code you found. They have been notified of your message and will contact you if they are interested.\n\nEmail sent via estoquesoftsystem.com\n\n`,
     });
 
     return;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to send report emails",
       additionalData: { ownerEmail, reporterEmail, item, type, normalizedName },

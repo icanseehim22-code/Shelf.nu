@@ -71,8 +71,8 @@ export function ExportAssetsButton() {
           ? {
               reason: (
                 <>
-                  Exporting is not available on the free tier of shelf.{" "}
-                  <UpgradeMessage />
+                  Exporting is not available on the free tier of
+                  EstoqueSoftSystem. <UpgradeMessage />
                 </>
               ),
             }

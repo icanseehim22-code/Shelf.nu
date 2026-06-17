@@ -1,7 +1,10 @@
 import { data, type LoaderFunctionArgs } from "react-router";
 import { NRM_ID_PARAM } from "~/components/nrm/export-nrm-button";
 import { exportNRMsToCsv } from "~/utils/csv.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getCurrentSearchParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -24,7 +27,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     const nrmIds = searchParams.get(NRM_ID_PARAM);
 
     if (!nrmIds) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label: "Team Member",
         message: "No NRMs selected",
@@ -41,7 +44,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       headers: { "Content-Type": "text/csv" },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

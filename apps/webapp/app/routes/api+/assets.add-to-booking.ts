@@ -8,7 +8,10 @@ import {
 import { createNotes } from "~/modules/note/service.server";
 import { getUserByID } from "~/modules/user/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { assertIsPost, payload, error, parseData } from "~/utils/http.server";
 import { wrapLinkForNote, wrapUserLinkForNote } from "~/utils/markdoc-wrappers";
 import {
@@ -70,7 +73,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       const allAssetsInBooking =
         alreadyAddedAssets.length === finalAssetIds.length;
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: allAssetsInBooking
           ? "The booking you have selected already contains all the selected assets. Please select different booking or different assets."
@@ -124,7 +127,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     return data(payload({ success: true, bookingId: booking.id }));
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }

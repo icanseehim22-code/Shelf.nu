@@ -298,9 +298,9 @@ export function ValueField({
                         </h6>
                         <p className="text-xs font-medium text-gray-500">
                           This fields supports barcode scanners. Simply place
-                          your cursor in the field and scan a Shelf QR code with
-                          your barcode scanner. The value will be automatically
-                          filled in for you.
+                          your cursor in the field and scan a EstoqueSoftSystem
+                          QR code with your barcode scanner. The value will be
+                          automatically filled in for you.
                         </p>
                       </div>
                     </TooltipContent>

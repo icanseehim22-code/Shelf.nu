@@ -39,7 +39,10 @@ import {
 } from "~/modules/audit/service.server";
 import scannerCss from "~/styles/scanner.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getParams, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -98,7 +101,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     });
 
     if (!auditSession) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit session not found",
         additionalData: { auditId, organizationId },
@@ -108,7 +111,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     }
 
     if (auditSession.status === "CANCELLED") {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "This audit has been cancelled and can no longer be modified.",
         additionalData: { auditId },
@@ -145,7 +148,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       const assetId = formData.get("assetId");
 
       if (!assetId || typeof assetId !== "string") {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: "Asset ID is required",
           additionalData: { auditId },
@@ -264,7 +267,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       return payload({ success: true });
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Invalid action intent",
       additionalData: { intent },
@@ -272,7 +275,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       status: 400,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, auditId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, auditId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -333,7 +336,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       payload({ title, header, session, expectedAssets, existingScans })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }

@@ -1,7 +1,10 @@
 import { data, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { db } from "~/database/db.server";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getParams } from "~/utils/http.server";
 
 export async function loader({ context, params }: LoaderFunctionArgs) {
@@ -23,7 +26,7 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           title: "Image not found",
           message:
@@ -46,7 +49,7 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
     const orgIds = userOrganizations.map((uo) => uo.organization.id);
 
     if (!orgIds.includes(image.ownerOrgId)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Unauthorized. This resource doesn't belong to you.",
         additionalData: {
@@ -67,7 +70,7 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

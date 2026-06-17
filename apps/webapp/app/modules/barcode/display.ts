@@ -60,7 +60,7 @@ export const ASSET_CODE_RESOLUTION_SELECT = {
 /**
  * The minimum entity shape required to resolve a display code.
  *
- * Designed to cover any code-bearing entity in Shelf — assets and kits
+ * Designed to cover any code-bearing entity in EstoqueSoftSystem — assets and kits
  * today, more if added later. All identifier-like fields are optional so
  * kits (which lack `sequentialId` and `preferredBarcodeId` in v1) and
  * partial loader selects both work without crashing:

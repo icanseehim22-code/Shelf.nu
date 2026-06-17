@@ -4,7 +4,7 @@ import {
   requireMobileAuth,
   requireOrganizationAccess,
 } from "~/modules/api/mobile-auth.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 
 /**
  * GET /api/mobile/locations?orgId=xxx&search=yyy
@@ -40,7 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     return data({ locations });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

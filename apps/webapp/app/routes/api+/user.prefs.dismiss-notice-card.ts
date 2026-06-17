@@ -1,6 +1,6 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { setCookie, userPrefs } from "~/utils/cookies.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error } from "~/utils/http.server";
 
 export async function action({ context, request }: ActionFunctionArgs) {
@@ -20,7 +20,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       headers: [setCookie(await userPrefs.serialize(cookie))],
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

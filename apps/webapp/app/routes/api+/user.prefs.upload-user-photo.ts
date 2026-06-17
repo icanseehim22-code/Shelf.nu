@@ -4,7 +4,10 @@ import sharp from "sharp";
 import { getUserByID, updateUser } from "~/modules/user/service.server";
 import { DEFAULT_MAX_IMAGE_UPLOAD_SIZE } from "~/utils/constants";
 import { dateTimeInUnix } from "~/utils/date-time-in-unix";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 
 import { assertIsPost, payload, error } from "~/utils/http.server";
 import {
@@ -43,7 +46,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     /** if profile picture is an empty string, the upload failed so we return an error */
     if (!profilePicture || profilePicture === "") {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Something went wrong. Please refresh and try again",
         label: "File storage",
@@ -63,7 +66,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return data(payload({ updatedUser }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

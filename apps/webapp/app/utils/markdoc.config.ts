@@ -14,7 +14,7 @@ function collectRawContent(node: Node | undefined): string {
 }
 
 /**
- * Markdoc configuration for Shelf.nu
+ * Markdoc configuration for EstoqueSoftSystem
  *
  * This configuration defines custom tags and components for enhanced markdown rendering.
  * Currently includes:

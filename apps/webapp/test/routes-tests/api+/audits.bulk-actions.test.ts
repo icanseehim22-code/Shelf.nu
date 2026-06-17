@@ -8,7 +8,7 @@
  *   - `organizationId`, `userId`, `currentSearchParams`, and
  *     `isSelfServiceOrBase` are forwarded to the service
  *   - `ALL_SELECTED_KEY` sentinel values are passed through unchanged
- *   - Service + permission errors flow through `makeShelfError` and surface
+ *   - Service + permission errors flow through `makeEstoqueSoftSystemError` and surface
  *     with the correct HTTP status on the response
  *
  * Lives under `test/routes-tests/` rather than next to the route itself
@@ -28,7 +28,7 @@ import {
   bulkDeleteAudits,
 } from "~/modules/audit/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import {
   PermissionAction,
@@ -212,13 +212,13 @@ describe("api/audits.bulk-actions action", () => {
     );
   });
 
-  it("surfaces a service ShelfError through the response with the matching status and message", async () => {
+  it("surfaces a service EstoqueSoftSystemError through the response with the matching status and message", async () => {
     vi.mocked(requirePermission).mockResolvedValue({
       organizationId: "org-1",
       isSelfServiceOrBase: false,
     } as any);
     vi.mocked(bulkArchiveAudits).mockRejectedValue(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: null,
         message:
           "Some audits are not in a completed or cancelled state and cannot be archived.",
@@ -243,7 +243,7 @@ describe("api/audits.bulk-actions action", () => {
 
   it("propagates a permission rejection as a non-200 response and does NOT call the service", async () => {
     vi.mocked(requirePermission).mockRejectedValue(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: null,
         message: "Forbidden",
         label: "Auth",
@@ -360,13 +360,13 @@ describe("api/audits.bulk-actions action", () => {
       );
     });
 
-    it("surfaces a service ShelfError with the matching HTTP status", async () => {
+    it("surfaces a service EstoqueSoftSystemError with the matching HTTP status", async () => {
       vi.mocked(requirePermission).mockResolvedValue({
         organizationId: "org-1",
         isSelfServiceOrBase: false,
       } as any);
       vi.mocked(bulkDeleteAudits).mockRejectedValue(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: "Some selected audits are not archived.",
           label: "Audit",

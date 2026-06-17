@@ -1,6 +1,6 @@
 # App configuration - shelf.config.ts
 
-This file contains configuration options that are used to adjust and disable certain functionalities in Shelf.nu.
+This file contains configuration options that are used to adjust and disable certain functionalities in EstoqueSoftSystem.
 
 ```ts
 // shelf.config.ts
@@ -45,7 +45,7 @@ sendOnboardingEmail: true;
 
 ### enablePremiumFeatures
 
-Choose whether you want premium features to be enabled. Setting this to `false` will allow your users to use all features of Shelf without limitations.
+Choose whether you want premium features to be enabled. Setting this to `false` will allow your users to use all features of EstoqueSoftSystem without limitations.
 
 **Default value:** `false`  
 **Environment variable:** `ENABLE_PREMIUM_FEATURES`
@@ -61,7 +61,7 @@ You can set this directly in the config file or use the environment variable to 
 
 Controls whether business intelligence fields are collected during user onboarding. When enabled, users are asked to provide:
 
-- How they heard about Shelf (referral source)
+- How they heard about EstoqueSoftSystem (referral source)
 - Their role
 - Team size
 - Company/Organization name (for self-serve signups)
@@ -83,7 +83,7 @@ collectBusinessIntel: true;
 
 > **⚠️ Deprecated:** Use `collectBusinessIntel` instead. This option is kept for backwards compatibility.
 
-Choose whether an open field will be shown on the onboarding page, asking the user to provide info on how they found out about Shelf.
+Choose whether an open field will be shown on the onboarding page, asking the user to provide info on how they found out about EstoqueSoftSystem.
 
 **Default value:** `false`
 **Environment variable:** `SHOW_HOW_DID_YOU_FIND_US`
@@ -102,7 +102,7 @@ freeTrialDays: 14;
 
 ### disableSignup
 
-Prevents new users from signing up to your Shelf instance. Useful for closed/private instances.
+Prevents new users from signing up to your EstoqueSoftSystem instance. Useful for closed/private instances.
 
 **Default value:** `false`  
 **Environment variable:** `DISABLE_SIGNUP`
@@ -156,7 +156,7 @@ faviconPath: "/static/my-favicon.ico";
 
 Primary color used in email templates and notifications.
 
-**Default value:** `"#EF6820"` (Shelf orange)
+**Default value:** `"#EF6820"` (EstoqueSoftSystem orange)
 
 ```ts
 // Custom email color

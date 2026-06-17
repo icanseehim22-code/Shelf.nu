@@ -9,7 +9,7 @@ import {
 } from "~/modules/tier/service.server";
 import { getUserByID } from "~/modules/user/service.server";
 import type { ErrorLabel } from "./error";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import { isPersonalOrg } from "./organization";
 
 const label: ErrorLabel = "Tier";
@@ -34,7 +34,7 @@ export const canExportAssets = (
 };
 
 /**
- * Determines whether the current organization's tier allows hiding Shelf
+ * Determines whether the current organization's tier allows hiding EstoqueSoftSystem
  * branding on printable labels.
  *
  * @param tierLimit - The tier limits associated with the organization.
@@ -68,7 +68,7 @@ export async function assertUserCanExportAssets({
   });
 
   if (!canExportAssets(tierLimit)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Not allowed",
       message:
@@ -115,7 +115,7 @@ export async function assertUserCanImportAssets({
   });
 
   if (!canImportAssets(tierLimit)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Not allowed",
       message: "You are not allowed to import assets",
@@ -154,7 +154,7 @@ export async function assertUserCanImportNRM({
   });
 
   if (!canImportNRM(tierLimit)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Not allowed",
       message:
@@ -206,7 +206,7 @@ export const assertUserCanCreateMoreCustomFields = async ({
   });
 
   if (!canCreateMore) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Not allowed",
       message:
@@ -268,7 +268,7 @@ export async function assertWillExceedCustomFieldLimit({
   });
 
   if (willExceedLimit) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: `Activating these fields will exceed your allowed limit(${tierLimit.maxCustomFields}) of active custom fields . Try selecting a smaller number or fields or upgrade your plan to activate more.`,
       shouldBeCaptured: false,
@@ -324,7 +324,7 @@ export async function assertUserCanCreateMoreOrganizations(userId: string) {
       totalOrganizations: organizations.length || 1,
     })
   ) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Not allowed",
       message: "You cannot create more workspaces with your current plan.",
@@ -357,7 +357,7 @@ export function assertCanUseBookings(
   currentOrganization: Pick<Organization, "type">
 ) {
   if (!canUseBookings(currentOrganization)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Not allowed",
       message:
@@ -388,7 +388,7 @@ export async function assertUserCanInviteUsersToWorkspace({
       },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Failed to get organization",
         additionalData: { organizationId },
@@ -397,7 +397,7 @@ export async function assertUserCanInviteUsersToWorkspace({
     });
 
   if (isPersonalOrg(org)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Not allowed",
       message:

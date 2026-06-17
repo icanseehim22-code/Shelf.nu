@@ -229,8 +229,8 @@ const WorkspaceGeneralEditForms = ({
           subHeading={
             canHideShelfBranding ? (
               <p>
-                Control whether the "Powered by Shelf.nu" footer appears on QR
-                and barcode labels.
+                Control whether the "Powered by EstoqueSoftSystem" footer
+                appears on QR and barcode labels.
               </p>
             ) : (
               <p>
@@ -242,7 +242,7 @@ const WorkspaceGeneralEditForms = ({
                 >
                   Upgrade your plan
                 </Button>{" "}
-                to hide Shelf branding on labels.
+                to hide EstoqueSoftSystem branding on labels.
               </p>
             )
           }
@@ -270,13 +270,14 @@ const WorkspaceGeneralEditForms = ({
                   canHideShelfBranding ? "text-gray-700" : "text-gray-400"
                 )}
               >
-                Display Shelf branding on labels
+                Display EstoqueSoftSystem branding on labels
               </label>
               <p
                 id="showShelfBranding-desc"
                 className="text-[14px] text-gray-600"
               >
-                Toggle Shelf branding on downloadable QR and barcode labels.
+                Toggle EstoqueSoftSystem branding on downloadable QR and barcode
+                labels.
               </p>
             </div>
           </div>

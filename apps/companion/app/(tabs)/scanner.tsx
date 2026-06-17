@@ -286,7 +286,7 @@ function ScannerContent() {
         let kitId: string | null = null;
 
         if (qrId) {
-          // ── Shelf QR path ──
+          // ── EstoqueSoftSystem QR path ──
 
           // Early batch dedup by QR ID (saves a network call)
           if (
@@ -354,7 +354,8 @@ function ScannerContent() {
             setScanResult({
               type: "not_found",
               title: "Code Not Recognized",
-              message: "This code is not recognized as a Shelf asset code.",
+              message:
+                "This code is not recognized as a EstoqueSoftSystem asset code.",
             });
             finalizeScan();
             return;
@@ -418,7 +419,7 @@ function ScannerContent() {
           flashFrame("error");
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
-          // For Shelf QR codes, offer a path to link the QR to a new asset:
+          // For EstoqueSoftSystem QR codes, offer a path to link the QR to a new asset:
           // - If claimed to current org → navigate to in-app asset creation
           // - If unclaimed → bridge to web for the claim+link flow
           // Barcodes don't have an external link flow, so no action for those
@@ -901,8 +902,8 @@ function ScannerContent() {
         <Ionicons name="camera-outline" size={64} color={colors.mutedLight} />
         <Text style={styles.messageTitle}>Camera Access Needed</Text>
         <Text style={styles.messageBody}>
-          Shelf needs camera access to scan QR codes and barcodes on your
-          assets.
+          EstoqueSoftSystem needs camera access to scan QR codes and barcodes on
+          your assets.
         </Text>
         {permission.canAskAgain ? (
           <TouchableOpacity

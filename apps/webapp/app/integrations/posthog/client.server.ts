@@ -20,7 +20,7 @@
 import { PostHog } from "posthog-node";
 
 import { POSTHOG_API_KEY, POSTHOG_HOST } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 
 /** Lazily-initialised singleton. Stays `null` once we know there is no key. */
@@ -83,7 +83,7 @@ export type ServerFunnelEvent =
  * is always safe to call from inside signup or a webhook handler.
  *
  * @param args - The event name + its typed properties, plus `distinctId`
- *   (use the Shelf user id so events stitch to one person) and optional
+ *   (use the EstoqueSoftSystem user id so events stitch to one person) and optional
  *   `groups` for org-level group analytics.
  */
 export function captureServerEvent(
@@ -107,7 +107,7 @@ export function captureServerEvent(
     // why: analytics is best-effort — a transport/logging failure must never
     // surface to the caller (signup, Stripe webhook). Log and swallow.
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to capture server analytics event",
         additionalData: { event: args.event },

@@ -1,6 +1,6 @@
 # Editor V2 Schema Mapping
 
-The Editor V2 ProseMirror schema intentionally mirrors the Markdown/Markdoc nodes that we already support in Shelf. The goal is to guarantee a lossless round-trip when converting between Markdoc and ProseMirror, while also preserving unsupported blocks verbatim via the raw block node.
+The Editor V2 ProseMirror schema intentionally mirrors the Markdown/Markdoc nodes that we already support in EstoqueSoftSystem. The goal is to guarantee a lossless round-trip when converting between Markdoc and ProseMirror, while also preserving unsupported blocks verbatim via the raw block node.
 
 ## Block Nodes
 

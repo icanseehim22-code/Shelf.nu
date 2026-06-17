@@ -41,7 +41,11 @@ import {
 import { calcTimeDifference } from "~/utils/date-fns";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
 import type { ErrorLabel } from "~/utils/error";
-import { isLikeShelfError, isNotFoundError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  isNotFoundError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { getRedirectUrlFromRequest } from "~/utils/http";
 import {
   payload,
@@ -191,7 +195,7 @@ async function cancelScheduler(
     await scheduler.cancel(booking.activeSchedulerReference);
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to cancel the scheduler for booking",
         additionalData: { booking },
@@ -281,7 +285,7 @@ export async function createStatusTransitionNote({
     });
   } catch (err) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: err,
         message: "Failed to record BOOKING_STATUS_CHANGED event",
         additionalData: { bookingId, fromStatus, toStatus },
@@ -360,7 +364,7 @@ export async function scheduleNextBookingJob({
       data: { activeSchedulerReference: id },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while scheduling the next booking job.",
       additionalData: { ...data, when },
@@ -384,7 +388,7 @@ async function updateBookingAssetStates(
       data: { status },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating the booking asset states.",
       additionalData: { booking, status },
@@ -409,7 +413,7 @@ async function updateBookingKitStates({
       data: { status },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating the booking kit states.",
       additionalData: { kitIds, status },
@@ -579,14 +583,14 @@ export async function createBooking({
 
     return createdBooking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while trying to create or update the booking. Please try again or contact support.",
       additionalData: { booking, hints },
       label,
-      shouldBeCaptured: isLikeShelfError(cause)
+      shouldBeCaptured: isLikeEstoqueSoftSystemError(cause)
         ? cause.shouldBeCaptured
         : undefined,
     });
@@ -673,7 +677,7 @@ export async function updateBasicBooking({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           status: 404,
           message:
@@ -711,7 +715,7 @@ export async function updateBasicBooking({
     ];
 
     if (notAllowedStatus.includes(booking.status)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Update failed",
         message: "Booking update is not allowed at this state of booking",
@@ -778,7 +782,7 @@ export async function updateBasicBooking({
           };
         }
       } else {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "Update failed",
           message:
@@ -997,11 +1001,11 @@ export async function updateBasicBooking({
 
     return updatedBooking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
       title: "Update failed",
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Could not update the details of booking",
     });
@@ -1063,7 +1067,7 @@ export async function reserveBooking({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           label,
           message:
@@ -1088,7 +1092,7 @@ export async function reserveBooking({
         const additionalText =
           additionalCount > 0 ? ` and ${additionalCount} more` : "";
 
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           label,
           title: "Booking conflict",
@@ -1100,7 +1104,7 @@ export async function reserveBooking({
 
     /** Validate the booking dates */
     if (!from || !to) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         message: "Booking dates are missing.",
@@ -1109,7 +1113,7 @@ export async function reserveBooking({
 
     /** Make sure that the start date is in future */
     if (from && isBefore(from, new Date())) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         message: "Booking start date should be in future.",
@@ -1118,7 +1122,7 @@ export async function reserveBooking({
 
     /** Make sure that the end date is after startDate */
     if (to && isBefore(to, from)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         message: "Booking end date should be after start date.",
@@ -1191,7 +1195,7 @@ export async function reserveBooking({
         };
       }
     } else {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Update failed",
         message:
@@ -1263,7 +1267,7 @@ export async function reserveBooking({
       await sendBookingEmailToAllRecipients({
         recipients,
         booking: bookingFound,
-        subject: `✅ Booking reserved (${bookingFound.name}) - shelf.nu`,
+        subject: `✅ Booking reserved (${bookingFound.name}) - estoquesoftsystem.com`,
         textContent: text,
         heading: `Booking reservation for ${custodian}`,
         hints,
@@ -1285,10 +1289,10 @@ export async function reserveBooking({
 
     return updatedBooking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Could not reserve the booking.",
     });
@@ -1413,7 +1417,7 @@ export async function checkoutBooking({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           label,
           message:
@@ -1451,7 +1455,7 @@ export async function checkoutBooking({
         const additionalText =
           additionalCount > 0 ? ` and ${additionalCount} more` : "";
 
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           label,
           title: "Booking conflict",
@@ -1479,7 +1483,7 @@ export async function checkoutBooking({
       const additionalText =
         additionalCount > 0 ? ` and ${additionalCount} more` : "";
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         title: "Assets in custody",
@@ -1637,10 +1641,10 @@ export async function checkoutBooking({
       include: { ...BOOKING_INCLUDE_FOR_EMAIL, assets: true },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while checking out booking.",
     });
@@ -1683,7 +1687,7 @@ export async function checkinBooking({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           status: 404,
           label,
@@ -1989,7 +1993,7 @@ export async function checkinBooking({
           });
         } catch (err) {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause: err,
               message:
                 "Failed to record BOOKING_STATUS_CHANGED event for partial check-in completion",
@@ -2076,7 +2080,7 @@ export async function checkinBooking({
       await sendBookingEmailToAllRecipients({
         recipients,
         booking: updatedBooking,
-        subject: `🎉 Booking complete (${updatedBooking.name}) - shelf.nu`,
+        subject: `🎉 Booking complete (${updatedBooking.name}) - estoquesoftsystem.com`,
         textContent: text,
         heading: `Your booking has been completed: "${updatedBooking.name}"`,
         hints,
@@ -2085,10 +2089,10 @@ export async function checkinBooking({
 
     return updatedBooking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while checking in booking.",
     });
@@ -2129,7 +2133,7 @@ export async function partialCheckinBooking({
         include: { assets: { select: { id: true, kitId: true } } },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           status: 404,
           label,
@@ -2152,7 +2156,7 @@ export async function partialCheckinBooking({
     );
 
     if (invalidAssetIds.length > 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         status: 400,
         label,
@@ -2198,7 +2202,7 @@ export async function partialCheckinBooking({
         .join(", ");
       const more =
         notCheckedOut.length > 3 ? ` and ${notCheckedOut.length - 3} more` : "";
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         status: 400,
         label,
@@ -2497,10 +2501,10 @@ export async function partialCheckinBooking({
 
     return updatedBooking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while partially checking in booking.",
     });
@@ -2532,7 +2536,7 @@ export async function partialCheckinBooking({
  * @param hints - Client hints (timezone/locale) for scheduling + date math
  * @param intentChoice - Optional early-checkout intent forwarded to the full op
  * @returns booking + checkedOutAssetCount + remainingAssetCount + isComplete
- * @throws {ShelfError} 404 if booking not found; 400 for membership/idempotency
+ * @throws {EstoqueSoftSystemError} 404 if booking not found; 400 for membership/idempotency
  *   violations; conflict/custody business-rule rejections
  */
 export async function partialCheckoutBooking({
@@ -2572,7 +2576,7 @@ export async function partialCheckoutBooking({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           status: 404,
           label,
@@ -2594,7 +2598,7 @@ export async function partialCheckoutBooking({
       bookingFound.status !== BookingStatus.ONGOING &&
       bookingFound.status !== BookingStatus.OVERDUE
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         status: 400,
         label,
@@ -2618,7 +2622,7 @@ export async function partialCheckoutBooking({
     );
 
     if (invalidAssetIds.length > 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         status: 400,
         label,
@@ -2727,7 +2731,7 @@ export async function partialCheckoutBooking({
         .join(", ");
       const more =
         inCustody.length > 3 ? ` and ${inCustody.length - 3} more` : "";
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         status: 400,
         label,
@@ -2748,7 +2752,7 @@ export async function partialCheckoutBooking({
           .join(", ");
         const more =
           conflicted.length > 3 ? ` and ${conflicted.length - 3} more` : "";
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           status: 400,
           label,
@@ -2766,7 +2770,7 @@ export async function partialCheckoutBooking({
       (assetId) => !alreadyCheckedOutSet.has(assetId)
     );
     if (assetIdsToCheckOut.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         status: 400,
         label,
@@ -3023,10 +3027,10 @@ export async function partialCheckoutBooking({
     const { bookingStatusChanged: _ignored, ...publicResult } = result;
     return publicResult;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while partially checking out booking.",
     });
@@ -3071,7 +3075,7 @@ export async function updateBookingAssets({
       const validAssetIds = validAssets.map((a) => a.id);
 
       if (validAssetIds.length === 0) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "None of the selected assets exist. They may have been deleted.",
@@ -3082,7 +3086,7 @@ export async function updateBookingAssets({
       }
 
       if (validAssetIds.length !== uniqueAssetIds.length) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "Some of the selected assets no longer exist. Please reload and try again.",
@@ -3191,7 +3195,7 @@ export async function updateBookingAssets({
         }
       } catch (noteError) {
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause: noteError,
             message: "Failed to create booking note after asset update",
             label,
@@ -3203,10 +3207,10 @@ export async function updateBookingAssets({
 
     return booking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while updating booking assets.",
     });
@@ -3272,7 +3276,7 @@ export async function archiveBooking({
         select: { id: true, status: true, activeSchedulerReference: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           label,
           title: "Not found",
@@ -3284,7 +3288,7 @@ export async function archiveBooking({
 
     /** Booking can be archived only if it is COMPLETE */
     if (booking.status !== BookingStatus.COMPLETE) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         message: "Archiving is only allowed for Completed bookings.",
@@ -3322,10 +3326,10 @@ export async function archiveBooking({
 
     return updatedBooking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while archiving the booking. Please try again.",
     });
@@ -3354,7 +3358,7 @@ export async function cancelBooking({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           label,
           message:
@@ -3370,7 +3374,7 @@ export async function cancelBooking({
     ];
 
     if (!allowedStatusForCancel.includes(bookingFound.status)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         message: "Booking cannot be cancelled at the current state.",
@@ -3442,7 +3446,7 @@ export async function cancelBooking({
       await sendBookingEmailToAllRecipients({
         recipients,
         booking,
-        subject: `❌ Booking cancelled (${booking.name}) - shelf.nu`,
+        subject: `❌ Booking cancelled (${booking.name}) - estoquesoftsystem.com`,
         textContent: text,
         heading: `Your booking has been cancelled: "${booking.name}"`,
         hints,
@@ -3475,10 +3479,10 @@ export async function cancelBooking({
 
     return booking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while cancelling the booking, please try again.",
     });
@@ -3499,7 +3503,7 @@ export async function revertBookingToDraft({
         select: { id: true, status: true },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           label,
           message:
@@ -3510,7 +3514,7 @@ export async function revertBookingToDraft({
 
     /** User can only revert the booking to DRAFT from RESERVED */
     if (booking.status !== BookingStatus.RESERVED) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         message: "Booking can be reverted to draft only for reserved state.",
@@ -3549,10 +3553,10 @@ export async function revertBookingToDraft({
 
     return cancelledBooking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while reverting the booking to draft.",
     });
@@ -3589,7 +3593,7 @@ export async function extendBooking({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           label,
           message:
@@ -3613,7 +3617,7 @@ export async function extendBooking({
     ];
 
     if (!allowedStatus.includes(booking.status)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         message: "Extending booking is not allowed for current status.",
@@ -3635,7 +3639,7 @@ export async function extendBooking({
 
     /** Validate that there are still active assets to extend the booking for */
     if (activeAssets.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         label,
         message:
@@ -3665,7 +3669,7 @@ export async function extendBooking({
       });
 
       if (clashingBookings?.length > 0) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           label,
           message:
@@ -3746,7 +3750,7 @@ export async function extendBooking({
       await sendBookingEmailToAllRecipients({
         recipients,
         booking: updatedBooking,
-        subject: `Booking extended (${updatedBooking.name}) - shelf.nu`,
+        subject: `Booking extended (${updatedBooking.name}) - estoquesoftsystem.com`,
         textContent: text,
         heading: `Booking extended from ${format(booking.to)} to ${format(
           newEndDate
@@ -3799,16 +3803,20 @@ export async function extendBooking({
 
     return updatedBooking;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
-    throw new ShelfError({
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
+    throw new EstoqueSoftSystemError({
       cause,
       label,
       title: "Error",
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while extending the booking.",
-      additionalData: isShelfError ? cause.additionalData : undefined,
-      shouldBeCaptured: isShelfError ? cause.shouldBeCaptured : true,
+      additionalData: isEstoqueSoftSystemError
+        ? cause.additionalData
+        : undefined,
+      shouldBeCaptured: isEstoqueSoftSystemError
+        ? cause.shouldBeCaptured
+        : true,
     });
   }
 }
@@ -3866,7 +3874,7 @@ export async function getBookingsFilterData({
     });
 
     if (!teamMember) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Team member not found",
         message:
@@ -4190,7 +4198,7 @@ export async function getBookings(params: {
 
     return { bookings, bookingCount };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching the bookings. Please try again or contact support.",
@@ -4242,7 +4250,7 @@ export async function removeAssets({
      * So we need to set it back to AVAILABLE
      * We only do that if the booking we removed it from is ongoing or overdue.
      * Reason is that the user can add an asset to a draft booking and remove it and that will reset its status back to available, which shouldnt happen
-     * https://github.com/Shelf-nu/shelf.nu/issues/703#issuecomment-1944315975
+     * https://github.com/EstoqueSoftSystem-nu/estoquesoftsystem.com/issues/703#issuecomment-1944315975
      *
      * Because prisma doesnt support transactional execution of nested queries, we need to do them in 2 steps, because if the disconnect runs first,
      * the updateMany will not find the assets in the booking anymore and wont update them
@@ -4296,7 +4304,7 @@ export async function removeAssets({
         );
       } catch (err) {
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause: err,
             message: "Failed to record BOOKING_ASSETS_REMOVED events",
             additionalData: { bookingId: booking.id, assetIds },
@@ -4358,7 +4366,7 @@ export async function removeAssets({
 
     return b;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while removing assets from the booking. Please try again or contact support.",
@@ -4387,7 +4395,7 @@ export async function deleteBooking(
   });
 
   if (!currentBooking) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "The booking you are trying to delete does not exist or has already been deleted.",
@@ -4451,7 +4459,7 @@ export async function deleteBooking(
       await sendBookingEmailToAllRecipients({
         recipients,
         booking: b,
-        subject: `🗑️ Booking deleted (${b.name}) - shelf.nu`,
+        subject: `🗑️ Booking deleted (${b.name}) - estoquesoftsystem.com`,
         textContent: text,
         heading: `Your booking has been deleted: "${b.name}"`,
         hints,
@@ -4483,7 +4491,7 @@ export async function deleteBooking(
 
     return b;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while deleting the booking. Please try again or contact support.",
@@ -4535,7 +4543,7 @@ function bookingOrgScopeWhere({
  * by {@link getBooking} and {@link getBookingHeaderData} so the cross-org
  * behavior cannot drift between them.
  *
- * @throws {ShelfError} 404 with cross-org redirect data
+ * @throws {EstoqueSoftSystemError} 404 with cross-org redirect data
  */
 function assertBookingInActiveOrg({
   bookingFound,
@@ -4560,7 +4568,7 @@ function assertBookingInActiveOrg({
         ? getRedirectUrlFromRequest(request)
         : undefined;
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Booking not found",
       message: "",
@@ -4621,19 +4629,19 @@ export async function getBooking<T extends Prisma.BookingInclude | undefined>(
 
     return bookingFound;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Booking not found",
       message:
         "The booking you are trying to access does not exist or you do not have permission to access it.",
       additionalData: {
         ...booking,
-        ...(isShelfError ? cause.additionalData : {}),
+        ...(isEstoqueSoftSystemError ? cause.additionalData : {}),
       },
       label,
-      shouldBeCaptured: isShelfError
+      shouldBeCaptured: isEstoqueSoftSystemError
         ? cause.shouldBeCaptured
         : !isNotFoundError(cause),
     });
@@ -4657,7 +4665,7 @@ export async function getBooking<T extends Prisma.BookingInclude | undefined>(
  * @param args.request - The request, used to build the cross-org redirect URL
  * @returns The booking's header fields (id, name, status, from, to,
  *   custodianUserId, organizationId)
- * @throws {ShelfError} 404 when the booking is not found or not accessible
+ * @throws {EstoqueSoftSystemError} 404 when the booking is not found or not accessible
  */
 export async function getBookingHeaderData({
   id,
@@ -4695,9 +4703,9 @@ export async function getBookingHeaderData({
 
     return bookingFound;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Booking not found",
       message:
@@ -4705,10 +4713,10 @@ export async function getBookingHeaderData({
       additionalData: {
         id,
         organizationId,
-        ...(isShelfError ? cause.additionalData : {}),
+        ...(isEstoqueSoftSystemError ? cause.additionalData : {}),
       },
       label,
-      shouldBeCaptured: isShelfError
+      shouldBeCaptured: isEstoqueSoftSystemError
         ? cause.shouldBeCaptured
         : !isNotFoundError(cause),
     });
@@ -4849,7 +4857,7 @@ export async function getBookingsForCalendar(params: {
 
     return events;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching the bookings for the calendar. Please try again or contact support.",
@@ -5110,7 +5118,7 @@ export async function bulkDeleteBookings({
         await sendBookingEmailToAllRecipients({
           recipients,
           booking: b,
-          subject: `🗑️ Booking deleted (${b.name}) - shelf.nu`,
+          subject: `🗑️ Booking deleted (${b.name}) - estoquesoftsystem.com`,
           textContent: text,
           heading: `Your booking has been deleted: "${b.name}"`,
           hints,
@@ -5122,11 +5130,11 @@ export async function bulkDeleteBookings({
     }
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk deleting bookings.";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: { bookingIds, organizationId },
@@ -5168,7 +5176,7 @@ export async function bulkArchiveBookings({
 
     /** Bookings must be complete to add them in archive */
     if (someBookingNotComplete) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Some bookings are not complete. Please make sure you are selecting completed bookings to archive them.",
@@ -5209,14 +5217,14 @@ export async function bulkArchiveBookings({
     /** Cancel any active schedulers */
     await Promise.all(bookings.map((b) => cancelScheduler(b)));
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while archiving bookings.",
-      additionalData: isShelfError
+      additionalData: isEstoqueSoftSystemError
         ? cause.additionalData
         : {
             bookingIds,
@@ -5279,7 +5287,7 @@ export async function bulkCancelBookings({
     );
 
     if (someUnavailableToCancelBookings) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "There are some unavailable to cancel booking selected. Please make sure you are selecting the booking which are allowed to cancel.",
@@ -5397,7 +5405,7 @@ export async function bulkCancelBookings({
         await sendBookingEmailToAllRecipients({
           recipients,
           booking: b,
-          subject: `❌ Booking cancelled (${b.name}) - shelf.nu`,
+          subject: `❌ Booking cancelled (${b.name}) - estoquesoftsystem.com`,
           textContent: text,
           heading: `Your booking has been cancelled: "${b.name}"`,
           hints,
@@ -5405,14 +5413,14 @@ export async function bulkCancelBookings({
       }
     }
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk cancelling bookings.",
-      additionalData: isShelfError
+      additionalData: isEstoqueSoftSystemError
         ? cause.additionalData
         : { bookingIds, organizationId, userId },
       label,
@@ -5657,11 +5665,11 @@ export async function addScannedAssetsToBooking({
     return updatedBooking;
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while adding scanned assets to booking.";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: { assetIds, kitIds, bookingId, organizationId, userId },
@@ -5678,7 +5686,7 @@ export async function addScannedAssetsToBooking({
  *
  * @param bookingId - Target booking id (from request input)
  * @param organizationId - Caller's validated organization id
- * @throws {ShelfError} if the booking is missing, cross-org, or not DRAFT/RESERVED
+ * @throws {EstoqueSoftSystemError} if the booking is missing, cross-org, or not DRAFT/RESERVED
  */
 export async function getExistingBookingDetails(
   bookingId: string,
@@ -5699,7 +5707,7 @@ export async function getExistingBookingDetails(
     });
 
     if (!booking) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Booking not found.",
         status: 404,
@@ -5709,7 +5717,7 @@ export async function getExistingBookingDetails(
     }
 
     if (!["DRAFT", "RESERVED"].includes(booking.status!)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Booking is not in Draft or Reserved status.",
         status: 400,
@@ -5719,8 +5727,8 @@ export async function getExistingBookingDetails(
     }
 
     return booking;
-  } catch (cause: ShelfError | any) {
-    throw new ShelfError({
+  } catch (cause: EstoqueSoftSystemError | any) {
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         cause?.message ||
@@ -5744,7 +5752,7 @@ export async function getExistingBookingDetails(
  *   add Org B's assets to a booking.
  * @returns The IDs of the assets that exist in `organizationId` and are not
  *   part of a kit
- * @throws {ShelfError} If any selected asset belongs to a kit
+ * @throws {EstoqueSoftSystemError} If any selected asset belongs to a kit
  */
 export async function getAvailableAssetsIdsForBooking(
   assetIds: Asset["id"][],
@@ -5759,7 +5767,7 @@ export async function getAvailableAssetsIdsForBooking(
     });
 
     if (selectedAssets.some((asset) => asset.kitId)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Cannot add assets that belong to a kit.",
         label: "Booking",
@@ -5767,8 +5775,8 @@ export async function getAvailableAssetsIdsForBooking(
     }
 
     return selectedAssets.map((asset) => asset.id);
-  } catch (cause: ShelfError | any) {
-    throw new ShelfError({
+  } catch (cause: EstoqueSoftSystemError | any) {
+    throw new EstoqueSoftSystemError({
       cause: cause,
       message: cause?.message
         ? cause.message
@@ -5788,7 +5796,7 @@ export async function getAvailableAssetsIdsForBooking(
  *   {@link getAvailableAssetsIdsForBooking} so foreign-org assets cannot be
  *   added to the booking (cross-org IDOR protection).
  * @returns The resolved (org-scoped) asset IDs and the booking details
- * @throws {ShelfError} If no assets are available or the booking lookup fails
+ * @throws {EstoqueSoftSystemError} If no assets are available or the booking lookup fails
  */
 export async function processBooking(
   bookingId: string,
@@ -5802,7 +5810,7 @@ export async function processBooking(
     ]);
 
     if (!finalAssetIds.length) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No assets available.",
         status: 400,
@@ -5817,11 +5825,11 @@ export async function processBooking(
     };
   } catch (cause) {
     let message = "Something went wrong while processing the booking.";
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       message = cause.message;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: cause,
       message,
       label: "Booking",
@@ -5963,9 +5971,9 @@ export async function duplicateBooking({
 
     return newBooking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while duplicating booking.",
       label,
@@ -6418,7 +6426,7 @@ function respondToPartialCheckout({
  * @param bookingId - Booking to inspect
  * @param organizationId - Caller's active organization (org-scopes the lookup)
  * @returns The ids of assets still eligible for check-out (possibly empty)
- * @throws {ShelfError} If the booking is not found in the organization
+ * @throws {EstoqueSoftSystemError} If the booking is not found in the organization
  */
 export async function getRemainingCheckoutAssetIds({
   bookingId,
@@ -6436,7 +6444,7 @@ export async function getRemainingCheckoutAssetIds({
       },
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         status: 404,
         label,
@@ -6476,7 +6484,7 @@ export async function getRemainingCheckoutAssetIds({
  * @param userId - Acting user
  * @param authSession - Auth session (notification sender)
  * @returns JSON payload (when returnJson) or a redirect to the booking page
- * @throws {ShelfError} If no eligible assets remain to check out
+ * @throws {EstoqueSoftSystemError} If no eligible assets remain to check out
  */
 export async function checkoutRemainingAssets({
   formData,
@@ -6510,7 +6518,7 @@ export async function checkoutRemainingAssets({
   });
 
   if (assetIds.length === 0) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       status: 400,
       label,
@@ -6557,10 +6565,10 @@ export async function getOngoingBookingForAsset({
 
     return booking;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while getting ongoing booking for asset.",
     });
@@ -6612,7 +6620,7 @@ export async function updateBookingNotificationRecipients({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update booking notification recipients",
       additionalData: { bookingId, organizationId, teamMemberIds },

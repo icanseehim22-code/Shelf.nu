@@ -1,5 +1,5 @@
 import type { Organization } from "@prisma/client";
-import { ShelfError } from "../error";
+import { EstoqueSoftSystemError } from "../error";
 
 /**
  * Server-side utility to check if audits are enabled for an organization
@@ -13,14 +13,14 @@ export function organizationHasAuditsEnabled(
 
 /**
  * Server-side utility to validate that an organization has audits enabled
- * Throws ShelfError if not enabled
+ * Throws EstoqueSoftSystemError if not enabled
  */
 export function validateAuditEnabled(
   organization: Pick<Organization, "auditsEnabled"> | undefined | null,
   additionalData?: Record<string, any>
 ): void {
   if (!organizationHasAuditsEnabled(organization)) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Audits not enabled",
       message: "Audit functionality is not enabled for this workspace",

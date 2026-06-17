@@ -96,11 +96,11 @@ vi.mock("~/modules/audit/note-content.server", () => ({
 
 // why: control error formatting in the catch block.
 vi.mock("~/utils/error", () => ({
-  makeShelfError: vi.fn((cause: any) => ({
+  makeEstoqueSoftSystemError: vi.fn((cause: any) => ({
     message: cause?.message || "Unknown error",
     status: cause?.status || 500,
   })),
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     status: number;
     label: string;
     additionalData: unknown;

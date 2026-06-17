@@ -10,7 +10,7 @@ import type {
   AuditAssetStatus,
 } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { getQrCodeMaps } from "../qr/service.server";
 
 /**
@@ -103,7 +103,7 @@ export interface AuditPdfDbResult {
  * @param role - User's role in the organization
  * @param _request - HTTP request (unused but kept for API consistency)
  * @returns Complete audit data for PDF generation
- * @throws {ShelfError} If audit not found or permission denied
+ * @throws {EstoqueSoftSystemError} If audit not found or permission denied
  */
 export async function fetchAllAuditPdfRelatedData(
   auditSessionId: string,
@@ -147,7 +147,7 @@ export async function fetchAllAuditPdfRelatedData(
     });
 
     if (!session) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Audit session not found",
         status: 404,
@@ -162,7 +162,7 @@ export async function fetchAllAuditPdfRelatedData(
       );
 
       if (!isAssignee) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           title: "Unauthorized",
           message: "You don't have permission to view this audit",
@@ -271,7 +271,7 @@ export async function fetchAllAuditPdfRelatedData(
     ]);
 
     if (!organization) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Organization not found",
         status: 404,
@@ -308,7 +308,7 @@ export async function fetchAllAuditPdfRelatedData(
       activityNotes,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Error fetching audit data for PDF",
       status: 500,

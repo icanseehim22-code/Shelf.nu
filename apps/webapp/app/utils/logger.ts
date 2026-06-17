@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/react-router";
 import pino from "pino";
 
 import { SENTRY_DSN, env } from "./env";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 
 /**
  * Fraction of handled 4xx errors to record in the Sentry log trail. Defaults
@@ -47,7 +47,7 @@ const logger = pino({
   level: "debug",
   serializers: {
     err: (cause) => {
-      if (!(cause instanceof ShelfError)) {
+      if (!(cause instanceof EstoqueSoftSystemError)) {
         return pino.stdSerializers.err(cause);
       }
       return serializeError(cause);
@@ -90,14 +90,14 @@ export class Logger {
    * conflicts) without consuming the small error-event quota or alerting —
    * `handleBeforeSendError` drops these from the error pipeline, and they land
    * on the separate logs quota instead. No-op for anything that isn't a 4xx
-   * `ShelfError`. A sampling rate caps volume so the trail can't be flooded.
+   * `EstoqueSoftSystemError`. A sampling rate caps volume so the trail can't be flooded.
    */
-  static handledClientError(cause: ShelfError) {
+  static handledClientError(cause: EstoqueSoftSystemError) {
     // 4xx only — client errors. Mirrors `isHandledClientError()` in ./error
     // (which the Sentry beforeSend hook uses to drop these from the error
     // pipeline). Inlined here, rather than imported, so this commonly-hit path
     // doesn't couple logger.ts to ./error's export surface — many tests fully
-    // mock ~/utils/error and a new import would break them. ShelfError.status
+    // mock ~/utils/error and a new import would break them. EstoqueSoftSystemError.status
     // defaults to 500, so a missing status is treated as a server error.
     const status = cause?.status ?? 500;
     if (!SENTRY_DSN || status < 400 || status >= 500) {

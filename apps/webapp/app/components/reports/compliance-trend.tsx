@@ -4,7 +4,7 @@
  * Line/area chart showing weekly compliance rate over the selected period.
  * Helps users understand if compliance is improving or declining.
  *
- * Uses Tremor's AreaChart with Shelf's primary colors.
+ * Uses Tremor's AreaChart with EstoqueSoftSystem's primary colors.
  */
 
 import { AreaChart } from "@tremor/react";

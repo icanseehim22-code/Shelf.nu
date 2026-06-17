@@ -5,7 +5,7 @@ import { extractStoragePath } from "~/components/assets/asset-image/utils";
 import { db } from "~/database/db.server";
 import { getSupabaseAdmin } from "~/integrations/supabase/client";
 import { isStorageObjectNotFound } from "~/modules/asset/service.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { payload, parseData } from "~/utils/http.server";
 import { Logger } from "~/utils/logger";
 import { oneDayFromNow } from "~/utils/one-week-from-now";
@@ -37,7 +37,7 @@ async function generateThumbnailIfMissing(asset: {
 
     if (!originalPath) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: `Could not extract image path for asset ${asset.id}`,
           additionalData: { assetId: asset.id, imagePath: asset.mainImage },
@@ -53,7 +53,7 @@ async function generateThumbnailIfMissing(asset: {
 
     if (downloadError) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: downloadError,
           message: `Error downloading image for asset ${asset.id}: ${downloadError.message}`,
           additionalData: { assetId: asset.id, originalPath },
@@ -141,7 +141,7 @@ async function generateThumbnailIfMissing(asset: {
     return thumbnailSignedUrl;
   } catch (error) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause: error,
         message: `Error generating thumbnail for asset ${asset.id}`,
         additionalData: { assetId: asset.id, userId: asset.userId },
@@ -211,7 +211,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
             `Main image file not found in storage for asset ${assetId}, keeping existing URL`
           );
         } else {
-          // Preserve shouldBeCaptured flag if it's already a ShelfError
+          // Preserve shouldBeCaptured flag if it's already a EstoqueSoftSystemError
           const shouldCapture =
             error &&
             typeof error === "object" &&
@@ -221,7 +221,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
               : true;
 
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause: error,
               message: `Failed to refresh main image URL for asset ${assetId}`,
               additionalData: { assetId, mainImagePath, userId },
@@ -252,7 +252,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
               `Thumbnail file not found in storage for asset ${assetId}, keeping existing URL`
             );
           } else {
-            // Preserve shouldBeCaptured flag if it's already a ShelfError
+            // Preserve shouldBeCaptured flag if it's already a EstoqueSoftSystemError
             const shouldCapture =
               error &&
               typeof error === "object" &&
@@ -262,7 +262,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
                 : true;
 
             Logger.error(
-              new ShelfError({
+              new EstoqueSoftSystemError({
                 cause: error,
                 message: `Failed to refresh thumbnail URL for asset ${assetId}`,
                 additionalData: { assetId, thumbnailPath, userId },
@@ -314,7 +314,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   } catch (cause) {
     // Log the error for debugging
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Error refreshing image.",
         label: "Assets",

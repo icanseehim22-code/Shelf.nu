@@ -6,7 +6,7 @@ import {
 } from "@prisma/client";
 
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import {
   createKit,
@@ -553,7 +553,7 @@ describe("getKit", () => {
         organizationId: "org-1",
         userOrganizations,
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 
   it("should throw error when kit not found", async () => {
@@ -566,7 +566,7 @@ describe("getKit", () => {
         id: "nonexistent-kit",
         organizationId: "org-1",
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 });
 
@@ -658,7 +658,7 @@ describe("deleteKit", () => {
         id: "kit-1",
         organizationId: "org-1",
       })
-    ).rejects.toThrow(ShelfError);
+    ).rejects.toThrow(EstoqueSoftSystemError);
   });
 });
 
@@ -1169,7 +1169,7 @@ describe("relinkKitQrCode", () => {
         organizationId: "org-1",
         userId: "user-1",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
   });
 });
 

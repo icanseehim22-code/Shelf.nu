@@ -28,7 +28,10 @@ import type {
   CustodySnapshotPdfMeta,
 } from "~/modules/reports/types";
 import { getDateTimeFormat, getLocale } from "~/utils/client-hints";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -104,7 +107,7 @@ export const loader = async ({
     // Validate report exists
     const reportDef = getReportById(reportId);
     if (!reportDef) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Report "${reportId}" not found`,
         label: "Report",
@@ -138,7 +141,7 @@ export const loader = async ({
     });
 
     if (!organization) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Organization not found",
         label: "Organization",
@@ -317,7 +320,7 @@ export const loader = async ({
       }
 
       default:
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message: `PDF export not implemented for report "${reportId}"`,
           label: "Report",
@@ -327,7 +330,7 @@ export const loader = async ({
 
     return data(payload({ pdfMeta }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, reportId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, reportId });
     throw data(error(reason), { status: reason.status });
   }
 };

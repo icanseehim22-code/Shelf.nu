@@ -46,8 +46,8 @@ vi.mock("~/modules/audit/service.server", () => ({
 
 // why: we need to control error formatting in the catch block
 vi.mock("~/utils/error", () => ({
-  makeShelfError: vi.fn(),
-  ShelfError: class ShelfError extends Error {
+  makeEstoqueSoftSystemError: vi.fn(),
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     status: number;
     constructor(opts: any) {
       super(opts.message);
@@ -66,7 +66,7 @@ import {
   completeAuditSession,
   requireAuditAssignee,
 } from "~/modules/audit/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 
 const mockUser = {
   id: "user-1",
@@ -141,7 +141,7 @@ describe("POST /api/mobile/audits/complete", () => {
     const assigneeError = new Error("Not an assignee");
     (assigneeError as any).status = 403;
     (requireAuditAssignee as any).mockRejectedValue(assigneeError);
-    (makeShelfError as any).mockReturnValue({
+    (makeEstoqueSoftSystemError as any).mockReturnValue({
       message: "Not an assignee",
       status: 403,
     });
@@ -161,7 +161,7 @@ describe("POST /api/mobile/audits/complete", () => {
     const permError = new Error("Permission denied");
     (permError as any).status = 403;
     (requireMobilePermission as any).mockRejectedValue(permError);
-    (makeShelfError as any).mockReturnValue({
+    (makeEstoqueSoftSystemError as any).mockReturnValue({
       message: "Permission denied",
       status: 403,
     });

@@ -4,7 +4,7 @@
  */
 import { parseISO } from "date-fns";
 import { parseAcceptLanguage } from "intl-parse-accept-language";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import { useRequestInfo } from "./request-info";
 
 export interface ClientHint {
@@ -25,7 +25,7 @@ type ClientHintNames = keyof typeof clientHints;
 function getCookieValue(cookieString: string, name: ClientHintNames) {
   const hint = clientHints[name];
   if (!hint) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: `Unknown client hint: ${name}`,
       label: "Dev error",

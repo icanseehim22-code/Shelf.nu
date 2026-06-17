@@ -12,7 +12,11 @@ import type { LoaderFunctionArgs } from "react-router";
 import { db } from "~/database/db.server";
 import { updateCookieWithPerPage } from "~/utils/cookies.server";
 import type { ErrorLabel } from "~/utils/error";
-import { isLikeShelfError, isNotFoundError, ShelfError } from "~/utils/error";
+import {
+  isLikeEstoqueSoftSystemError,
+  isNotFoundError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { getCurrentSearchParams } from "~/utils/http.server";
 import { id } from "~/utils/id/id.server";
 import { getParamsValues } from "~/utils/list";
@@ -29,7 +33,7 @@ export async function getQrByAssetId({ assetId }: Pick<Qr, "assetId">) {
       where: { assetId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching the QR. Please try again or contact support.",
@@ -45,7 +49,7 @@ export async function getQrByKitId({ kitId }: Pick<Qr, "kitId">) {
       where: { kitId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while fetching the QR. Please try again or contact support.",
@@ -73,7 +77,7 @@ export async function getQr<T extends Prisma.QrInclude | undefined>({
 
     return qr as QrWithInclude<T>;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "This code doesn't exist or it doesn't belong to your current organization.",
@@ -94,7 +98,7 @@ export async function getQrOrganizationLookup({ qrId }: { qrId: Qr["id"] }) {
   });
 
   if (!qr) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "This code doesn't exist.",
       title: "QR code not found",
@@ -175,7 +179,7 @@ export async function generateOrphanedCodes({
       skipDuplicates: true,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to generate orphaned codes",
       additionalData: { userId, amount, organizationId },
@@ -229,9 +233,9 @@ export async function generateUnclaimedCodesForPrint({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Failed to generate orphaned codes",
       additionalData: { amount },
@@ -261,7 +265,7 @@ export async function assertWhetherQrBelongsToCurrentOrganization({
       });
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "This code doesn't exist or it doesn't belong to your current organization. A new asset cannot be linked to it.",
@@ -302,7 +306,7 @@ export const getPaginatedAndFilterableQrCodes = async ({
       totalPages,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get paginated and qr codes",
       additionalData: { page, search },
@@ -397,7 +401,7 @@ async function getQrCodes({
 
     return { qrCodes, totalQrCodes };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get qr codes",
       additionalData: { page, perPage, search },
@@ -419,7 +423,7 @@ export async function markBatchAsPrinted({ batch }: { batch: string }) {
     });
     return updatedBatch;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to mark batch as printed",
       additionalData: { batch },
@@ -442,7 +446,7 @@ export async function claimQrCode({
     /** First, just in case we check whether its claimed */
     const qr = await getQr({ id });
     if (qr.organizationId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         message:
           "This QR code already belongs to an organization so you cannot claim it.",
         title: "QR code already claimed",
@@ -464,7 +468,7 @@ export async function claimQrCode({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to claim qr code",
       additionalData: { id, organizationId, userId },
@@ -574,7 +578,7 @@ export async function parseQrCodesFromImportData({
     );
 
     if (duplicateCodes.length) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Some of the QR codes you are trying to import are present more than once in the data. Please make sure each QR code is only present once.",
@@ -593,7 +597,7 @@ export async function parseQrCodesFromImportData({
     );
 
     if (nonExistentCodes.length) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Some of the QR codes you are trying to import do not exist",
         additionalData: { nonExistentCodes },
@@ -611,7 +615,7 @@ export async function parseQrCodesFromImportData({
       )
     );
     if (linkedCodes.length) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Some of the QR codes you are trying to import are already linked to an asset or a kit. Please use unlinked or unclaimed codes for your import.",
@@ -634,7 +638,7 @@ export async function parseQrCodesFromImportData({
       )
     );
     if (connectedToOtherOrgs.length) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Some of the QR codes you are trying to import don't belong to your current organization. You can only import codes that are unclaimed, unlinked or linked to your organization.",
@@ -666,15 +670,17 @@ export async function parseQrCodesFromImportData({
 
     return qrCodePerAsset;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
-    throw new ShelfError({
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError ? cause.message : "Failed to get qr codes",
+      message: isEstoqueSoftSystemError
+        ? cause.message
+        : "Failed to get qr codes",
       additionalData: {
         data,
         userId,
         organizationId,
-        ...(isShelfError && cause.additionalData),
+        ...(isEstoqueSoftSystemError && cause.additionalData),
       },
       label,
     });

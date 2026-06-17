@@ -23,7 +23,7 @@ import {
   mergedSchema,
 } from "~/utils/custom-fields";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   assertIsPost,
   payload,
@@ -96,7 +96,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       nextSequentialId,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -245,7 +245,7 @@ export async function action({ context, request }: LoaderFunctionArgs) {
 
     return redirect(`/assets`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

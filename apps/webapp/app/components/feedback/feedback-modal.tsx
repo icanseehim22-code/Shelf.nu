@@ -287,7 +287,7 @@ export default function FeedbackModal({ open, onClose }: FeedbackModalProps) {
                 placeholder={
                   feedbackType === "issue"
                     ? "Tell us about the issue you're experiencing..."
-                    : "Share your idea for improving Shelf..."
+                    : "Share your idea for improving EstoqueSoftSystem..."
                 }
                 rows={5}
                 maxLength={5000}

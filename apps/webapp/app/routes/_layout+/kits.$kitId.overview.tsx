@@ -16,7 +16,7 @@ import { getKit } from "~/modules/kit/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { getClientHint } from "~/utils/client-hints";
 import { formatCurrency } from "~/utils/currency";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, getParams, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -73,7 +73,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       header,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -110,7 +110,7 @@ export default function KitOverview() {
         {kit?.qrCodes?.[0] ? (
           <li className="w-full border-b-[1.1px] border-b-gray-100 p-4 last:border-b-0 md:flex">
             <span className="w-1/4 text-[14px] font-medium text-gray-900">
-              Shelf QR ID
+              EstoqueSoftSystem QR ID
             </span>
             <div className="mt-1 w-3/5 text-gray-600 md:mt-0">
               {kit.qrCodes[0].id}
@@ -216,7 +216,7 @@ export default function KitOverview() {
                       <Button
                         variant="link"
                         target="_blank"
-                        to="https://www.shelf.nu/knowledge-base/alternative-barcodes"
+                        to="https://www.estoquesoftsystem.com/knowledge-base/alternative-barcodes"
                       >
                         barcode support
                       </Button>

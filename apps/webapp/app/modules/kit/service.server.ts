@@ -32,10 +32,10 @@ import { updateCookieWithPerPage } from "~/utils/cookies.server";
 import { dateTimeInUnix } from "~/utils/date-time-in-unix";
 import type { ErrorLabel } from "~/utils/error";
 import {
-  isLikeShelfError,
+  isLikeEstoqueSoftSystemError,
   isNotFoundError,
   maybeUniqueConstraintViolation,
-  ShelfError,
+  EstoqueSoftSystemError,
   VALIDATION_ERROR,
 } from "~/utils/error";
 import { extractImageNameFromSupabaseUrl } from "~/utils/extract-image-name-from-supabase-url";
@@ -316,9 +316,9 @@ export async function updateKit({
 
     return kit;
   } catch (cause) {
-    // If it's already a ShelfError with validation errors, re-throw as is
+    // If it's already a EstoqueSoftSystemError with validation errors, re-throw as is
     if (
-      cause instanceof ShelfError &&
+      cause instanceof EstoqueSoftSystemError &&
       cause.additionalData?.[VALIDATION_ERROR]
     ) {
       throw cause;
@@ -369,9 +369,9 @@ export async function updateKitImage({
       organizationId,
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Something went wrong while updating image for kit.",
       additionalData: { kitId, userId, field: "image" },
@@ -523,7 +523,7 @@ export async function getPaginatedAndFilterableKits<
       hideUnavailable === true &&
       (!bookingFrom || !bookingTo)
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Booking dates are needed to hide unavailable kit.",
         additionalData: { hideUnavailable, bookingFrom, bookingTo },
@@ -568,7 +568,7 @@ export async function getPaginatedAndFilterableKits<
       search,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching kits",
       additionalData: { page, perPage, organizationId },
@@ -629,7 +629,7 @@ export async function getKit<T extends Prisma.KitInclude | undefined>({
           ? getRedirectUrlFromRequest(request)
           : undefined;
 
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Kit not found",
         message: "",
@@ -648,19 +648,19 @@ export async function getKit<T extends Prisma.KitInclude | undefined>({
 
     return kit as KitWithInclude<T>;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Kit not found",
       message:
         "The kit you are trying to access does not exist or you do not have permission to access it.",
       additionalData: {
         id,
-        ...(isShelfError ? cause.additionalData : {}),
+        ...(isEstoqueSoftSystemError ? cause.additionalData : {}),
       },
       label,
-      shouldBeCaptured: isShelfError
+      shouldBeCaptured: isEstoqueSoftSystemError
         ? cause.shouldBeCaptured
         : !isNotFoundError(cause),
     });
@@ -728,7 +728,7 @@ export async function getAssetsForKits({
 
     return { page, perPage, search, items, totalItems, totalPages };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Fail to fetch paginated and filterable assets",
       additionalData: {
@@ -779,7 +779,7 @@ export async function deleteKit({
       return tx.kit.delete({ where: { id, organizationId } });
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while deleting kit",
       additionalData: { id, organizationId },
@@ -798,7 +798,7 @@ export async function deleteKitImage({
   try {
     const path = extractImageNameFromSupabaseUrl({ url, bucketName });
     if (!path) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Cannot extract the image path from the URL",
         additionalData: { url, bucketName },
@@ -817,7 +817,7 @@ export async function deleteKitImage({
     return true;
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to delete kit image",
         additionalData: { url, bucketName },
@@ -930,7 +930,7 @@ export async function releaseCustody({
 
     return kit;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while releasing the custody. Please try again or contact support.",
@@ -1022,7 +1022,7 @@ export async function updateKitsWithBookingCustodians<T extends Kit>(
         resolvedKits.push(kit);
         /** This case should never happen because there must be a custodianUser or custodianTeamMember assigned to a booking */
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause: null,
             message: "Could not find custodian for kit",
             additionalData: { kit },
@@ -1034,7 +1034,7 @@ export async function updateKitsWithBookingCustodians<T extends Kit>(
 
     return resolvedKits;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update kits with booking custodian",
       additionalData: { kits },
@@ -1162,7 +1162,7 @@ export async function bulkDeleteKits({
       );
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while bulk deleting kits.",
       additionalData: { kitIds, organizationId, userId },
@@ -1241,7 +1241,7 @@ export async function bulkAssignKitCustody({
 
     const someKitsNotAvailable = kits.some((kit) => kit.status !== "AVAILABLE");
     if (someKitsNotAvailable) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "There are some unavailable kits. Please make sure you are selecting only available kits.",
@@ -1255,7 +1255,7 @@ export async function bulkAssignKitCustody({
       (asset) => asset.status !== "AVAILABLE"
     );
     if (someAssetsUnavailable) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "There are some unavailable assets in some kits. Please make sure you have all available assets in kits.",
@@ -1353,11 +1353,11 @@ export async function bulkAssignKitCustody({
     });
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk checking out kits.";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: {
@@ -1427,7 +1427,7 @@ export async function bulkReleaseKitCustody({
     /** Kits will be released only if all the selected kits are IN_CUSTODY */
     const allKitsInCustody = kits.every((kit) => kit.status === "IN_CUSTODY");
     if (!allKitsInCustody) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "There are some kits which are not in custody. Please make sure you are only selecting kits in custody to release them.",
@@ -1507,11 +1507,11 @@ export async function bulkReleaseKitCustody({
     });
   } catch (cause) {
     const message =
-      cause instanceof ShelfError
+      cause instanceof EstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while bulk releasing kits.";
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message,
       additionalData: { kitIds, organizationId, userId },
@@ -1581,7 +1581,7 @@ export async function createKitsIfNotExists({
 
     return Object.fromEntries(Array.from(kits));
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating kits. Seems like some of the location data in your import file is invalid. Please check and try again.",
@@ -1614,7 +1614,7 @@ export async function updateKitQrCode({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Couldn't disconnect existing codes",
           label,
@@ -1633,7 +1633,7 @@ export async function updateKitQrCode({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Couldn't connect the new QR code",
           label,
@@ -1641,7 +1641,7 @@ export async function updateKitQrCode({
         });
       });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating kit QR code",
       label,
@@ -1674,7 +1674,7 @@ export async function relinkKitQrCode({
   ]);
 
   if (!kit) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Kit not found.",
       label,
@@ -1684,7 +1684,7 @@ export async function relinkKitQrCode({
   }
 
   if (qr.organizationId && qr.organizationId !== organizationId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "QR not valid.",
       message: "This QR code does not belong to your organization",
@@ -1695,7 +1695,7 @@ export async function relinkKitQrCode({
   }
 
   if (qr.assetId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "QR already linked.",
       message:
@@ -1706,7 +1706,7 @@ export async function relinkKitQrCode({
   }
 
   if (qr.kitId && qr.kitId !== kitId) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "QR already linked.",
       message:
@@ -1747,7 +1747,7 @@ export async function relinkKitQrCode({
  * @param kitIds - Kit IDs sourced from request input
  * @param organizationId - Caller's validated organization ID
  * @returns Asset IDs belonging to the in-org kits
- * @throws {ShelfError} on DB failure
+ * @throws {EstoqueSoftSystemError} on DB failure
  */
 export async function getAvailableKitAssetForBooking(
   kitIds: Kit["id"][],
@@ -1765,7 +1765,7 @@ export async function getAvailableKitAssetForBooking(
 
     return allAssets.map((asset) => asset.id);
   } catch (cause: any) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: cause,
       message:
         cause?.message ||
@@ -1806,7 +1806,7 @@ export async function updateKitLocation({
     });
 
     if (!kit) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Kit not found",
         label,
@@ -1996,7 +1996,7 @@ export async function updateKitLocation({
       where: { id, organizationId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating kit location",
       label,
@@ -2326,7 +2326,7 @@ export async function bulkUpdateKitLocation({
 
     return { count: actualKitIds.length };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while updating kit location",
       label,
@@ -2400,7 +2400,7 @@ export async function updateKitAssets({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Kit not found",
           additionalData: { kitId, userId, organizationId },
@@ -2463,7 +2463,7 @@ export async function updateKitAssets({
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "Something went wrong while fetching the assets. Please try again or contact support.",
@@ -2483,7 +2483,7 @@ export async function updateKitAssets({
       (asset) => asset.custody && asset.kit?.id !== kit.id
     );
     if (isSomeAssetInCustody) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Cannot add assets that are already in custody to a kit. Please release custody of assets to allow them to be added to a kit.",
@@ -2854,11 +2854,11 @@ export async function updateKitAssets({
 
     return kit;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while updating kit assets.",
       label,
@@ -3042,7 +3042,7 @@ export async function bulkRemoveAssetsFromKits({
 
     return true;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to bulk remove assets from kits",
       additionalData: { assetIds, organizationId, userId },

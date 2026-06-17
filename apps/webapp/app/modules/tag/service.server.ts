@@ -11,7 +11,7 @@ import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
 import {
   isNotFoundError,
-  ShelfError,
+  EstoqueSoftSystemError,
   maybeUniqueConstraintViolation,
 } from "~/utils/error";
 import { getRandomColor } from "~/utils/get-random-color";
@@ -69,7 +69,7 @@ export async function getTags(params: {
 
     return { tags, totalTags };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching the tags",
       additionalData: { ...params },
@@ -127,7 +127,7 @@ export async function deleteTag({
       where: { id, organizationId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while deleting the tag",
       additionalData: { id, organizationId },
@@ -201,7 +201,7 @@ export async function createTagsIfNotExists({
 
     return tags;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating the tags. Seems like some of the tag data in your import file is invalid. Please check and try again.",
@@ -225,7 +225,7 @@ export async function getTag({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       title: "Tag not found",
       message:
@@ -288,7 +288,7 @@ export async function bulkDeleteTags({
         : { id: { in: tagIds }, organizationId },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while bulk deleting tags.",
       additionalData: { tagIds, organizationId },
@@ -318,7 +318,7 @@ export async function getTagsForBookingTagsFilter({
 
     return { tags, totalTags: tags.length };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching tags for booking filter",
       additionalData: { organizationId },

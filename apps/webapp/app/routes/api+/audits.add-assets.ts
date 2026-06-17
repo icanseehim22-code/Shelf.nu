@@ -6,7 +6,7 @@ import { resolveAssetIdsForBulkOperation } from "~/modules/asset/bulk-operations
 import { CurrentSearchParamsSchema } from "~/modules/asset/utils.server";
 import { getAssetIndexSettings } from "~/modules/asset-index-settings/service.server";
 import { addAssetsToAudit } from "~/modules/audit/service.server";
-import { badRequest, makeShelfError } from "~/utils/error";
+import { badRequest, makeEstoqueSoftSystemError } from "~/utils/error";
 import { assertIsPost, error, parseData, payload } from "~/utils/http.server";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import {
@@ -98,7 +98,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

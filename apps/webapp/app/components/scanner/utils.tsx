@@ -287,11 +287,11 @@ export const processFrame = async ({
 
       // Check if it's a QR code first
       if (detectedFormat === "QRCode") {
-        // Check if it's a Shelf QR code by checking against known Shelf QR patterns
+        // Check if it's a EstoqueSoftSystem QR code by checking against known EstoqueSoftSystem QR patterns
         const isShelfQr = isShelfQrCode(result.text);
 
         if (isShelfQr) {
-          // Handle as Shelf QR code
+          // Handle as EstoqueSoftSystem QR code
           await handleDetection({
             result: result.text,
             onCodeDetectionSuccess,
@@ -337,7 +337,7 @@ export const processFrame = async ({
         await onCodeDetectionSuccess({
           value: result.text,
           type: "barcode",
-          error: `We detected a ${detectedFormat} barcode, but Shelf currently works with ${SUPPORTED_BARCODE_FORMATS.join(
+          error: `We detected a ${detectedFormat} barcode, but EstoqueSoftSystem currently works with ${SUPPORTED_BARCODE_FORMATS.join(
             ", "
           )} barcodes only.`,
         });
@@ -452,7 +452,7 @@ export const handleDetection = async ({
   // Not a valid QR code or barcode
   await onCodeDetectionSuccess?.({
     value: result,
-    error: "Scanned code is not a valid Shelf QR code or barcode.",
+    error: "Scanned code is not a valid EstoqueSoftSystem QR code or barcode.",
   });
 };
 

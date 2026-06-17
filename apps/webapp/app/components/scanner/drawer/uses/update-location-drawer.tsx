@@ -30,7 +30,7 @@ import type {
   AssetFromQr,
   KitFromQr,
 } from "~/routes/api+/get-scanned-item.$qrId";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { objectToFormData } from "~/utils/object-to-form-data";
 import { tw } from "~/utils/tw";
 import { createAvailabilityLabels } from "../availability-label-factory";
@@ -199,7 +199,7 @@ function AddToLocationForm({ disableSubmit }: { disableSubmit: boolean }) {
         setLocationState({
           status: "error",
           errorMessage:
-            error instanceof ShelfError
+            error instanceof EstoqueSoftSystemError
               ? error.message
               : "Something went wrong while adding assets/kit to location. Please try again.",
         });

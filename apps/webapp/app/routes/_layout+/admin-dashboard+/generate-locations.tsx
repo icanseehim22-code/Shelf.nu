@@ -13,7 +13,10 @@ import { generateLocationWithImages } from "~/modules/location/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { DEFAULT_MAX_IMAGE_UPLOAD_SIZE } from "~/utils/constants";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { payload, error, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -34,7 +37,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
     await requireAdmin(userId);
     return payload(null);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -65,7 +68,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     invariant(image instanceof File, "file not the right type");
 
     if (image.size === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Image is required",
         status: 400,
@@ -74,7 +77,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     }
 
     if (image.size > DEFAULT_MAX_IMAGE_UPLOAD_SIZE) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `Image size exceeds maximum allowed size of ${
           DEFAULT_MAX_IMAGE_UPLOAD_SIZE / (1024 * 1024)
@@ -100,7 +103,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return payload(null);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

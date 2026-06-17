@@ -24,7 +24,7 @@ import { getPaginatedAndFilterableSettingUsers } from "~/modules/settings/servic
 import type { RouteHandleWithName } from "~/modules/types";
 import { resolveUserAction } from "~/modules/user/utils.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { computeHasActiveFilters } from "~/utils/filter-params";
 import { error, getCurrentSearchParams } from "~/utils/http.server";
 import {
@@ -93,7 +93,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       },
     };
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -116,7 +116,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return await resolveUserAction(request, organizationId, userId, role);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -148,10 +148,10 @@ export default function UserTeamSetting() {
       <ContextualModal />
 
       <p className="mb-6 text-xs text-gray-600">
-        Users by default have a mail registered in shelf and can get reminders,
-        log in or perform other actions. Read more about our{" "}
+        Users by default have a mail registered in EstoqueSoftSystem and can get
+        reminders, log in or perform other actions. Read more about our{" "}
         <Link
-          to="https://www.shelf.nu/knowledge-base/user-roles-and-their-permissions"
+          to="https://www.estoquesoftsystem.com/knowledge-base/user-roles-and-their-permissions"
           target="_blank"
           className="underline"
         >

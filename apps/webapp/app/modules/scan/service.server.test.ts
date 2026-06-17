@@ -13,7 +13,7 @@
  * @see {@link file://./service.server.ts}
  */
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import { updateScanGeolocation } from "./service.server";
 
@@ -49,7 +49,7 @@ describe("updateScanGeolocation", () => {
         latitude: "1",
         longitude: "2",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     expect(db.scan.update).not.toHaveBeenCalled();
   });
 
@@ -70,7 +70,7 @@ describe("updateScanGeolocation", () => {
         latitude: "1",
         longitude: "2",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     expect(db.scan.update).not.toHaveBeenCalled();
   });
 
@@ -91,7 +91,7 @@ describe("updateScanGeolocation", () => {
         latitude: "1",
         longitude: "2",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     expect(db.scan.update).not.toHaveBeenCalled();
   });
 
@@ -115,7 +115,7 @@ describe("updateScanGeolocation", () => {
         latitude: "10",
         longitude: "20",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     expect(db.scan.update).not.toHaveBeenCalled();
   });
 
@@ -139,7 +139,7 @@ describe("updateScanGeolocation", () => {
         latitude: "10",
         longitude: "20",
       })
-    ).rejects.toBeInstanceOf(ShelfError);
+    ).rejects.toBeInstanceOf(EstoqueSoftSystemError);
     expect(db.scan.update).not.toHaveBeenCalled();
   });
 

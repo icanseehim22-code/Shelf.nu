@@ -38,7 +38,7 @@ import { checkExhaustiveSwitch } from "~/utils/check-exhaustive-switch";
 import { getHints } from "~/utils/client-hints";
 import { DATE_TIME_FORMAT } from "~/utils/constants";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   error,
   getParams,
@@ -97,7 +97,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       header,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -265,7 +265,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
           return payload({ success: true });
         } catch (cause) {
           // Handle constraint violations and other barcode creation errors
-          const reason = makeShelfError(cause);
+          const reason = makeEstoqueSoftSystemError(cause);
 
           // Extract specific validation errors if they exist
           const validationErrors = reason.additionalData
@@ -291,7 +291,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     return data(error(reason), { status: reason.status });
   }
 }

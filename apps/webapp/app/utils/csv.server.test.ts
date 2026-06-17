@@ -14,7 +14,7 @@ import {
   formatValueForCsv,
   parseCsv,
 } from "~/utils/csv.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 // why: mock parseFormData to control file upload parsing in tests
 // while keeping MaxFileSizeExceededError available
@@ -106,8 +106,8 @@ describe("csvDataFromRequest", () => {
       thrown = error;
     }
 
-    expect(thrown).toBeInstanceOf(ShelfError);
-    const shelfError = thrown as ShelfError;
+    expect(thrown).toBeInstanceOf(EstoqueSoftSystemError);
+    const shelfError = thrown as EstoqueSoftSystemError;
     expect(shelfError.message).toMatch(/Invalid Opening Quote/i);
     expect(shelfError.shouldBeCaptured).toBe(false);
   });
@@ -126,8 +126,8 @@ describe("csvDataFromRequest", () => {
       thrown = error;
     }
 
-    expect(thrown).toBeInstanceOf(ShelfError);
-    const shelfError = thrown as ShelfError;
+    expect(thrown).toBeInstanceOf(EstoqueSoftSystemError);
+    const shelfError = thrown as EstoqueSoftSystemError;
     expect(shelfError.message).toBe(
       "Something went wrong while parsing the CSV file."
     );
@@ -150,8 +150,8 @@ describe("csvDataFromRequest", () => {
       thrown = error;
     }
 
-    expect(thrown).toBeInstanceOf(ShelfError);
-    const shelfError = thrown as ShelfError;
+    expect(thrown).toBeInstanceOf(EstoqueSoftSystemError);
+    const shelfError = thrown as EstoqueSoftSystemError;
     expect(shelfError.title).toBe("File too large");
     expect(shelfError.message).toMatch(/too large/);
     expect(shelfError.shouldBeCaptured).toBe(false);
@@ -174,8 +174,8 @@ describe("csvDataFromRequest", () => {
       thrown = error;
     }
 
-    expect(thrown).toBeInstanceOf(ShelfError);
-    const shelfError = thrown as ShelfError;
+    expect(thrown).toBeInstanceOf(EstoqueSoftSystemError);
+    const shelfError = thrown as EstoqueSoftSystemError;
     expect(shelfError.title).toBe("File too large");
     expect(shelfError.shouldBeCaptured).toBe(false);
   });

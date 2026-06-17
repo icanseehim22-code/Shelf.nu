@@ -20,9 +20,9 @@ vi.mock("~/database/db.server", () => ({
   },
 }));
 
-// why: testing error handling behavior without depending on ShelfError implementation
+// why: testing error handling behavior without depending on EstoqueSoftSystemError implementation
 vi.mock("~/utils/error", () => ({
-  ShelfError: class ShelfError extends Error {
+  EstoqueSoftSystemError: class EstoqueSoftSystemError extends Error {
     constructor(config: any) {
       super(config.message);
       Object.assign(this, config);
@@ -31,7 +31,7 @@ vi.mock("~/utils/error", () => ({
 }));
 
 const mockDb = await import("~/database/db.server");
-const { ShelfError } = await import("~/utils/error");
+const { EstoqueSoftSystemError } = await import("~/utils/error");
 
 const teamMemberNoteCreateMock = vi.mocked(mockDb.db.teamMemberNote.create);
 const teamMemberNoteFindManyMock = vi.mocked(mockDb.db.teamMemberNote.findMany);
@@ -142,7 +142,7 @@ describe("team member note service", () => {
       expect(result).toEqual(note);
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       teamMemberNoteCreateMock.mockRejectedValue(
         new Error("Database connection failed")
       );
@@ -154,7 +154,7 @@ describe("team member note service", () => {
           organizationId: "org-1",
           userId: "admin-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         createTeamMemberNote({
@@ -242,7 +242,7 @@ describe("team member note service", () => {
       expect(teamMemberNoteFindManyMock).not.toHaveBeenCalled();
     });
 
-    it("re-throws ShelfError directly without wrapping", async () => {
+    it("re-throws EstoqueSoftSystemError directly without wrapping", async () => {
       teamMemberFindFirstMock.mockResolvedValue(null);
 
       await expect(
@@ -256,7 +256,7 @@ describe("team member note service", () => {
       });
     });
 
-    it("throws ShelfError when database query fails", async () => {
+    it("throws EstoqueSoftSystemError when database query fails", async () => {
       teamMemberFindFirstMock.mockResolvedValue({ id: "tm-1" } as any);
       teamMemberNoteFindManyMock.mockRejectedValue(
         new Error("Database timeout")
@@ -267,7 +267,7 @@ describe("team member note service", () => {
           teamMemberId: "tm-1",
           organizationId: "org-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         getTeamMemberNotes({
@@ -327,7 +327,7 @@ describe("team member note service", () => {
       });
     });
 
-    it("throws ShelfError when database operation fails", async () => {
+    it("throws EstoqueSoftSystemError when database operation fails", async () => {
       teamMemberNoteDeleteManyMock.mockRejectedValue(
         new Error("Database error")
       );
@@ -338,7 +338,7 @@ describe("team member note service", () => {
           userId: "admin-1",
           organizationId: "org-1",
         })
-      ).rejects.toThrow(ShelfError);
+      ).rejects.toThrow(EstoqueSoftSystemError);
 
       await expect(
         deleteTeamMemberNote({

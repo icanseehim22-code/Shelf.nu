@@ -2,7 +2,7 @@
  * ISO 4217 Currency Codes & Formatting
  *
  * This file serves as the single source of truth for all supported currencies
- * in the Shelf application. The list is based on the ISO 4217 standard which
+ * in the EstoqueSoftSystem application. The list is based on the ISO 4217 standard which
  * defines alphabetic and numeric codes for currencies.
  *
  * @see https://www.iso.org/iso-4217-currency-codes.html

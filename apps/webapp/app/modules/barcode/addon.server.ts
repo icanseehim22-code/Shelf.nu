@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import type { PriceWithProduct } from "~/components/subscription/prices";
 import { db } from "~/database/db.server";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { premiumIsEnabled, stripe } from "~/utils/stripe.server";
 
 const label: ErrorLabel = "Stripe";
@@ -24,7 +24,7 @@ export async function createBarcodeAddonCheckoutSession({
 }): Promise<string> {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { priceId, userId, domainUrl, customerId },
@@ -46,7 +46,7 @@ export async function createBarcodeAddonCheckoutSession({
     });
 
     if (!url) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "No url found in stripe checkout session response",
         additionalData: { priceId, userId, domainUrl, customerId },
@@ -55,7 +55,7 @@ export async function createBarcodeAddonCheckoutSession({
     }
     return url;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating barcode add-on checkout session. Please try again later or contact support.",
@@ -79,7 +79,7 @@ export async function createBarcodeAddonTrialSubscription({
 }) {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { customerId, priceId, userId },
@@ -115,7 +115,7 @@ export async function createBarcodeAddonTrialSubscription({
 
     return { subscription, hasPaymentMethod: !!defaultPaymentMethod };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating barcode add-on trial. Please try again later or contact support.",
@@ -154,7 +154,7 @@ export async function getBarcodeAddonPrices() {
 
     return { month: monthlyPrice, year: yearlyPrice };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while fetching barcode add-on prices.",
       label,
@@ -178,7 +178,7 @@ export async function linkBarcodeAddonToOrganization({
 }) {
   try {
     if (!stripe) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Stripe not initialized",
         additionalData: { customerId, organizationId },
@@ -227,7 +227,7 @@ export async function linkBarcodeAddonToOrganization({
     }
 
     if (!barcodeSubscription) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "No active subscription with barcode addon found for this customer",
@@ -257,7 +257,7 @@ export async function linkBarcodeAddonToOrganization({
       select: { id: true },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while linking barcode add-on to organization.",

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { bulkAssignCustody } from "~/modules/asset/service.server";
 import { action } from "~/routes/api+/assets.bulk-assign-custody";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { requirePermission } from "~/utils/roles.server";
 
 // why: mocking Remix's data() function to return Response objects for React Router v7 single fetch

@@ -17,7 +17,7 @@ import { useAutoFocus } from "~/hooks/use-auto-focus";
 import { getCategory, updateCategory } from "~/modules/category/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { error, getParams, payload, parseData } from "~/utils/http.server";
 
@@ -64,7 +64,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     return payload({ header, colorFromServer, category });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -115,7 +115,7 @@ export async function action({ context, request, params }: LoaderFunctionArgs) {
 
     return redirect(`/categories`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     return data(error(reason), { status: reason.status });
   }
 }

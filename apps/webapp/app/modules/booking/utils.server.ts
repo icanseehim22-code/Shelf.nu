@@ -3,7 +3,7 @@ import type { Asset, Booking, Organization, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 import { redirect } from "react-router";
 import type { ErrorLabel } from "~/utils/error";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label: ErrorLabel = "Booking";
 
@@ -42,7 +42,7 @@ export function isBookingExpired({ to }: { to: NonNullable<Booking["to"]> }) {
 
     return end < now;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Something went wrong while checking if the booking is expired.",
       label,

@@ -89,9 +89,9 @@ import {
 } from "~/utils/cookies.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
 import {
-  ShelfError,
+  EstoqueSoftSystemError,
   isZodValidationError,
-  makeShelfError,
+  makeEstoqueSoftSystemError,
 } from "~/utils/error";
 import {
   payload,
@@ -234,7 +234,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     /** For self service & base users, we only allow them to read their own bookings */
     if (!canSeeAllBookings && booking.custodianUserId !== authSession.userId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "You are not authorized to view this booking",
         status: 403,
@@ -595,7 +595,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       }
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -799,7 +799,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
           role === OrganizationRoles.BASE &&
           b.status !== BookingStatus.DRAFT
         ) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message:
               "You are not authorized to delete this booking. BASE users can only delete draft bookings.",
@@ -1035,7 +1035,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
           role === OrganizationRoles.ADMIN &&
           bookingSettings.requireExplicitCheckinForAdmin
         ) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             title: "Not allowed to quick check-in",
             message:
@@ -1049,7 +1049,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
           role === OrganizationRoles.SELF_SERVICE &&
           bookingSettings.requireExplicitCheckinForSelfService
         ) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             title: "Not allowed to quick check-in",
             message:
@@ -1343,7 +1343,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       }
       case "updateNotificationRecipients": {
         if (isSelfServiceOrBase) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message:
               "You do not have permission to manage notification recipients.",
@@ -1450,7 +1450,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(
+    const reason = makeEstoqueSoftSystemError(
       cause,
       { userId, id },
       !isZodValidationError(cause)

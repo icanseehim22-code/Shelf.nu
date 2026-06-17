@@ -13,7 +13,10 @@ import {
 } from "~/modules/scan/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   assertIsPost,
   payload,
@@ -131,7 +134,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         }
       );
     } else {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "Something went wrong with handling this QR code. This should not happen. Please try again or contact support.",
@@ -139,7 +142,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       });
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, id });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, id });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -179,7 +182,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     return data(payload({ ok: true }));
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }

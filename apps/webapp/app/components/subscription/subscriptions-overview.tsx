@@ -454,7 +454,7 @@ function LegacyPricingTooltip() {
           <p>
             You are on a{" "}
             <Button
-              to="https://www.shelf.nu/legacy-plan-faq"
+              to="https://www.estoquesoftsystem.com/legacy-plan-faq"
               target="_blank"
               variant="link"
             >

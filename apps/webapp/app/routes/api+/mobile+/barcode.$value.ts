@@ -7,7 +7,7 @@ import {
   MOBILE_ASSET_SELECT,
 } from "~/modules/api/mobile-auth.server";
 import { getBarcodeByValue } from "~/modules/barcode/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { getParams } from "~/utils/http.server";
 
 /**
@@ -15,7 +15,7 @@ import { getParams } from "~/utils/http.server";
  *
  * Resolves a barcode (additional code) to its linked asset.
  * Used by the mobile scanner as a fallback when a scanned code
- * is not a Shelf QR code.
+ * is not a EstoqueSoftSystem QR code.
  *
  * Requires the organization to have `barcodesEnabled: true`.
  */
@@ -97,7 +97,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

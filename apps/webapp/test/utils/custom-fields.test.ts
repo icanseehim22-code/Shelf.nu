@@ -2,7 +2,7 @@ import type { CustomField } from "@prisma/client";
 import { describe, expect, it } from "vitest";
 
 import { buildCustomFieldValue } from "~/utils/custom-fields";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const baseCustomField: CustomField = {
   id: "cf_1",
@@ -42,7 +42,7 @@ describe("buildCustomFieldValue", () => {
     const buildInvalidValue = () =>
       buildCustomFieldValue({ raw: "invalid" }, customField);
 
-    expect(buildInvalidValue).toThrowError(ShelfError);
+    expect(buildInvalidValue).toThrowError(EstoqueSoftSystemError);
     expect(buildInvalidValue).toThrowError(
       "Custom field 'Budget': Invalid value 'invalid'. Contains non-numeric characters. Expected format: Plain numbers with optional decimal separator (e.g., 600, 600.50, or 600,50). Currency symbols will be automatically removed."
     );
@@ -97,13 +97,13 @@ describe("buildCustomFieldValue", () => {
 
     expect(() =>
       buildCustomFieldValue({ raw: "1,234" }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
     expect(() =>
       buildCustomFieldValue({ raw: "1,234.56" }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
     expect(() =>
       buildCustomFieldValue({ raw: "12,345,678.90" }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
   });
 
   it("rejects numbers with thousand separators (EU format)", () => {
@@ -114,13 +114,13 @@ describe("buildCustomFieldValue", () => {
 
     expect(() =>
       buildCustomFieldValue({ raw: "1.234" }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
     expect(() =>
       buildCustomFieldValue({ raw: "1.234,56" }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
     expect(() =>
       buildCustomFieldValue({ raw: "12.345.678,90" }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
   });
 
   it("handles negative numbers", () => {
@@ -169,14 +169,14 @@ describe("buildCustomFieldValue", () => {
     } as CustomField;
 
     expect(() => buildCustomFieldValue({ raw: NaN }, customField)).toThrowError(
-      ShelfError
+      EstoqueSoftSystemError
     );
     expect(() =>
       buildCustomFieldValue({ raw: Infinity }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
     expect(() =>
       buildCustomFieldValue({ raw: -Infinity }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
   });
 
   it("rejects scientific notation", () => {
@@ -187,10 +187,10 @@ describe("buildCustomFieldValue", () => {
 
     expect(() =>
       buildCustomFieldValue({ raw: "1e10" }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
     expect(() =>
       buildCustomFieldValue({ raw: "1E5" }, customField)
-    ).toThrowError(ShelfError);
+    ).toThrowError(EstoqueSoftSystemError);
   });
 
   describe("BOOLEAN type", () => {

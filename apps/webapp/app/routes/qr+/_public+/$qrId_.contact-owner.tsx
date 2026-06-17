@@ -19,7 +19,10 @@ import {
   sendReportEmails,
 } from "~/modules/report-found/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { ShelfError, makeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  makeEstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import {
   assertIsPost,
@@ -77,7 +80,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
     return null;
   } catch (cause) {
-    const reason = makeShelfError(cause, { qrId });
+    const reason = makeEstoqueSoftSystemError(cause, { qrId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -98,7 +101,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         select: QR_SELECT_FOR_REPORT,
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message:
             "Something went wrong while fetching the QR. Please try again or contact support.",
@@ -112,7 +115,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
      * We still handle the unclaimed case defensively, and to keep TS happy.
      */
     if (!qr.organizationId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Unclaimed QR code",
         message:
@@ -149,7 +152,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     return payload({ report });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }

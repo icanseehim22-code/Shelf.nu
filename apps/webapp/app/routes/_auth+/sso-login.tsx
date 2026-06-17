@@ -20,7 +20,11 @@ import { useAutoFocus } from "~/hooks/use-auto-focus";
 import { signInWithSSO } from "~/modules/auth/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { mobilePkceChallengeCookie } from "~/utils/cookies.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import {
   payload,
@@ -35,7 +39,7 @@ const SSOLoginFormSchema = z.object({
     .string()
     .transform((email) => email.toLowerCase())
     .refine(isValidDomain, () => ({
-      message: "Please enter a valid domain name",
+      message: "Insira um nome de domínio válido",
     })),
   redirectTo: z.string().optional(),
   // "mobile" routes the post-auth redirect to the native-app callback so the
@@ -44,8 +48,8 @@ const SSOLoginFormSchema = z.object({
 });
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
-  const title = "Log in with SSO";
-  const subHeading = "Enter your company's domain to login with SSO.";
+  const title = "Entrar com SSO";
+  const subHeading = "Insira o domínio da sua empresa para entrar com SSO.";
   const { disableSSO } = config;
 
   const url = new URL(request.url);
@@ -61,11 +65,11 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     }
 
     if (disableSSO) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
-        title: "SSO is disabled",
+        title: "SSO desativado",
         message:
-          "For more information, please contact your workspace administrator.",
+          "Para mais informações, contate o administrador do seu workspace.",
         label: "User onboarding",
         status: 403,
         shouldBeCaptured: false,
@@ -94,7 +98,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
     return payload({ title, subHeading });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -118,7 +122,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(error(reason), { status: reason.status });
   }
 }
@@ -150,8 +154,8 @@ export default function SSOLogin() {
             <Input
               ref={domainInputRef}
               data-test-id="domain"
-              label="Company domain"
-              placeholder="yourdomain.com"
+              label="Domínio da empresa"
+              placeholder="seudominio.com"
               required
               name={zo.fields.domain()}
               type="text"
@@ -167,7 +171,7 @@ export default function SSOLogin() {
               disabled={disabled}
               width="full"
             >
-              Log In
+              Entrar
             </Button>
           </div>
         </Form>
@@ -175,13 +179,13 @@ export default function SSOLogin() {
           <div className="text-sm text-error-500">{data.error.message}</div>
         )}
         <div>
-          Want to enable SSO for your organization?{" "}
+          Quer habilitar SSO para a sua organização?{" "}
           <Button
             as="a"
-            href="mailto:hello@shelf.nu?subject=SSO request"
+            href="mailto:hello@estoquesoftsystem.com?subject=SSO request"
             variant="link"
           >
-            Contact us
+            Fale conosco
           </Button>
         </div>
       </div>

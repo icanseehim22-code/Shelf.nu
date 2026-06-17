@@ -20,9 +20,9 @@ import { signUpWithEmailPass } from "~/modules/auth/service.server";
 import { findUserByEmail } from "~/modules/user/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import {
-  ShelfError,
+  EstoqueSoftSystemError,
   isZodValidationError,
-  makeShelfError,
+  makeEstoqueSoftSystemError,
   notAllowedMethod,
 } from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
@@ -36,17 +36,17 @@ import { validEmail } from "~/utils/misc";
 import { validateNonSSOSignup } from "~/utils/sso.server";
 
 export function loader({ context }: LoaderFunctionArgs) {
-  const title = "Create an account";
-  const subHeading = "Start your journey with Shelf";
+  const title = "Criar uma conta";
+  const subHeading = "Comece sua jornada com o EstoqueSoftSystem";
   const { disableSignup } = config;
 
   try {
     if (disableSignup) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
-        title: "Signup is disabled",
+        title: "Cadastro desativado",
         message:
-          "For more information, please contact your workspace administrator.",
+          "Para mais informações, contate o administrador do seu workspace.",
         label: "User onboarding",
         status: 403,
         shouldBeCaptured: false,
@@ -58,7 +58,7 @@ export function loader({ context }: LoaderFunctionArgs) {
 
     return data(payload({ title, subHeading }));
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -69,21 +69,27 @@ const JoinFormSchema = z
       .string()
       .transform((email) => email.toLowerCase())
       .refine(validEmail, () => ({
-        message: "Please enter a valid email",
+        message: "Insira um e-mail válido",
       })),
     password: z
       .string()
-      .min(8, "Your password is too short. Min 8 characters are required."),
+      .min(
+        8,
+        "Sua senha é muito curta. São necessários no mínimo 8 caracteres."
+      ),
     confirmPassword: z
       .string()
-      .min(8, "Your password is too short. Min 8 characters are required."),
+      .min(
+        8,
+        "Sua senha é muito curta. São necessários no mínimo 8 caracteres."
+      ),
     redirectTo: z.string().optional(),
   })
   .superRefine(({ password, confirmPassword }, ctx) => {
     if (password !== confirmPassword) {
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Password and confirm password must match",
+        message: "A senha e a confirmação devem ser iguais",
         path: ["confirmPassword"],
       });
     }
@@ -106,9 +112,9 @@ export async function action({ request }: ActionFunctionArgs) {
         const existingUser = await findUserByEmail(email);
 
         if (existingUser) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
-            message: "User with this Email already exits, login instead",
+            message: "Já existe um usuário com este e-mail. Faça login.",
             additionalData: {
               email,
             },
@@ -129,7 +135,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     throw notAllowedMethod(method);
   } catch (cause) {
-    const reason = makeShelfError(
+    const reason = makeEstoqueSoftSystemError(
       cause,
       undefined,
       isZodValidationError(cause)
@@ -161,8 +167,8 @@ export default function Join() {
             <Input
               ref={emailInputRef}
               data-test-id="email"
-              label="Email address"
-              placeholder="zaans@huisje.com"
+              label="Endereço de e-mail"
+              placeholder="nome@exemplo.com"
               required
               name={zo.fields.email()}
               type="email"
@@ -174,7 +180,7 @@ export default function Join() {
           </div>
 
           <PasswordInput
-            label="Password"
+            label="Senha"
             placeholder="**********"
             required
             data-test-id="password"
@@ -185,7 +191,7 @@ export default function Join() {
             error={zo.errors.password()?.message}
           />
           <PasswordInput
-            label="Confirm Password"
+            label="Confirmar senha"
             placeholder="**********"
             required
             data-test-id="confirmPassword"
@@ -208,7 +214,7 @@ export default function Join() {
             disabled={disabled}
             width="full"
           >
-            Get Started
+            Começar
           </Button>
         </Form>
         <div className="mt-6">
@@ -218,7 +224,7 @@ export default function Join() {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="bg-white px-2 text-gray-500">
-                {"Or use a One Time Password"}
+                {"Ou use uma Senha de Uso Único"}
               </span>
             </div>
           </div>
@@ -228,7 +234,7 @@ export default function Join() {
         </div>
         <div className="flex items-center justify-center pt-5">
           <div className="text-center text-sm text-gray-500">
-            {"Already have an account? "}
+            {"Já tem uma conta? "}
             <Button
               variant="link"
               to={{

@@ -9,7 +9,7 @@ import {
 } from "@react-email/components";
 import { config } from "~/config/shelf.config";
 import { SERVER_URL, SUPPORT_EMAIL } from "~/utils/env";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { resolveUserDisplayName } from "~/utils/user";
 import { LogoForEmail } from "../logo";
@@ -46,7 +46,7 @@ User Dashboard: ${SERVER_URL}/admin-dashboard/${user.id}
 
 Please review the user's subscription status in the Stripe dashboard.
 
-— Shelf System
+— EstoqueSoftSystem
 `;
 };
 
@@ -96,7 +96,7 @@ export const sendUnpaidInvoiceUserEmail = async ({
     });
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message:
           "Something went wrong while sending the unpaid invoice user email",
@@ -117,7 +117,7 @@ export const unpaidInvoiceUserText = ({
 
   return `${greeting},
 
-We wanted to let you know that we weren't able to process your recent payment for your Shelf subscription.
+We wanted to let you know that we weren't able to process your recent payment for your EstoqueSoftSystem subscription.
 
 Subscription: ${subscriptionName}
 Amount due: ${amountDue}${dueDate ? `\nDue date: ${dueDate}` : ""}
@@ -128,7 +128,7 @@ Update your payment method: ${SERVER_URL}/account-details/subscription
 
 If you have any questions, feel free to reach out to us at ${SUPPORT_EMAIL}. We're happy to help!
 
-The Shelf Team
+The EstoqueSoftSystem Team
 `;
 };
 
@@ -143,7 +143,9 @@ function UnpaidInvoiceUserEmailTemplate({
   return (
     <Html>
       <Head>
-        <title>Action needed: Payment issue with your Shelf subscription</title>
+        <title>
+          Action needed: Payment issue with your EstoqueSoftSystem subscription
+        </title>
       </Head>
 
       <Container style={{ padding: "32px 16px", maxWidth: "100%" }}>
@@ -156,7 +158,7 @@ function UnpaidInvoiceUserEmailTemplate({
 
           <Text style={{ ...styles.p }}>
             We wanted to let you know that we weren't able to process your
-            recent payment for your Shelf subscription.
+            recent payment for your EstoqueSoftSystem subscription.
           </Text>
 
           <Text
@@ -213,7 +215,9 @@ function UnpaidInvoiceUserEmailTemplate({
             {SUPPORT_EMAIL}. We're happy to help!
           </Text>
 
-          <Text style={{ marginTop: "24px", ...styles.p }}>The Shelf Team</Text>
+          <Text style={{ marginTop: "24px", ...styles.p }}>
+            The EstoqueSoftSystem Team
+          </Text>
         </div>
       </Container>
     </Html>

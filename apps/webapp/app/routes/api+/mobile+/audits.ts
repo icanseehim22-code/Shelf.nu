@@ -6,7 +6,7 @@ import {
   requireOrganizationAccess,
 } from "~/modules/api/mobile-auth.server";
 import { getAuditsForOrganization } from "~/modules/audit/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 
 /**
  * GET /api/mobile/audits
@@ -142,7 +142,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       totalPages: Math.ceil(totalAudits / perPage),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

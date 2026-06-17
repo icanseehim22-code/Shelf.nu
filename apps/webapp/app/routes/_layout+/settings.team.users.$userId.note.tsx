@@ -24,7 +24,11 @@ import {
   deleteTeamMemberNote,
 } from "~/modules/team-member-note/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -144,7 +148,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { targetUserId, userId });
+    const reason = makeEstoqueSoftSystemError(cause, { targetUserId, userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -157,7 +161,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
  * @param args.targetUserId - The User ID from the route param
  * @param args.organizationId - The current workspace
  * @returns The TeamMember ID for this user in this workspace
- * @throws {ShelfError} 404 if no TeamMember exists for this user in the org
+ * @throws {EstoqueSoftSystemError} 404 if no TeamMember exists for this user in the org
  */
 async function resolveTeamMemberForUser({
   targetUserId,
@@ -173,7 +177,7 @@ async function resolveTeamMemberForUser({
   });
 
   if (!teamMember) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "User not found in this workspace",
       status: 404,

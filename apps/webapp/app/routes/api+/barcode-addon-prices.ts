@@ -3,7 +3,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import { data } from "react-router";
 import { getBarcodeAddonPrices } from "~/modules/barcode/addon.server";
 import { getUserByID } from "~/modules/user/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error } from "~/utils/http.server";
 import { customerHasPaymentMethod } from "~/utils/stripe.server";
 
@@ -27,7 +27,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
 
     return data({ ...prices, hasPaymentMethod });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

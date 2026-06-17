@@ -26,7 +26,10 @@ import styles from "~/styles/layout/custom-modal.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { setCookie } from "~/utils/cookies.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import { wrapLinkForNote, wrapUserLinkForNote } from "~/utils/markdoc-wrappers";
@@ -74,7 +77,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       ],
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -108,7 +111,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
     ).map((asset) => asset.id);
 
     if (bookingAssets.length > 0 && intersected(bookingAssets, finalAssetIds)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `The booking you have selected already contains the asset you are trying to add. Please select a different booking.`,
         status: 400,
@@ -158,7 +161,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect(`/assets/${params.assetId}/overview`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

@@ -2,7 +2,10 @@ import { data, type ActionFunctionArgs } from "react-router";
 import { bulkInviteUsers } from "~/modules/invite/service.server";
 import { IMPORT_USERS_CSV_HEADERS } from "~/modules/invite/utils.server";
 import { csvDataFromRequest } from "~/utils/csv.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { assertIsPost, payload, error } from "~/utils/http.server";
 import { extractCSVDataFromContentImport } from "~/utils/import.server";
 import {
@@ -32,7 +35,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     const csvData = await csvDataFromRequest({ request });
     if (csvData.length < 2) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "CSV file is empty",
         additionalData: { userId },
@@ -59,7 +62,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return data(payload({ success: true, ...response }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

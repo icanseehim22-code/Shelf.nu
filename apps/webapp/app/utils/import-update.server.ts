@@ -19,7 +19,10 @@ import type {
   UpdateAssetPayload,
 } from "~/modules/asset/types";
 import { buildCustomFieldValue } from "~/utils/custom-fields";
-import { ShelfError, isLikeShelfError } from "~/utils/error";
+import {
+  EstoqueSoftSystemError,
+  isLikeEstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   analyzeUpdateHeaders,
   computeAssetDiffs,
@@ -65,7 +68,7 @@ export { fetchAssetsForUpdate } from "./import-update-entities.server";
  * @param csvData - Full CSV data array (first row is headers)
  * @param organizationId - Organization scope for the query
  * @returns Complete preview of all changes that would be applied
- * @throws {ShelfError} If no identifier column found or row limit exceeded
+ * @throws {EstoqueSoftSystemError} If no identifier column found or row limit exceeded
  */
 export async function buildUpdatePreview({
   csvData,
@@ -79,7 +82,7 @@ export async function buildUpdatePreview({
 
   // Guard against oversized imports
   if (dataRows.length > MAX_BULK_UPDATE_ROWS) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: `CSV contains ${dataRows.length} data rows, but the maximum is ${MAX_BULK_UPDATE_ROWS}. Please split your file into smaller batches.`,
       label: "Assets",
@@ -97,7 +100,7 @@ export async function buildUpdatePreview({
 
   // Validate: must have at least one identifier column
   if (headerAnalysis.idColumnIndex === -1) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "No identifier column found. Your CSV needs an Asset ID or ID column. The ID column is automatically included in all Asset Index exports.",
@@ -187,7 +190,7 @@ export async function buildUpdatePreview({
  * @param userId - User performing the import
  * @param request - Original HTTP request (passed through to updateAsset)
  * @returns Results summary with updated, skipped, and failed assets
- * @throws {ShelfError} If no identifier column found or row limit exceeded
+ * @throws {EstoqueSoftSystemError} If no identifier column found or row limit exceeded
  */
 export async function applyBulkUpdatesFromImport({
   csvData,
@@ -206,7 +209,7 @@ export async function applyBulkUpdatesFromImport({
 
   // Guard against oversized imports
   if (dataRows.length > MAX_BULK_UPDATE_ROWS) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: `CSV contains ${dataRows.length} data rows, but the maximum is ${MAX_BULK_UPDATE_ROWS}. Please split your file into smaller batches.`,
       label: "Assets",
@@ -222,7 +225,7 @@ export async function applyBulkUpdatesFromImport({
   const headerAnalysis = analyzeUpdateHeaders(headers, orgCustomFields);
 
   if (headerAnalysis.idColumnIndex === -1) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "No identifier column found. Your CSV needs an Asset ID or ID column.",
@@ -551,7 +554,7 @@ export async function applyBulkUpdatesFromImport({
           } else {
             const locationId = locationNameMap.get(locationChange.newValue);
             if (!locationId) {
-              throw new ShelfError({
+              throw new EstoqueSoftSystemError({
                 cause: null,
                 message: `Location "${locationChange.newValue}" could not be resolved`,
                 label: "Assets",
@@ -573,12 +576,12 @@ export async function applyBulkUpdatesFromImport({
           // If location fails due to kit constraint, track it but continue.
           // The kit constraint error sets additionalData.kitId.
           const isKitConstraint =
-            isLikeShelfError(cause) &&
-            !!(cause as ShelfError).additionalData?.kitId;
+            isLikeEstoqueSoftSystemError(cause) &&
+            !!(cause as EstoqueSoftSystemError).additionalData?.kitId;
           if (!isKitConstraint) {
             throw cause; // Re-throw non-kit errors
           }
-          const msg = (cause as ShelfError).message;
+          const msg = (cause as EstoqueSoftSystemError).message;
           locationKitError = `Location change skipped: ${msg}`;
         }
       }
@@ -597,8 +600,8 @@ export async function applyBulkUpdatesFromImport({
             changesApplied++;
           }
         } catch (cause) {
-          const msg = isLikeShelfError(cause)
-            ? (cause as ShelfError).message
+          const msg = isLikeEstoqueSoftSystemError(cause)
+            ? (cause as EstoqueSoftSystemError).message
             : "Booking availability update failed";
           // Track as partial failure if other fields already applied
           if (changesApplied > 0 || hasMainChanges) {
@@ -648,8 +651,8 @@ export async function applyBulkUpdatesFromImport({
         }
       }
     } catch (cause) {
-      const msg = isLikeShelfError(cause)
-        ? (cause as ShelfError).message
+      const msg = isLikeEstoqueSoftSystemError(cause)
+        ? (cause as EstoqueSoftSystemError).message
         : "Unknown error";
       failed.push({
         id: matchId,

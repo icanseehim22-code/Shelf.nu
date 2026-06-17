@@ -573,7 +573,8 @@ const AuditPDFContent = ({
 
       {/* Footer */}
       <div className="mt-8 border-t border-gray-300 pt-4 text-center text-xs text-gray-500">
-        Generated on <DateS date={new Date()} /> | Powered by shelf.nu
+        Generated on <DateS date={new Date()} /> | Powered by
+        estoquesoftsystem.com
       </div>
     </div>
   );

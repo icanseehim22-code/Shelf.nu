@@ -7,7 +7,7 @@ import {
   trackUpdateClick,
   trackUpdateView,
 } from "~/modules/update/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload } from "~/utils/http.server";
 import { parseMarkdownToReact } from "~/utils/md";
 import {
@@ -43,7 +43,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(reason, { status: reason.status });
   }
 }
@@ -116,7 +116,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
         throw new Error(`Unknown intent: ${intent}`);
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(reason, { status: reason.status });
   }
 }

@@ -1,7 +1,7 @@
 import type PgBoss from "pg-boss";
 import { sendAuditTrialEndsTomorrowEmail } from "~/emails/stripe/audit-trial-ends-tomorrow";
 import { sendBarcodeTrialEndsTomorrowEmail } from "~/emails/stripe/barcode-trial-ends-tomorrow";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { QueueNames, scheduler } from "~/utils/scheduler.server";
 import { customerHasPaymentMethod, stripe } from "~/utils/stripe.server";
@@ -76,7 +76,7 @@ export async function registerAddonTrialWorkers() {
         await handleAddonTrialJob(job);
       } catch (cause) {
         Logger.error(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause,
             message:
               "Something went wrong while processing addon trial scheduled job.",

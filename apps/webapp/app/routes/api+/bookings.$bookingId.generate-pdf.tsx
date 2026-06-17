@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { PdfDbResult } from "~/modules/booking/pdf-helpers";
 import { fetchAllPdfRelatedData } from "~/modules/booking/pdf-helpers";
 import { getDateTimeFormat } from "~/utils/client-hints";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   payload,
   error,
@@ -80,7 +80,7 @@ export const loader = async ({
 
     return data(payload({ pdfMeta }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     throw data(error(reason), { status: reason.status });
   }
 };

@@ -21,7 +21,7 @@ import type { CreateAssetFromContentImportPayload } from "~/modules/asset/types"
 import { createTeamMemberIfNotExists } from "~/modules/team-member/service.server";
 import styles from "~/styles/layout/custom-modal.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error } from "~/utils/http.server";
 import {
@@ -50,7 +50,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       showModal: true,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -95,7 +95,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
     return payload({ success: true });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

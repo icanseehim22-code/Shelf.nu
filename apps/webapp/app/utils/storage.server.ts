@@ -17,7 +17,7 @@ import { cropImage } from "./crop-image";
 import { delay } from "./delay";
 import { SUPABASE_URL } from "./env";
 import type { AdditionalData, ErrorLabel } from "./error";
-import { isLikeShelfError, ShelfError } from "./error";
+import { isLikeEstoqueSoftSystemError, EstoqueSoftSystemError } from "./error";
 import { extractImageNameFromSupabaseUrl } from "./extract-image-name-from-supabase-url";
 import { id } from "./id/id.server";
 import { detectImageFormat } from "./image-format.server";
@@ -45,7 +45,7 @@ export function getPublicFileURL({
 
     return data.publicUrl;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to get public file URL",
       additionalData: { filename, bucketName },
@@ -75,7 +75,7 @@ export async function createSignedUrl({
       if (!error) {
         const signedUrl = data?.signedUrl;
         if (!signedUrl) {
-          throw new ShelfError({
+          throw new EstoqueSoftSystemError({
             cause: null,
             message: "Supabase did not return a signed URL",
             additionalData: { filename: normalizedFilename, bucketName },
@@ -87,14 +87,14 @@ export async function createSignedUrl({
 
       // Supabase occasionally responds with HTML on 50x/edge errors, which the client surfaces
       // as StorageUnknownError with a JSON parse failure. Retry before surfacing it to keep
-      // transient CDN hiccups from bubbling up as user-facing ShelfErrors.
+      // transient CDN hiccups from bubbling up as user-facing EstoqueSoftSystemErrors.
       const isHtmlError = isSupabaseHtmlError(error);
       const isFetchFailed = isSupabaseFetchFailedError(error);
 
       if (isHtmlError || isFetchFailed) {
         if (attempt < maxAttempts) {
           Logger.warn(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause: error,
               message: isHtmlError
                 ? "Supabase returned a non-JSON response while creating a signed URL. Retrying."
@@ -114,7 +114,7 @@ export async function createSignedUrl({
 
         // All retry attempts exhausted with HTML errors - this is a transient
         // infrastructure issue that shouldn't spam Sentry
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: error,
           message:
             "Supabase is experiencing temporary issues. Using existing URL.",
@@ -137,7 +137,7 @@ export async function createSignedUrl({
         if (attempt < maxAttempts) {
           const backoffMs = Math.pow(2, attempt - 1) * 1000; // 1s, 2s
           Logger.warn(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause: error,
               message:
                 "Supabase rate limit hit while creating a signed URL. Retrying with backoff.",
@@ -157,7 +157,7 @@ export async function createSignedUrl({
 
         // All retries exhausted - this is a transient rate-limit issue
         // that shouldn't spam Sentry
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: error,
           message:
             "Supabase rate limit exceeded. Please try again in a moment.",
@@ -178,7 +178,7 @@ export async function createSignedUrl({
         if (attempt < maxAttempts) {
           const backoffMs = Math.pow(2, attempt - 1) * 1000; // 1s, 2s
           Logger.warn(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause: error,
               message:
                 "Supabase server error while creating a signed URL. Retrying with backoff.",
@@ -198,7 +198,7 @@ export async function createSignedUrl({
 
         // All retries exhausted - this is a transient server issue
         // that shouldn't spam Sentry
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: error,
           message:
             "Supabase is experiencing temporary issues. Using existing URL.",
@@ -217,19 +217,19 @@ export async function createSignedUrl({
     }
 
     // The loop should always return or throw, but ensure we never fall through.
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "Unable to create signed URL after retries.",
       additionalData: { filename: normalizedFilename, bucketName },
       label,
     });
   } catch (cause) {
-    // If it's already a ShelfError, preserve it (including shouldBeCaptured flag)
-    if (isLikeShelfError(cause)) {
+    // If it's already a EstoqueSoftSystemError, preserve it (including shouldBeCaptured flag)
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while creating a signed URL. Please try again. If the issue persists contact support.",
@@ -332,16 +332,18 @@ export async function uploadFile(
     // Return just the path string for backward compatibility
     return data.path;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isShelfError
+      message: isEstoqueSoftSystemError
         ? cause.message
         : "Something went wrong while uploading the file. Please try again or contact support.",
       additionalData: { filename, contentType, bucketName },
       label,
-      shouldBeCaptured: isShelfError ? cause.shouldBeCaptured : undefined,
+      shouldBeCaptured: isEstoqueSoftSystemError
+        ? cause.shouldBeCaptured
+        : undefined,
     });
   }
 }
@@ -437,7 +439,7 @@ export async function parseFileFormData({
     const sizeLimitError = getMaxFileSizeExceededError(cause);
 
     if (sizeLimitError) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         title: "File too large",
         message: `Image file size exceeds maximum allowed size of ${
@@ -449,29 +451,32 @@ export async function parseFileFormData({
       });
     }
 
-    const nestedShelfError = findShelfErrorInCause(cause);
+    const nestedEstoqueSoftSystemError =
+      findEstoqueSoftSystemErrorInCause(cause);
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: nestedShelfError
-        ? nestedShelfError.message
+      message: nestedEstoqueSoftSystemError
+        ? nestedEstoqueSoftSystemError.message
         : "Something went wrong while uploading the file. Please try again or contact support.",
-      title: nestedShelfError?.title,
+      title: nestedEstoqueSoftSystemError?.title,
       label,
-      shouldBeCaptured: nestedShelfError?.shouldBeCaptured,
+      shouldBeCaptured: nestedEstoqueSoftSystemError?.shouldBeCaptured,
     });
   }
 }
 
 /**
- * Recursively walks the `.cause` chain to find a `ShelfError`.
+ * Recursively walks the `.cause` chain to find a `EstoqueSoftSystemError`.
  *
  * Libraries like `@remix-run/form-data-parser` wrap errors in their own
- * `FormDataParseError`, hiding the nested ShelfError. This helper lets
+ * `FormDataParseError`, hiding the nested EstoqueSoftSystemError. This helper lets
  * callers recover the original message, `title`, and `shouldBeCaptured` flag.
  */
-export function findShelfErrorInCause(error: unknown): ShelfError | null {
-  if (isLikeShelfError(error)) {
+export function findEstoqueSoftSystemErrorInCause(
+  error: unknown
+): EstoqueSoftSystemError | null {
+  if (isLikeEstoqueSoftSystemError(error)) {
     return error;
   }
 
@@ -481,7 +486,7 @@ export function findShelfErrorInCause(error: unknown): ShelfError | null {
     return null;
   }
 
-  return findShelfErrorInCause(cause);
+  return findEstoqueSoftSystemErrorInCause(cause);
 }
 
 /**
@@ -514,7 +519,7 @@ function getMaxFileSizeExceededError(
  */
 function logUploadError(cause: unknown, additionalData: AdditionalData) {
   Logger.error(
-    new ShelfError({
+    new EstoqueSoftSystemError({
       cause,
       message: "Failed to upload image",
       additionalData,
@@ -646,7 +651,7 @@ export async function uploadImageFromUrl(
 
         if (isBlocked || attempt === 2) {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause,
               message: isBlocked
                 ? "Refused to fetch image from a private or reserved address"
@@ -666,7 +671,7 @@ export async function uploadImageFromUrl(
     // This should not happen due to the early returns above, but TypeScript needs the check
     if (!fetchResult) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: "Unexpected null response after retry loop",
           additionalData: { imageUrl },
@@ -687,7 +692,7 @@ export async function uploadImageFromUrl(
     const detectedImageType = detectImageFormat(buffer);
 
     if (!actualContentType?.startsWith("image/") && !detectedImageType) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "URL does not point to a valid image",
         additionalData: { imageUrl, contentType: actualContentType },
@@ -739,19 +744,21 @@ export async function uploadImageFromUrl(
 
     return data.path;
   } catch (cause) {
-    const isShelfError = isLikeShelfError(cause);
+    const isEstoqueSoftSystemError = isLikeEstoqueSoftSystemError(cause);
 
     // Log the error and return null instead of throwing
     // This allows the import process to continue without the image
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
-        message: isShelfError
+        message: isEstoqueSoftSystemError
           ? cause.message
           : "Failed to process and upload image from URL",
         additionalData: { imageUrl, filename, contentType, bucketName },
         label,
-        shouldBeCaptured: isShelfError ? cause.shouldBeCaptured : true,
+        shouldBeCaptured: isEstoqueSoftSystemError
+          ? cause.shouldBeCaptured
+          : true,
       })
     );
 
@@ -773,7 +780,7 @@ export async function deleteProfilePicture({
       ) ||
       url === ""
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Invalid file URL",
         additionalData: { url },
@@ -790,7 +797,7 @@ export async function deleteProfilePicture({
     }
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Fail to delete the profile picture",
         additionalData: { url, bucketName },
@@ -810,7 +817,7 @@ export async function deleteAssetImage({
   try {
     const path = extractImageNameFromSupabaseUrl({ url, bucketName });
     if (!path) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Cannot extract the image path from the URL",
         additionalData: { url, bucketName },
@@ -829,7 +836,7 @@ export async function deleteAssetImage({
     return true;
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Fail to delete the asset image",
         additionalData: { url, bucketName },
@@ -864,7 +871,7 @@ export async function removePublicFile({ publicUrl }: { publicUrl: string }) {
         `${SUPABASE_URL}/storage/v1/object/public/${PUBLIC_BUCKET}/`
       )
     ) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Invalid file URL",
         additionalData: { publicUrl },
@@ -880,9 +887,9 @@ export async function removePublicFile({ publicUrl }: { publicUrl: string }) {
       throw error;
     }
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
-      message: isLikeShelfError(cause)
+      message: isLikeEstoqueSoftSystemError(cause)
         ? cause.message
         : "Failed to remove file. Please try again.",
       label,

@@ -412,7 +412,7 @@ function AuditScannerContent() {
         let asset: { id: string; title: string } | null;
 
         if (qrId) {
-          // ── Shelf QR path ──
+          // ── EstoqueSoftSystem QR path ──
           const { data: qrData, error } = await api.qr(qrId);
           if (error || !qrData?.qr?.asset) {
             flashFrame("error");
@@ -775,7 +775,7 @@ function AuditScannerContent() {
         <Ionicons name="camera-outline" size={64} color={colors.mutedLight} />
         <Text style={styles.messageTitle}>Camera Access Needed</Text>
         <Text style={styles.messageBody}>
-          Shelf needs camera access to scan assets for this audit.
+          EstoqueSoftSystem needs camera access to scan assets for this audit.
         </Text>
         {permission.canAskAgain ? (
           <TouchableOpacity

@@ -26,7 +26,7 @@ import {
   isOnTime,
   resolveCheckInAt,
 } from "~/modules/booking/lateness";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import { resolveCheckInTimes } from "./check-in-time.server";
 
@@ -225,7 +225,7 @@ export async function bookingComplianceReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Booking Compliance report",
@@ -978,7 +978,7 @@ export async function overdueItemsReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Overdue Items report",
@@ -1322,7 +1322,7 @@ export async function idleAssetsReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Idle Assets report",
@@ -1705,7 +1705,7 @@ export async function custodySnapshotReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Custody Snapshot report",
@@ -1964,7 +1964,7 @@ export async function topBookedAssetsReport(
       topBookedAsset,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Top Booked Assets report",
@@ -2301,7 +2301,7 @@ export async function assetDistributionReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Asset Distribution report",
@@ -2558,7 +2558,7 @@ export async function assetInventoryReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Asset Inventory report",
@@ -2937,7 +2937,7 @@ export async function monthlyBookingTrendsReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Monthly Booking Trends report",
@@ -3167,7 +3167,7 @@ export async function assetUtilizationReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Asset Utilization report",
@@ -3406,7 +3406,7 @@ export async function assetActivityReport(
       pageSize,
     };
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       label: "Report",
       message: "Failed to generate Asset Activity Summary report",

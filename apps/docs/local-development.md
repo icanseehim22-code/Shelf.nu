@@ -1,6 +1,6 @@
 # Local Development Guide 💻
 
-This guide covers everything you need to know for developing Shelf.nu locally after completing the [Supabase Setup](./supabase-setup.md).
+This guide covers everything you need to know for developing EstoqueSoftSystem locally after completing the [Supabase Setup](./supabase-setup.md).
 
 ## Prerequisites ✅
 
@@ -14,7 +14,7 @@ This guide covers everything you need to know for developing Shelf.nu locally af
 
 ## Monorepo Overview 📦
 
-Shelf.nu is organized as a **pnpm + Turborepo monorepo**. All commands use `pnpm` instead of `npm`.
+EstoqueSoftSystem is organized as a **pnpm + Turborepo monorepo**. All commands use `pnpm` instead of `npm`.
 
 | Package                    | Path                  | Description                            |
 | -------------------------- | --------------------- | -------------------------------------- |
@@ -64,7 +64,7 @@ pnpm install
 
 ### 2. Setup Local SSL (Optional but Recommended) 🔒
 
-Shelf is configured to use HTTPS locally for a better development experience. You can set this up using `mkcert`:
+EstoqueSoftSystem is configured to use HTTPS locally for a better development experience. You can set this up using `mkcert`:
 
 #### Install mkcert
 
@@ -128,7 +128,7 @@ pnpm webapp:dev
 
 ## Technology Stack 🛠️
 
-Understanding Shelf's tech stack will help you develop effectively:
+Understanding EstoqueSoftSystem's tech stack will help you develop effectively:
 
 ### Core Framework
 

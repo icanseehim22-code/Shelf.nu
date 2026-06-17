@@ -31,7 +31,10 @@ import { updateUserTierId } from "~/modules/tier/service.server";
 import { softDeleteUser, getUserByID } from "~/modules/user/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -153,7 +156,7 @@ export const loader = async ({ context, params }: LoaderFunctionArgs) => {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Failed to load user organizations",
           additionalData: { userId, shelfUserId },
@@ -222,7 +225,7 @@ export const loader = async ({ context, params }: LoaderFunctionArgs) => {
       premiumIsEnabled,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, shelfUserId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, shelfUserId });
     throw data(error(reason), { status: reason.status });
   }
 };
@@ -400,7 +403,7 @@ export const action = async ({
 
     return payload(null);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, shelfUserId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, shelfUserId });
     return data(error(reason), { status: reason.status });
   }
 };

@@ -1,6 +1,6 @@
 import { describe, expect, it, vitest, beforeEach } from "vitest";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { parseQrCodesFromImportData } from "./service.server";
 
 // why: parseQrCodesFromImportData reads QR rows from the database to detect
@@ -19,7 +19,7 @@ const userId = "user-1";
 const organizationId = "org-1";
 
 /**
- * Runs parseQrCodesFromImportData and returns the thrown ShelfError, failing
+ * Runs parseQrCodesFromImportData and returns the thrown EstoqueSoftSystemError, failing
  * the test if it unexpectedly resolves.
  */
 async function captureThrow(
@@ -29,8 +29,8 @@ async function captureThrow(
     await parseQrCodesFromImportData({ data, userId, organizationId });
     throw new Error("expected parseQrCodesFromImportData to throw");
   } catch (err) {
-    expect(err).toBeInstanceOf(ShelfError);
-    return err as ShelfError;
+    expect(err).toBeInstanceOf(EstoqueSoftSystemError);
+    return err as EstoqueSoftSystemError;
   }
 }
 

@@ -4,7 +4,10 @@ import type { LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { db } from "~/database/db.server";
 import { getQr } from "~/modules/qr/service.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -113,7 +116,7 @@ export async function loader({ request, params, context }: LoaderFunctionArgs) {
       });
 
       if (!asset) {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause: null,
           message:
             "This SAM ID doesn't exist or it doesn't belong to your current organization.",
@@ -184,7 +187,7 @@ export async function loader({ request, params, context }: LoaderFunctionArgs) {
     });
 
     if (qr.organizationId !== organizationId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "This code doesn't exist or it doesn't belong to your current organization.",
@@ -195,7 +198,7 @@ export async function loader({ request, params, context }: LoaderFunctionArgs) {
     }
 
     if (!qr.assetId && !qr.kitId) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "QR code is not linked to any asset or kit",
         additionalData: { qrId, shouldSendNotification: false },
@@ -254,7 +257,7 @@ export async function loader({ request, params, context }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     const sendNotification = reason.additionalData?.shouldSendNotification;
     const shouldSendNotification =
       typeof sendNotification === "boolean" && sendNotification;

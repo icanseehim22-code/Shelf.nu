@@ -2,7 +2,7 @@ import { init } from "@paralleldrive/cuid2";
 import { hasNumber } from ".";
 import { DEFAULT_CUID_LENGTH } from "../constants";
 import { FINGERPRINT } from "../env";
-import { ShelfError } from "../error";
+import { EstoqueSoftSystemError } from "../error";
 import { Logger } from "../logger";
 
 /**
@@ -14,7 +14,7 @@ export function id(length?: number) {
   try {
     if (length && length < 7) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: "Id is too short",
           additionalData: { length },
@@ -56,7 +56,7 @@ export function id(length?: number) {
     }
     return generatedId;
   } catch (cause) {
-    const e = new ShelfError({
+    const e = new EstoqueSoftSystemError({
       cause,
       message: "Id generation failed",
       label: "DB",

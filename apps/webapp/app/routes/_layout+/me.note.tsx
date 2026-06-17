@@ -20,7 +20,11 @@ import {
   deleteTeamMemberNote,
 } from "~/modules/team-member-note/service.server";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError, notAllowedMethod, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  notAllowedMethod,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import {
   payload,
   error,
@@ -124,7 +128,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       }
     }
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }
@@ -136,7 +140,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
  * @param args.userId - The authenticated user's ID
  * @param args.organizationId - The current workspace
  * @returns The TeamMember ID
- * @throws {ShelfError} 404 if no active TeamMember exists
+ * @throws {EstoqueSoftSystemError} 404 if no active TeamMember exists
  */
 async function resolveOwnTeamMember({
   userId,
@@ -151,7 +155,7 @@ async function resolveOwnTeamMember({
   });
 
   if (!teamMember) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message: "You are not a member of this workspace",
       status: 404,

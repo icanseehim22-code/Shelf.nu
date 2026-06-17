@@ -1,6 +1,6 @@
 # Tracking & Analytics Scripts
 
-Shelf supports several optional tracking and analytics integrations. Most of them follow the same pattern: set an environment variable with the service token/ID, and the script loads automatically on page load. Some UI-based tools (for example, the Crisp chat widget) are still configured via environment variable but only activate in response to user interaction. In all cases, if the required variable is not set, no script is injected — keeping the app lightweight for self-hosted instances.
+EstoqueSoftSystem supports several optional tracking and analytics integrations. Most of them follow the same pattern: set an environment variable with the service token/ID, and the script loads automatically on page load. Some UI-based tools (for example, the Crisp chat widget) are still configured via environment variable but only activate in response to user interaction. In all cases, if the required variable is not set, no script is injected — keeping the app lightweight for self-hosted instances.
 
 This approach keeps tokens out of the open-source codebase while allowing each deployment to configure its own analytics or support tooling.
 
@@ -56,7 +56,7 @@ MICROSOFT_CLARITY_ID="your-clarity-project-id"
 
 ### Crisp Chat
 
-Live chat widget for customer support. Shelf configures it with the logged-in user's name and email so support agents have context.
+Live chat widget for customer support. EstoqueSoftSystem configures it with the logged-in user's name and email so support agents have context.
 
 **Environment variable:** `CRISP_WEBSITE_ID`
 
@@ -76,7 +76,7 @@ CRISP_WEBSITE_ID="your-crisp-website-id"
 
 ### Sentry
 
-Error tracking and performance monitoring. Shelf includes a tunnel endpoint (`/api/sentry-tunnel`) that proxies Sentry events through the app's own domain, avoiding ad-blocker interference.
+Error tracking and performance monitoring. EstoqueSoftSystem includes a tunnel endpoint (`/api/sentry-tunnel`) that proxies Sentry events through the app's own domain, avoiding ad-blocker interference.
 
 **Environment variables:**
 

@@ -2,7 +2,7 @@ import { data, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { getAsset } from "~/modules/asset/service.server";
 import { generateQrObj } from "~/modules/qr/utils.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -59,7 +59,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
       })
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, assetId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, assetId });
     return data(error(reason), { status: reason.status });
   }
 }

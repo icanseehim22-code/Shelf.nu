@@ -1,7 +1,7 @@
 /**
  * Cross-Org Ownership Guards
  *
- * Shelf is multi-tenant: every domain entity (asset, tag, team member, …) is
+ * EstoqueSoftSystem is multi-tenant: every domain entity (asset, tag, team member, …) is
  * scoped to an `organizationId`. Whenever a mutation links or reads entities by
  * an ID that originated from request/form input, the server MUST prove those
  * IDs belong to the caller's organization — otherwise an attacker in Org A can
@@ -10,7 +10,7 @@
  * These guards centralize that check so every link/connect path uses the exact
  * same, tested logic instead of re-implementing (and occasionally forgetting)
  * the `where: { id: { in }, organizationId }` count-compare. They throw a 400
- * `ShelfError` on any mismatch — we deliberately do NOT silently drop foreign
+ * `EstoqueSoftSystemError` on any mismatch — we deliberately do NOT silently drop foreign
  * IDs, because that hides attacks and corrupts the user's intended action.
  *
  * Each guard is transaction-aware: pass the active `tx` so the validation runs
@@ -30,7 +30,7 @@ import type {
   User,
 } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label = "Request validation";
 
@@ -104,7 +104,7 @@ export type OrgValidationTxClient = {
  * @param params.assetIds - Asset IDs sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if any ID is missing or belongs to another org
+ * @throws {EstoqueSoftSystemError} 400 if any ID is missing or belongs to another org
  */
 export async function assertAssetsBelongToOrg(
   {
@@ -124,7 +124,7 @@ export async function assertAssetsBelongToOrg(
   });
 
   if (found.length !== uniqueIds.length) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Invalid assets",
       message:
@@ -148,7 +148,7 @@ export async function assertAssetsBelongToOrg(
  * @param params.locationIds - Location IDs sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if any ID is missing or belongs to another org
+ * @throws {EstoqueSoftSystemError} 400 if any ID is missing or belongs to another org
  */
 export async function assertLocationsBelongToOrg(
   {
@@ -168,7 +168,7 @@ export async function assertLocationsBelongToOrg(
   });
 
   if (found.length !== uniqueIds.length) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Invalid locations",
       message:
@@ -191,7 +191,7 @@ export async function assertLocationsBelongToOrg(
  * @param params.kitIds - Kit IDs sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if any ID is missing or belongs to another org
+ * @throws {EstoqueSoftSystemError} 400 if any ID is missing or belongs to another org
  */
 export async function assertKitsBelongToOrg(
   { kitIds, organizationId }: { kitIds: Kit["id"][]; organizationId: string },
@@ -208,7 +208,7 @@ export async function assertKitsBelongToOrg(
   });
 
   if (found.length !== uniqueIds.length) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Invalid kits",
       message:
@@ -234,7 +234,7 @@ export async function assertKitsBelongToOrg(
  * @param params.customFieldIds - Custom-field IDs sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if any ID is missing or belongs to another org
+ * @throws {EstoqueSoftSystemError} 400 if any ID is missing or belongs to another org
  */
 export async function assertCustomFieldsBelongToOrg(
   {
@@ -254,7 +254,7 @@ export async function assertCustomFieldsBelongToOrg(
   });
 
   if (found.length !== uniqueIds.length) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Invalid custom fields",
       message:
@@ -273,7 +273,7 @@ export async function assertCustomFieldsBelongToOrg(
  * @param params.tagIds - Tag IDs sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if any ID is missing or belongs to another org
+ * @throws {EstoqueSoftSystemError} 400 if any ID is missing or belongs to another org
  */
 export async function assertTagsBelongToOrg(
   { tagIds, organizationId }: { tagIds: Tag["id"][]; organizationId: string },
@@ -290,7 +290,7 @@ export async function assertTagsBelongToOrg(
   });
 
   if (found.length !== uniqueIds.length) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Invalid tags",
       message:
@@ -309,7 +309,7 @@ export async function assertTagsBelongToOrg(
  * @param params.teamMemberId - Team member ID sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if the team member is missing or in another org
+ * @throws {EstoqueSoftSystemError} 400 if the team member is missing or in another org
  */
 export async function assertTeamMemberBelongsToOrg(
   {
@@ -326,7 +326,7 @@ export async function assertTeamMemberBelongsToOrg(
   });
 
   if (!found) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Team member not found",
       message: "The selected team member could not be found in your workspace.",
@@ -344,7 +344,7 @@ export async function assertTeamMemberBelongsToOrg(
  * @param params.categoryId - Category ID sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if the category is missing or in another org
+ * @throws {EstoqueSoftSystemError} 400 if the category is missing or in another org
  */
 export async function assertCategoryBelongsToOrg(
   {
@@ -361,7 +361,7 @@ export async function assertCategoryBelongsToOrg(
   });
 
   if (!found) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Invalid category",
       message:
@@ -380,7 +380,7 @@ export async function assertCategoryBelongsToOrg(
  * @param params.locationId - Location ID sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if the location is missing or in another org
+ * @throws {EstoqueSoftSystemError} 400 if the location is missing or in another org
  */
 export async function assertLocationBelongsToOrg(
   {
@@ -397,7 +397,7 @@ export async function assertLocationBelongsToOrg(
   });
 
   if (!found) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Invalid location",
       message:
@@ -421,7 +421,7 @@ export async function assertLocationBelongsToOrg(
  * @param params.userId - User ID sourced from request/form input
  * @param params.organizationId - The caller's (validated) organization ID
  * @param tx - Optional Prisma transaction client; defaults to the global `db`
- * @throws {ShelfError} 400 if the user is not a member of the organization
+ * @throws {EstoqueSoftSystemError} 400 if the user is not a member of the organization
  */
 export async function assertUserBelongsToOrg(
   { userId, organizationId }: { userId: User["id"]; organizationId: string },
@@ -435,7 +435,7 @@ export async function assertUserBelongsToOrg(
   });
 
   if (!found) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       title: "Invalid custodian",
       message:

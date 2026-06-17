@@ -5,7 +5,7 @@ import type { BarcodeType } from "@prisma/client";
 
 import type { Filter } from "~/components/assets/assets-index/advanced-filters/schema";
 import { normalizeBarcodeValue } from "~/modules/barcode/validation";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { isSafeSqlIdentifier } from "~/utils/sql";
 import { parseFilters } from "./filter-parsing";
@@ -1429,14 +1429,14 @@ const VALID_DIRECTIONS = new Set<"asc" | "desc">(["asc", "desc"]);
  * - Missing or empty direction → defaults to "asc" (legacy URL pattern:
  *   `?sortBy=name`).
  * - Recognized direction (any case) → normalized to lowercase.
- * - Anything else → throws `ShelfError` (HTTP 400). Surfacing the bad
+ * - Anything else → throws `EstoqueSoftSystemError` (HTTP 400). Surfacing the bad
  *   input is preferred over silently sorting ascending, both for UX
  *   clarity and because invalid direction is the primary signal that
  *   someone is poking at the sort param.
  *
  * @param raw - The raw direction string from the URL.
  * @returns A safe lowercase direction.
- * @throws {ShelfError} When `raw` is non-empty and not a recognized direction.
+ * @throws {EstoqueSoftSystemError} When `raw` is non-empty and not a recognized direction.
  */
 function normalizeDirection(raw: string | undefined): "asc" | "desc" {
   if (raw === undefined || raw === "") return "asc";
@@ -1444,7 +1444,7 @@ function normalizeDirection(raw: string | undefined): "asc" | "desc" {
   if (VALID_DIRECTIONS.has(lowered as "asc" | "desc")) {
     return lowered as "asc" | "desc";
   }
-  throw new ShelfError({
+  throw new EstoqueSoftSystemError({
     cause: null,
     message: `Invalid sort direction: "${raw}". Must be "asc" or "desc".`,
     title: "Invalid sort direction",
@@ -1533,7 +1533,7 @@ export function parseSortingOptions(sortBy: string[]): {
       const barcodeType = field.name.slice("barcode_".length);
       if (!isSafeSqlIdentifier(barcodeType)) {
         Logger.warn(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause: null,
             message: "Skipping sort term: unsafe barcode field name",
             additionalData: { fieldName: field.name },
@@ -1554,7 +1554,7 @@ export function parseSortingOptions(sortBy: string[]): {
       // that isn't a safe identifier.
       if (!isSafeSqlIdentifier(alias)) {
         Logger.warn(
-          new ShelfError({
+          new EstoqueSoftSystemError({
             cause: null,
             message: "Skipping sort term: unsafe custom field name",
             additionalData: { fieldName: field.name, alias },
@@ -1583,7 +1583,7 @@ export function parseSortingOptions(sortBy: string[]): {
       }
     } else {
       Logger.warn(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: "Skipping sort term: unknown field",
           additionalData: { fieldName: field.name },
@@ -1632,7 +1632,7 @@ function isTextColumn(fieldName: string): boolean {
  * check should never throw in practice. It exists to keep the function
  * safe under future refactors or alternate callers.
  *
- * @throws {ShelfError} If any alias fails identifier validation.
+ * @throws {EstoqueSoftSystemError} If any alias fails identifier validation.
  */
 export function generateCustomFieldSelect(
   customFieldSortings: CustomFieldSorting[]
@@ -1641,7 +1641,7 @@ export function generateCustomFieldSelect(
 
   for (const cf of customFieldSortings) {
     if (!isSafeSqlIdentifier(cf.alias)) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Invalid custom field alias for SQL select",
         additionalData: { alias: cf.alias },

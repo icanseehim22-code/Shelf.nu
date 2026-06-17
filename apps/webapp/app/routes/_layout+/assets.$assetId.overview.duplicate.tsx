@@ -21,7 +21,7 @@ import styles from "~/styles/layout/custom-modal.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { MAX_DUPLICATES_ALLOWED } from "~/utils/constants";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { getValidationErrors } from "~/utils/http";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
@@ -64,7 +64,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       asset,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, assetId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, assetId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -127,7 +127,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       `/assets/${amountOfDuplicates > 1 ? "" : duplicatedAssets[0].id}`
     );
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, assetId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, assetId });
     return data(error(reason), { status: reason.status });
   }
 }

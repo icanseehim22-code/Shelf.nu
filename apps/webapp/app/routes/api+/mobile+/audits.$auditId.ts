@@ -9,7 +9,7 @@ import {
   getAuditSessionDetails,
   getAuditScans,
 } from "~/modules/audit/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { getParams } from "~/utils/http.server";
 
 /**
@@ -122,7 +122,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       canComplete: canCompleteAudit,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { extractStoragePath } from "~/components/assets/asset-image/utils";
 import { db } from "~/database/db.server";
 import { getSupabaseAdmin } from "~/integrations/supabase/client";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { payload, parseData } from "~/utils/http.server";
 import { Logger } from "~/utils/logger";
 import { oneDayFromNow } from "~/utils/one-week-from-now";
@@ -51,7 +51,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     // If asset doesn't exist, return early with error information
     if (!asset) {
       Logger.warn(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: `Asset not found for thumbnail generation: ${assetId}`,
           additionalData: { assetId, userId },
@@ -97,7 +97,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
           return data(payload({ asset: updatedAsset }));
         } catch (error) {
           Logger.error(
-            new ShelfError({
+            new EstoqueSoftSystemError({
               cause: error,
               message: `Failed to refresh thumbnail URL for asset ${assetId}`,
               additionalData: { assetId, thumbnailPath, userId },
@@ -214,7 +214,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
     if (!existsCheck) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: `Asset was deleted during thumbnail generation: ${assetId}`,
           additionalData: { assetId, userId },
@@ -266,7 +266,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     }
 
     // If everything fails, log the error and return a response with error information
-    const reason = new ShelfError({
+    const reason = new EstoqueSoftSystemError({
       cause,
       message: "Error generating thumbnail.",
       label: "Assets",

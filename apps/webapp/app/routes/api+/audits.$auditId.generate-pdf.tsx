@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { AuditPdfDbResult } from "~/modules/audit/pdf-helpers";
 import { fetchAllAuditPdfRelatedData } from "~/modules/audit/pdf-helpers";
 import { getDateTimeFormat } from "~/utils/client-hints";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, error, getParams } from "~/utils/http.server";
 import { sanitizeNoteContent } from "~/utils/note-sanitizer.server";
 import {
@@ -85,7 +85,7 @@ export const loader = async ({
     return data(payload({ pdfMeta }));
   } catch (cause) {
     // Handle errors and return appropriate HTTP status
-    const reason = makeShelfError(cause, { userId, auditId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, auditId });
     throw data(error(reason), { status: reason.status });
   }
 };

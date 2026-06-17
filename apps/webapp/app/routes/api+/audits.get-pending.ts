@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import { data } from "react-router";
 
 import { getPendingAuditsForOrganization } from "~/modules/audit/service.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { error, payload } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -25,7 +25,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
     return data(payload({ audits }));
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

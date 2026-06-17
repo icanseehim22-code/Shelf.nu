@@ -1,6 +1,6 @@
 # Database Triggers
 
-This document contains information about all PostgreSQL triggers used in Shelf.nu. Triggers are database-level functions that automatically execute in response to certain events (like INSERT, UPDATE, DELETE) on specific tables.
+This document contains information about all PostgreSQL triggers used in EstoqueSoftSystem. Triggers are database-level functions that automatically execute in response to certain events (like INSERT, UPDATE, DELETE) on specific tables.
 
 ## Why We Use Triggers
 

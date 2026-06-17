@@ -4,7 +4,7 @@ import { db } from "~/database/db.server";
 import { getKitsWhereInput } from "~/modules/kit/utils.server";
 import { getLocationDescendantIds } from "~/modules/location/descendants.server";
 import { getLocationsWhereInput } from "~/modules/location/utils.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 import { ALL_SELECTED_KEY } from "~/utils/list";
 import {
   assertKitsBelongToOrg,
@@ -74,7 +74,7 @@ export async function resolveAssetIdsForAudit({
 
     // Ensure there are assets to audit
     if (assetIds.length === 0) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: `No assets found in ${contextType} "${
           contextName || contextId
@@ -89,7 +89,7 @@ export async function resolveAssetIdsForAudit({
   }
 
   // This shouldn't happen due to schema validation, but handle it anyway
-  throw new ShelfError({
+  throw new EstoqueSoftSystemError({
     cause: null,
     message: "Either assetIds or context parameters must be provided",
     status: 400,
@@ -232,7 +232,7 @@ export async function getAssetsForUserContext({
  * @param locationIds - Selected location IDs (may contain ALL_SELECTED_KEY)
  * @param currentSearchParams - Serialized Locations-list search params (for select-all)
  * @returns Asset IDs across the selected locations
- * @throws {ShelfError} 400 if none of the selected locations contain assets
+ * @throws {EstoqueSoftSystemError} 400 if none of the selected locations contain assets
  */
 export async function resolveAssetIdsForLocationSelection({
   organizationId,
@@ -272,7 +272,7 @@ export async function resolveAssetIdsForLocationSelection({
   });
 
   if (assets.length === 0) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "None of the selected locations contain assets. Add assets before starting an audit.",
@@ -305,7 +305,7 @@ export async function resolveAssetIdsForLocationSelection({
  * @param kitIds - Selected kit IDs (may contain ALL_SELECTED_KEY)
  * @param currentSearchParams - Serialized Kits-list search params (for select-all)
  * @returns Asset IDs across the selected kits
- * @throws {ShelfError} 400 if none of the selected kits contain assets
+ * @throws {EstoqueSoftSystemError} 400 if none of the selected kits contain assets
  */
 export async function resolveAssetIdsForKitSelection({
   organizationId,
@@ -345,7 +345,7 @@ export async function resolveAssetIdsForKitSelection({
   });
 
   if (assets.length === 0) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause: null,
       message:
         "None of the selected kits contain assets. Add assets before starting an audit.",

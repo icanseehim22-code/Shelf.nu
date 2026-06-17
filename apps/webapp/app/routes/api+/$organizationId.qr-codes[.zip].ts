@@ -1,7 +1,10 @@
 import { data, type LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 import { db } from "~/database/db.server";
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { error, getParams } from "~/utils/http.server";
 import { requireAdmin } from "~/utils/roles.server";
 import { createQrCodesZip } from "~/utils/zip-qr-codes";
@@ -46,7 +49,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         },
       })
       .catch((cause) => {
-        throw new ShelfError({
+        throw new EstoqueSoftSystemError({
           cause,
           message: "Something went wrong fetching the QR codes.",
           additionalData: { userId, organizationId },
@@ -60,7 +63,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       headers: { "content-type": "application/zip" },
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId });
     return data(error(reason), { status: reason.status });
   }
 }

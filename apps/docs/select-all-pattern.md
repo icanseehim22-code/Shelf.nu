@@ -1,6 +1,6 @@
 # Select All Pattern
 
-This guide documents the "Select All" pattern used in Shelf.nu for bulk operations across multiple pages of filtered data.
+This guide documents the "Select All" pattern used in EstoqueSoftSystem for bulk operations across multiple pages of filtered data.
 
 ## Overview
 
@@ -57,7 +57,7 @@ Every bulk operation using `ALL_SELECTED_KEY` follows this pattern:
 
 ### Important: Simple vs Advanced Mode
 
-Shelf has two index modes that require different filtering approaches:
+EstoqueSoftSystem has two index modes that require different filtering approaches:
 
 - **Simple Mode**: Uses Prisma where clauses (`Prisma.AssetWhereInput`)
 - **Advanced Mode**: Uses raw SQL queries with filter parsing
@@ -216,7 +216,7 @@ export async function bulkMarkAvailability({
 
     return true;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update asset availability",
       additionalData: { assetIds, organizationId, type },

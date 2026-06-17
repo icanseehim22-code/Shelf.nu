@@ -18,8 +18,8 @@ vi.mock("~/utils/logger", () => ({
 
 // why: env vars are read at import time; shelf.config.ts also imports from this module
 vi.mock("~/utils/env", () => ({
-  SERVER_URL: "https://app.shelf.nu",
-  SUPPORT_EMAIL: "support@shelf.nu",
+  SERVER_URL: "https://app.estoquesoftsystem.com",
+  SUPPORT_EMAIL: "support@estoquesoftsystem.com",
   SEND_ONBOARDING_EMAIL: false,
   ENABLE_PREMIUM_FEATURES: false,
   FREE_TRIAL_DAYS: "7",

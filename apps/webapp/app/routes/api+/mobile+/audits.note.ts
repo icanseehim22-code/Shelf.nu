@@ -10,7 +10,7 @@ import {
 import { requireAuditAssetInSession } from "~/modules/audit/mobile-evidence.server";
 import { stripMarkdocDelimiters } from "~/modules/audit/note-content.server";
 import { NOTE_MAX_CONTENT_LENGTH } from "~/utils/constants";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import {
   PermissionAction,
   PermissionEntity,
@@ -32,7 +32,7 @@ import {
  * @param args - Remix action args; `request` carries the bearer auth
  *   header, the `orgId` query param, and the JSON body
  * @returns JSON `{ note }` on success, else `{ error: { message } }` 4xx
- * @throws Never — failures are caught and returned via `makeShelfError`
+ * @throws Never — failures are caught and returned via `makeEstoqueSoftSystemError`
  */
 export async function action({ request }: ActionFunctionArgs) {
   try {
@@ -136,7 +136,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return data({ note });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

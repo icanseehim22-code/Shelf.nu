@@ -19,7 +19,7 @@ import { getTeamMember } from "~/modules/team-member/service.server";
 import styles from "~/styles/layout/custom-modal.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { payload, error, getParams, parseData } from "~/utils/http.server";
 import {
@@ -49,7 +49,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
 
     return payload({ showModal: true, teamMember });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, nrmId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, nrmId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -87,7 +87,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
 
     return redirect("/settings/team/nrm");
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, nrmId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, nrmId });
     return data(error(reason), { status: reason.status });
   }
 }

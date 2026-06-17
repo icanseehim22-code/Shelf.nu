@@ -1,4 +1,4 @@
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 
 /**
  * Per-user rate limit for mobile API handlers. Used as a second tier on top
@@ -70,7 +70,7 @@ export async function enforceUserRateLimit(
     const key = `mobile:user:${userId}:${bucket}:${config.windowMs}`;
     const result = check(key, config, now);
     if (!result.allowed) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message: "Too many requests. Please try again later.",
         additionalData: { userId, bucket, retryAfterSec: result.retryAfterSec },

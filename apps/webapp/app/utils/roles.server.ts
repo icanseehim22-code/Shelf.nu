@@ -3,7 +3,7 @@ import { OrganizationRoles, Roles } from "@prisma/client";
 import * as Sentry from "@sentry/react-router";
 import { db } from "~/database/db.server";
 import { getSelectedOrganization } from "~/modules/organization/context.server";
-import { ShelfError } from "./error";
+import { EstoqueSoftSystemError } from "./error";
 import type {
   PermissionAction,
   PermissionEntity,
@@ -17,7 +17,7 @@ export async function requireUserWithPermission(name: Roles, userId: string) {
       select: { id: true },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "You do not have permission to access this resource",
       additionalData: { userId, name },

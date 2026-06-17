@@ -27,7 +27,10 @@ import scannerCss from "~/styles/scanner.css?url";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { canUserManageBookingAssets } from "~/utils/bookings";
 
-import { makeShelfError, ShelfError } from "~/utils/error";
+import {
+  makeEstoqueSoftSystemError,
+  EstoqueSoftSystemError,
+} from "~/utils/error";
 import { isFormProcessing } from "~/utils/form";
 import { assertIsPost, payload, error, getParams } from "~/utils/http.server";
 import {
@@ -82,7 +85,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
         : canUserManageBookingAssets(booking, isSelfService);
 
     if (!canCheckin) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         message:
           "You cannot check in assets for this booking at the moment. The booking may not be ongoing or you may not have permission to manage its assets.",
@@ -126,7 +129,7 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
       partialCheckinDetails,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     throw data(error(reason), { status: reason.status });
   }
 }
@@ -158,7 +161,7 @@ export async function action({ context, request, params }: ActionFunctionArgs) {
       authSession,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, bookingId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, bookingId });
     return data(error(reason), { status: reason.status });
   }
 }

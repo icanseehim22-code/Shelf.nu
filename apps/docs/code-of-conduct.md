@@ -1,6 +1,6 @@
 ---
 title: Code of Conduct
-description: Community guidelines and standards for Shelf.nu
+description: Community guidelines and standards for EstoqueSoftSystem
 ---
 
 # Contributor Covenant Code of Conduct

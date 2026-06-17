@@ -18,7 +18,7 @@ import {
   requireOrganizationAccess,
 } from "~/modules/api/mobile-auth.server";
 import { UNCATEGORIZED_SENTINEL } from "~/modules/api/mobile-custom-fields.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 
 /**
  * GET /api/mobile/custom-fields?orgId=X&categoryId=Y
@@ -95,7 +95,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       })),
     });
   } catch (cause) {
-    const reason = makeShelfError(cause);
+    const reason = makeEstoqueSoftSystemError(cause);
     return data(
       { error: { message: reason.message } },
       { status: reason.status }

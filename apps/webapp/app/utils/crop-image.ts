@@ -1,5 +1,5 @@
 import type { ResizeOptions } from "sharp";
-import { isLikeShelfError, ShelfError } from "./error";
+import { isLikeEstoqueSoftSystemError, EstoqueSoftSystemError } from "./error";
 import { detectImageFormat } from "./image-format.server";
 
 export const cropImage = async (
@@ -16,7 +16,7 @@ export const cropImage = async (
     const detectedFormat = detectImageFormat(buffer);
 
     if (!detectedFormat) {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause: null,
         title: "Unsupported image format",
         message:
@@ -42,11 +42,11 @@ export const cropImage = async (
       .webp({ quality: 80 })
       .toBuffer();
   } catch (cause) {
-    if (isLikeShelfError(cause)) {
+    if (isLikeEstoqueSoftSystemError(cause)) {
       throw cause;
     }
 
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message:
         "Something went wrong while cropping the image. Please try again. If the issue persists contact support.",

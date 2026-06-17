@@ -5,7 +5,7 @@ import { db } from "~/database/db.server";
 import { bookingUpdatesTemplateString } from "~/emails/bookings-updates-template";
 import { sendEmail } from "~/emails/mail.server";
 import { getTimeRemainingMessage } from "~/utils/date-fns";
-import { isNotFoundError, ShelfError } from "~/utils/error";
+import { isNotFoundError, EstoqueSoftSystemError } from "~/utils/error";
 import { Logger } from "~/utils/logger";
 import { wrapBookingStatusForNote } from "~/utils/markdoc-wrappers";
 import { QueueNames, scheduler } from "~/utils/scheduler.server";
@@ -35,7 +35,7 @@ const checkoutReminder = async ({ data }: PgBoss.Job<SchedulerData>) => {
       include: BOOKING_INCLUDE_FOR_EMAIL,
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Booking not found",
         additionalData: { data, work: data.eventType },
@@ -59,7 +59,7 @@ const checkoutReminder = async ({ data }: PgBoss.Job<SchedulerData>) => {
         resolveUserDisplayName(booking.custodianUser) ||
         (booking.custodianTeamMember?.name as string);
 
-      const subject = `🔔 Checkout reminder (${booking.name}) - shelf.nu`;
+      const subject = `🔔 Checkout reminder (${booking.name}) - estoquesoftsystem.com`;
 
       const text = checkoutReminderEmailContent({
         bookingName: booking.name,
@@ -104,7 +104,7 @@ const checkinReminder = async ({ data }: PgBoss.Job<SchedulerData>) => {
       include: BOOKING_INCLUDE_FOR_EMAIL,
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Booking not found",
         additionalData: { data, work: data.eventType },
@@ -150,7 +150,7 @@ const overdueHandler = async ({ data }: PgBoss.Job<SchedulerData>) => {
       include: BOOKING_INCLUDE_FOR_EMAIL,
     })
     .catch((cause) => {
-      throw new ShelfError({
+      throw new EstoqueSoftSystemError({
         cause,
         message: "Booking update failed",
         additionalData: { data, work: data.eventType },
@@ -196,7 +196,7 @@ const overdueHandler = async ({ data }: PgBoss.Job<SchedulerData>) => {
       resolveUserDisplayName(booking.custodianUser) ||
       (booking.custodianTeamMember?.name as string);
 
-    const subject = `⚠️ Overdue booking (${booking.name}) - shelf.nu`;
+    const subject = `⚠️ Overdue booking (${booking.name}) - estoquesoftsystem.com`;
 
     const text = overdueBookingEmailContent({
       bookingName: booking.name,
@@ -305,7 +305,7 @@ const autoArchiveHandler = async ({ data }: PgBoss.Job<SchedulerData>) => {
     Logger.info(`Auto-archived booking ${booking.id}`);
   } catch (cause) {
     Logger.error(
-      new ShelfError({
+      new EstoqueSoftSystemError({
         cause,
         message: "Failed to auto-archive booking",
         additionalData: { bookingId: data.id },
@@ -332,7 +332,7 @@ export const registerBookingWorkers = async () => {
     const handler = event2HandlerMap[job.data.eventType];
     if (typeof handler != "function") {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause: null,
           message: "Wrong event type received for the scheduled worker",
           additionalData: { job },
@@ -345,7 +345,7 @@ export const registerBookingWorkers = async () => {
       await handler(job);
     } catch (cause) {
       Logger.error(
-        new ShelfError({
+        new EstoqueSoftSystemError({
           cause,
           message: "Something went wrong while executing scheduled work.",
           additionalData: { data: job.data, work: job.data.eventType },

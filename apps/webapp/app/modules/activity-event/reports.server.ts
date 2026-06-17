@@ -16,7 +16,7 @@ import type { ActivityAction } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 import type { ActorSnapshot } from "./types";
 
@@ -290,8 +290,8 @@ function wrap(
   cause: unknown,
   helper: string,
   additionalData: Record<string, unknown>
-): ShelfError {
-  return new ShelfError({
+): EstoqueSoftSystemError {
+  return new EstoqueSoftSystemError({
     cause,
     label: "Activity",
     message: `Failed to run activity report: ${helper}`,

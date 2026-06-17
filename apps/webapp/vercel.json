@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "https://shelf-nu-rdug.onrender.com/$1"
+    }
+  ]
+}

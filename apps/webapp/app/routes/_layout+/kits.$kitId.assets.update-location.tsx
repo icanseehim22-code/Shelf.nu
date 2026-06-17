@@ -9,7 +9,7 @@ import { getLocationsForCreateAndEdit } from "~/modules/asset/service.server";
 import { getKit, updateKitLocation } from "~/modules/kit/service.server";
 import { appendToMetaTitle } from "~/utils/append-to-meta-title";
 import { sendNotification } from "~/utils/emitter/send-notification.server";
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { payload, getParams, parseData } from "~/utils/http.server";
 import {
   PermissionAction,
@@ -60,7 +60,7 @@ export async function loader({ params, request, context }: LoaderFunctionArgs) {
       totalLocations,
     });
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     throw reason;
   }
 }
@@ -97,7 +97,7 @@ export async function action({ params, request, context }: ActionFunctionArgs) {
 
     return redirect(`/kits/${kitId}/assets`);
   } catch (cause) {
-    const reason = makeShelfError(cause, { userId, kitId });
+    const reason = makeEstoqueSoftSystemError(cause, { userId, kitId });
     return reason;
   }
 }

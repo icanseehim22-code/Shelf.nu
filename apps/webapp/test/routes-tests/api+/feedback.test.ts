@@ -1,4 +1,4 @@
-import { makeShelfError } from "~/utils/error";
+import { makeEstoqueSoftSystemError } from "~/utils/error";
 import { action } from "~/routes/api+/feedback";
 import { createActionArgs } from "@mocks/remix";
 
@@ -48,7 +48,7 @@ vitest.mock("~/emails/feedback/feedback-email", () => ({
 }));
 
 vitest.mock("~/utils/error", () => ({
-  makeShelfError: vitest.fn(),
+  makeEstoqueSoftSystemError: vitest.fn(),
 }));
 
 import { parseFileFormData, getPublicFileURL } from "~/utils/storage.server";
@@ -170,7 +170,7 @@ describe("/api/feedback", () => {
         status: 400,
         message: "Please provide at least 10 characters",
       };
-      (makeShelfError as any).mockReturnValue(shelfError);
+      (makeEstoqueSoftSystemError as any).mockReturnValue(shelfError);
 
       const result = await action(
         createActionArgs({ request, context: mockContext })
@@ -189,7 +189,7 @@ describe("/api/feedback", () => {
       });
 
       const shelfError = { status: 405, message: "Method not allowed" };
-      (makeShelfError as any).mockReturnValue(shelfError);
+      (makeEstoqueSoftSystemError as any).mockReturnValue(shelfError);
 
       const result = await action(
         createActionArgs({ request, context: mockContext })

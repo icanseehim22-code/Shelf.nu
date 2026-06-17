@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "~/database/db.server";
-import { ShelfError } from "~/utils/error";
+import { EstoqueSoftSystemError } from "~/utils/error";
 
 const label = "Booking Settings";
 
@@ -61,7 +61,7 @@ export async function getBookingSettingsForOrganization(
 
     return bookingSettings;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to retrieve booking settings configuration",
       additionalData: { organizationId },
@@ -160,7 +160,7 @@ export async function updateBookingSettings({
 
     return bookingSettings;
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update booking settings configuration",
       additionalData: {
@@ -227,7 +227,7 @@ export async function getBookingNotificationSettingsForOrg(
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to retrieve booking notification settings",
       additionalData: { organizationId },
@@ -293,7 +293,7 @@ export async function updateAlwaysNotifyTeamMembers({
       },
     });
   } catch (cause) {
-    throw new ShelfError({
+    throw new EstoqueSoftSystemError({
       cause,
       message: "Failed to update always-notify team members",
       additionalData: { organizationId, teamMemberIds },

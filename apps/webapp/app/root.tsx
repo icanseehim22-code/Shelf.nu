@@ -60,7 +60,7 @@ export const links: LinksFunction = () => [
 
 export const meta: MetaFunction = () => [
   {
-    title: "shelf.nu",
+    title: "EstoqueSoftSystem",
   },
 ];
 
@@ -108,7 +108,7 @@ export function Layout({ children }: { children: ReactNode }) {
             meta, so a root-level descriptor would be dropped on the pages
             users actually visit. Placed in the shared document <head> it is
             present site-wide. Mobile Safari renders a native banner linking to
-            the Shelf Companion App Store listing (id6765639874), or "Open" if
+            the EstoqueSoftSystem Companion App Store listing (id6765639874), or "Open" if
             installed. Apple-hosted, zero-maintenance, no CLS, no cookie. */}
         <meta name="apple-itunes-app" content="app-id=6765639874" />
         <ClientHintCheck nonce={nonce} />
@@ -167,7 +167,7 @@ function App() {
         "Apologies, we’re down for scheduled maintenance. Please try again later."
       }
       cta={{
-        to: "https://www.shelf.nu/blog-categories/updates-maintenance",
+        to: "https://www.estoquesoftsystem.com/blog-categories/updates-maintenance",
         text: "Learn more",
       }}
       icon="tool"

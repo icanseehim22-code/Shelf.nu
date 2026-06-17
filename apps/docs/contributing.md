@@ -1,11 +1,11 @@
 ---
-title: Contributing to Shelf.nu
-description: How to contribute to the Shelf.nu project
+title: Contributing to EstoqueSoftSystem
+description: How to contribute to the EstoqueSoftSystem project
 ---
 
-# Contribute to Shelf
+# Contribute to EstoqueSoftSystem
 
-We really appreciate your interest to contribute to Shelf! Any kind of contribution is highly appreciated, not only coding ☺️.
+We really appreciate your interest to contribute to EstoqueSoftSystem! Any kind of contribution is highly appreciated, not only coding ☺️.
 Wondering what is up for grabs? Check out those issues: https://github.com/Shelf-nu/shelf.nu/labels/Open%20for%20contibutions
 
 **Prerequisites:** Node.js (>=22.20.0) and pnpm (9.15.4+) installed on your computer.
