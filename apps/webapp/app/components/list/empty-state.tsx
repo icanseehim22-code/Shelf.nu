@@ -62,7 +62,7 @@ export const EmptyState = ({
     if (!isFiltered) return null;
 
     if (hasSearch && hasActiveFilters) {
-      // Both search and filters active — single "Clear All" button
+      // Both search and filters active — single "Limpar tudo" button
       return (
         <Button
           type="button"

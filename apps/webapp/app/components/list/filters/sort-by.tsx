@@ -115,8 +115,8 @@ export function SortBy<T extends Record<string, string>>({
                 updateSearchParam("orderDirection", event.currentTarget.value)
               }
             >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
+              <option value="asc">Crescente</option>
+              <option value="desc">Decrescente</option>
             </select>
           </div>
         </PopoverContent>

@@ -219,8 +219,8 @@ export async function action({ context, request }: ActionFunctionArgs) {
         });
 
         sendNotification({
-          title: "Assets deleted",
-          message: "Your assets has been deleted successfully",
+          title: "Ativos excluídos",
+          message: "Seus ativos foram excluídos com sucesso",
           icon: { name: "success", variant: "success" },
           senderId: authSession.userId,
         });
@@ -365,10 +365,10 @@ export default function AssetIndexPage() {
       </Header>
       <AssetsList
         customEmptyStateContent={{
-          title: "No assets yet",
+          title: "Nenhum ativo ainda",
           text: "Assets are the core of your inventory. Create your first asset to start tracking equipment, devices, or anything your team manages.",
           newButtonRoute: "/assets/new",
-          newButtonContent: "Create your first asset",
+          newButtonContent: "Crie seu primeiro ativo",
         }}
       />
     </div>

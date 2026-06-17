@@ -79,7 +79,7 @@ export const SearchForm = ({ className }: { className?: string }) => {
             icon={disabled ? "spinner" : "x"}
             variant="tertiary"
             disabled={disabled}
-            title="Clear search"
+            title="Limpar busca"
             className="absolute right-3.5 top-1/2 !w-auto -translate-y-1/2 cursor-pointer border-0 p-0 text-gray-400 hover:text-gray-700"
             onClick={clearSearch}
           />

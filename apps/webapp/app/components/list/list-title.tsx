@@ -20,7 +20,7 @@ type ListTitleProps = {
   disableSelectAllItems?: boolean;
   /**
    *
-   * This function is used to retrieve the items to be added in bulk-items when "Select All" is clicked.
+   * This function is used to retrieve the items to be added in bulk-items when "Selecionar tudo" is clicked.
    * It is useful when the loader data structure is different from the default one.
    * For example, the loader data on booking page is structured as:
    *

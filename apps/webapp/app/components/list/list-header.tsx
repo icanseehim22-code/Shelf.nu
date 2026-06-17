@@ -147,7 +147,7 @@ function AdvancedModeDropdown() {
               name="intent"
               value="changeFreeze"
             >
-              {freezeColumn ? "Unfreeze column" : "Freeze column"}
+              {freezeColumn ? "Descongelar coluna" : "Congelar coluna"}
             </Button>
           </freezeFetcher.Form>
 
@@ -170,7 +170,7 @@ function AdvancedModeDropdown() {
               name="intent"
               value="changeShowImage"
             >
-              {showAssetImage ? "Hide asset image" : "Show asset image"}
+              {showAssetImage ? "Ocultar imagem do ativo" : "Mostrar imagem do ativo"}
             </Button>
           </showImageFetcher.Form>
         </PopoverContent>

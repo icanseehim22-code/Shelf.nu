@@ -45,7 +45,7 @@ vi.mock("@radix-ui/react-popover", () => ({
 describe("SortBy", () => {
   const defaultProps = {
     sortingOptions: {
-      createdAt: "Date created",
+      createdAt: "Data de criação",
       name: "Name",
       status: "Status",
     },
@@ -64,8 +64,8 @@ describe("SortBy", () => {
     it("displays current orderBy and orderDirection from URL params", () => {
       render(<SortBy {...defaultProps} />);
 
-      const orderBySelect = screen.getByDisplayValue("Date created");
-      const orderDirectionSelect = screen.getByDisplayValue("Descending");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
+      const orderDirectionSelect = screen.getByDisplayValue("Decrescente");
 
       expect(orderBySelect).toBeInTheDocument();
       expect(orderDirectionSelect).toBeInTheDocument();
@@ -77,8 +77,8 @@ describe("SortBy", () => {
 
       render(<SortBy {...defaultProps} />);
 
-      const orderBySelect = screen.getByDisplayValue("Date created");
-      const orderDirectionSelect = screen.getByDisplayValue("Descending");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
+      const orderDirectionSelect = screen.getByDisplayValue("Decrescente");
 
       expect(orderBySelect).toHaveValue("createdAt");
       expect(orderDirectionSelect).toHaveValue("desc");
@@ -89,7 +89,7 @@ describe("SortBy", () => {
 
       render(<SortBy {...defaultProps} />);
 
-      const orderBySelect = screen.getByDisplayValue("Date created");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
       expect(orderBySelect).toHaveValue("createdAt");
     });
 
@@ -98,7 +98,7 @@ describe("SortBy", () => {
 
       render(<SortBy {...defaultProps} />);
 
-      const orderDirectionSelect = screen.getByDisplayValue("Descending");
+      const orderDirectionSelect = screen.getByDisplayValue("Decrescente");
       expect(orderDirectionSelect).toHaveValue("desc");
     });
 
@@ -109,7 +109,7 @@ describe("SortBy", () => {
       render(<SortBy {...defaultProps} />);
 
       const orderBySelect = screen.getByDisplayValue("Name");
-      const orderDirectionSelect = screen.getByDisplayValue("Ascending");
+      const orderDirectionSelect = screen.getByDisplayValue("Crescente");
 
       expect(orderBySelect).toHaveValue("name");
       expect(orderDirectionSelect).toHaveValue("asc");
@@ -135,7 +135,7 @@ describe("SortBy", () => {
 
       render(<SortBy {...defaultProps} />);
 
-      const orderBySelect = screen.getByDisplayValue("Date created");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
       fireEvent.change(orderBySelect, { target: { value: "name" } });
 
       expect(mockSetSearchParams).toHaveBeenCalledTimes(1);
@@ -162,7 +162,7 @@ describe("SortBy", () => {
 
       render(<SortBy {...defaultProps} />);
 
-      const orderDirectionSelect = screen.getByDisplayValue("Descending");
+      const orderDirectionSelect = screen.getByDisplayValue("Decrescente");
       fireEvent.change(orderDirectionSelect, { target: { value: "asc" } });
 
       expect(mockSetSearchParams).toHaveBeenCalledTimes(1);
@@ -191,7 +191,7 @@ describe("SortBy", () => {
 
       render(<SortBy {...defaultProps} />);
 
-      const orderBySelect = screen.getByDisplayValue("Date created");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
       fireEvent.change(orderBySelect, { target: { value: "status" } });
 
       const prevParams = new URLSearchParams(
@@ -212,8 +212,8 @@ describe("SortBy", () => {
       render(<SortBy {...defaultProps} />);
 
       const triggerButton = screen.getByRole("button", { name: /sorted by/i });
-      const orderBySelect = screen.getByDisplayValue("Date created");
-      const orderDirectionSelect = screen.getByDisplayValue("Descending");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
+      const orderDirectionSelect = screen.getByDisplayValue("Decrescente");
 
       expect(triggerButton).toBeDisabled();
       expect(orderBySelect).toBeDisabled();
@@ -226,8 +226,8 @@ describe("SortBy", () => {
       render(<SortBy {...defaultProps} />);
 
       const triggerButton = screen.getByRole("button", { name: /sorted by/i });
-      const orderBySelect = screen.getByDisplayValue("Date created");
-      const orderDirectionSelect = screen.getByDisplayValue("Descending");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
+      const orderDirectionSelect = screen.getByDisplayValue("Decrescente");
 
       expect(triggerButton).toBeDisabled();
       expect(orderBySelect).toBeDisabled();
@@ -240,8 +240,8 @@ describe("SortBy", () => {
       render(<SortBy {...defaultProps} />);
 
       const triggerButton = screen.getByRole("button", { name: /sorted by/i });
-      const orderBySelect = screen.getByDisplayValue("Date created");
-      const orderDirectionSelect = screen.getByDisplayValue("Descending");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
+      const orderDirectionSelect = screen.getByDisplayValue("Decrescente");
 
       expect(triggerButton).not.toBeDisabled();
       expect(orderBySelect).not.toBeDisabled();
@@ -253,12 +253,12 @@ describe("SortBy", () => {
     it("renders all provided sorting options", () => {
       render(<SortBy {...defaultProps} />);
 
-      const orderBySelect = screen.getByDisplayValue("Date created");
+      const orderBySelect = screen.getByDisplayValue("Data de criação");
       const options = Array.from(orderBySelect.querySelectorAll("option"));
 
       expect(options).toHaveLength(3);
       expect(options[0]).toHaveValue("createdAt");
-      expect(options[0]).toHaveTextContent("Date created");
+      expect(options[0]).toHaveTextContent("Data de criação");
       expect(options[1]).toHaveValue("name");
       expect(options[1]).toHaveTextContent("Name");
       expect(options[2]).toHaveValue("status");

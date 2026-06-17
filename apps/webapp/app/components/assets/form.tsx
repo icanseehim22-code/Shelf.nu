@@ -50,7 +50,7 @@ import { TagsAutocomplete } from "../tag/tags-autocomplete";
 export const NewAssetFormSchema = z.object({
   title: z
     .string()
-    .min(2, "Name is required")
+    .min(2, "Nome é obrigatório")
     .transform((val) => val.trim()), // We trim to avoid white spaces at start and end
 
   description: z.string().transform((val) => val.trim()),
@@ -252,7 +252,7 @@ export const AssetForm = ({
         <div className="flex items-start justify-between border-b pb-5">
           <div className=" ">
             <h2 className="mb-1 text-[18px] font-semibold">Basic fields</h2>
-            <p>Basic information about your asset.</p>
+            <p>Informações básicas sobre seu ativo.</p>
           </div>
           <div className="hidden flex-1 justify-end gap-2 md:flex">
             <Actions disabled={disabled} referer={referer} />
@@ -266,7 +266,7 @@ export const AssetForm = ({
         >
           <Input
             ref={titleInputRef}
-            label="Name"
+            label="Nome"
             hideLabel
             name="title"
             disabled={disabled}
@@ -285,14 +285,14 @@ export const AssetForm = ({
           className="border-b-0 pb-[10px]"
           subHeading={
             id
-              ? "This is the unique identifier for this asset"
-              : "This sequential ID will be assigned when the asset is created"
+              ? "Este é o identificador único deste ativo"
+              : "Este ID sequencial será atribuído quando o ativo for criado"
           }
         >
           <div className="flex items-center gap-2">
             <div className="shrink-0">
               <Input
-                label="Prefix"
+                label="Prefixo"
                 hideLabel
                 name="sequentialIdPrefix"
                 disabled={true}
@@ -304,7 +304,7 @@ export const AssetForm = ({
             <span className="font-medium text-gray-400">-</span>
             <div className="grow">
               <Input
-                label="Number"
+                label="Número"
                 hideLabel
                 name="sequentialIdNumber"
                 disabled={true}
@@ -384,7 +384,7 @@ export const AssetForm = ({
               name="description"
               defaultValue={description || ""}
               hideLabel
-              placeholder="Add a description for your asset."
+              placeholder="Adicione uma descrição para seu ativo."
               disabled={disabled}
               data-test-id="assetDescription"
               className="w-full"
@@ -416,7 +416,7 @@ export const AssetForm = ({
             model={{ name: "category", queryKey: "name" }}
             triggerWrapperClassName="flex flex-col !gap-0 justify-start items-start [&_.inner-label]:w-full [&_.inner-label]:text-left "
             contentLabel="Categories"
-            label="Category"
+            label="Categoria"
             hideLabel
             initialDataKey="categories"
             countKey="totalCategories"
@@ -425,7 +425,7 @@ export const AssetForm = ({
             allowClear={true}
             extraContent={({ onItemCreated, closePopover }) => (
               <InlineEntityCreationDialog
-                title="Create new category"
+                title="Criar nova categoria"
                 type="category"
                 buttonLabel="Create new category"
                 onCreated={(created) => {
@@ -503,7 +503,7 @@ export const AssetForm = ({
                   defaultValue={locationId || undefined}
                   model={{ name: "location", queryKey: "name" }}
                   contentLabel="Locations"
-                  label="Location"
+                  label="Local"
                   hideLabel
                   initialDataKey="locations"
                   countKey="totalLocations"
@@ -529,7 +529,7 @@ export const AssetForm = ({
               defaultValue={locationId || undefined}
               model={{ name: "location", queryKey: "name" }}
               contentLabel="Locations"
-              label="Location"
+              label="Local"
               hideLabel
               initialDataKey="locations"
               countKey="totalLocations"
@@ -538,7 +538,7 @@ export const AssetForm = ({
               extraContent={({ onItemCreated, closePopover }) => (
                 <InlineEntityCreationDialog
                   type="location"
-                  title="Create new location"
+                  title="Criar novo local"
                   buttonLabel="Create new location"
                   onCreated={(created) => {
                     if (created?.type !== "location") return;
@@ -581,7 +581,7 @@ export const AssetForm = ({
           <div className="relative w-full">
             <Input
               type="number"
-              label="Value"
+              label="Valor"
               inputClassName="pl-[70px] valuation-input"
               hideLabel
               name="valuation"
@@ -602,7 +602,7 @@ export const AssetForm = ({
             <FormRow
               rowLabel={"Barcodes"}
               className="border-b-0"
-              subHeading="Add additional barcodes to this asset (Code 128, Code 39, or Data Matrix). Note: Each asset automatically gets a default EstoqueSoftSystem QR code for tracking."
+              subHeading="Adicione códigos de barras a este ativo (Code 128, Code 39 ou Data Matrix). Obs.: cada ativo recebe automaticamente um QR code padrão do EstoqueSoftSystem para rastreio."
             >
               <BarcodesInput
                 ref={barcodesInputRef}
