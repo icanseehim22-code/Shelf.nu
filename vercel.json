@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/abastecimento", "destination": "https://abastecimentosoft-tbn1.vercel.app/abastecimento" },
-    { "source": "/abastecimento/:path*", "destination": "https://abastecimentosoft-tbn1.vercel.app/abastecimento/:path*" }
+    { "source": "/abastecimento", "destination": "https://abastecimentosoft-app.vercel.app/abastecimento" },
+    { "source": "/abastecimento/:path*", "destination": "https://abastecimentosoft-app.vercel.app/abastecimento/:path*" }
   ]
 }
