@@ -84,7 +84,7 @@ export default function CreateBookingForSelectedAssetsDialog() {
       ref={zo.ref}
       type="bookings"
       arrayFieldId="assetIds"
-      title="Create booking"
+      title="Criar reserva"
       description={`Create a new booking with selected(${selectedAssets.length}) assets`}
       actionUrl="/bookings/new"
       className="lg:w-[600px]"

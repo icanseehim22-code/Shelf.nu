@@ -92,7 +92,7 @@ export function AssetIndexFilters({
                 </div>
               }
               model={{ name: "category", queryKey: "name" }}
-              label="Filter by category"
+              label="Filtrar por categoria"
               placeholder="Search categories"
               initialDataKey="categories"
               countKey="totalCategories"
@@ -108,7 +108,7 @@ export function AssetIndexFilters({
                 </div>
               }
               model={{ name: "tag", queryKey: "name" }}
-              label="Filter by tag"
+              label="Filtrar por etiqueta"
               initialDataKey="tags"
               countKey="totalTags"
               withoutValueItem={{
@@ -124,7 +124,7 @@ export function AssetIndexFilters({
                 </div>
               }
               model={{ name: "location", queryKey: "name" }}
-              label="Filter by location"
+              label="Filtrar por local"
               initialDataKey="locations"
               countKey="totalLocations"
               withoutValueItem={{
@@ -156,7 +156,7 @@ export function AssetIndexFilters({
                   deletedAt: null,
                 }}
                 renderItem={(item) => resolveTeamMemberName(item, true)}
-                label="Filter by custodian"
+                label="Filtrar por responsável"
                 placeholder="Search team members"
                 initialDataKey="teamMembers"
                 countKey="totalTeamMembers"

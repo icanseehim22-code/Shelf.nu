@@ -86,7 +86,7 @@ export function ConfigureColumnsDropdown() {
           icon="columns"
           className="mt-2 font-normal text-gray-500 md:mt-0"
           width="full"
-          title="Columns configuration"
+          title="Configuração de colunas"
           aria-label={"Columns configuration"}
         />
       </PopoverTrigger>
@@ -202,7 +202,7 @@ export function ConfigureColumnsDropdown() {
                               }
                             }}
                             className="flex flex-1 items-center text-[14px] font-medium text-gray-700 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
-                            title="Custom field"
+                            title="Campo personalizado"
                           >
                             {" "}
                             <FakeCheckbox
@@ -232,7 +232,7 @@ export function ConfigureColumnsDropdown() {
                             )}`}
                             aria-describedby="reorder-instructions"
                             aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
-                            title="Drag to reorder or use Alt+Arrow keys"
+                            title="Arraste para reordenar ou use Alt+Setas"
                             tabIndex={0}
                           >
                             <div className="h-auto w-2">

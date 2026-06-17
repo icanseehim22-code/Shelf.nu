@@ -91,7 +91,7 @@ export const AssetsList = ({
             iconClassName="size-4"
             content={
               <>
-                <h6>Asset custody</h6>
+                <h6>Custódia do ativo</h6>
                 <p>
                   This column shows if a user has custody of the asset either
                   via direct assignment or via a booking. If you see{" "}
@@ -104,7 +104,7 @@ export const AssetsList = ({
         </Th>
       </When>
       <Th>Location</Th>
-      <Th>Actions</Th>
+      <Th>Ações</Th>
     </>
   ) : (
     <AdvancedTableHeader columns={columns} />

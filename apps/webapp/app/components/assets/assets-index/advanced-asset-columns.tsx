@@ -398,7 +398,7 @@ export function DescriptionColumn({ value }: { value: string }) {
             </TooltipTrigger>
 
             <TooltipContent side="top" className="max-w-[400px]">
-              <h5>Asset description</h5>
+              <h5>Descrição do ativo</h5>
               <MarkdownViewer content={value} className="mt-2 text-sm" />
             </TooltipContent>
           </Tooltip>
@@ -481,7 +481,7 @@ function UpcomingReminderColumn({
   upcomingReminder: AdvancedIndexAsset["upcomingReminder"];
 }) {
   if (!upcomingReminder) {
-    return <Td>No upcoming reminder</Td>;
+    return <Td>Nenhum lembrete próximo</Td>;
   }
 
   return (
@@ -631,7 +631,7 @@ function UpcomingBookingsColumn({
   });
 
   if (!bookings || bookings.length === 0) {
-    return <Td>No upcoming bookings</Td>;
+    return <Td>Nenhuma reserva próxima</Td>;
   }
 
   return (

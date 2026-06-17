@@ -36,7 +36,7 @@ export function AvailabilityViewToggle({
               return newParams;
             });
           }}
-          title="Switch to list view"
+          title="Mudar para visualização em lista"
           tooltip="List view"
           aria-label="Switch to list view"
           icon="sort"

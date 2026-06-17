@@ -216,8 +216,8 @@ function AdvancedFilter() {
             <div className="border-b p-4 pb-5">
               {filters.length === 0 ? (
                 <div>
-                  <h5>No filters applied to this view</h5>
-                  <p>Add a column below to filter the view</p>
+                  <h5>Nenhum filtro aplicado a esta visualização</h5>
+                  <p>Adicione uma coluna abaixo para filtrar a visualização</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -524,8 +524,8 @@ function AdvancedSorting() {
           <div className="border-b p-4 pb-5">
             {sorts.length === 0 ? (
               <div>
-                <h5>No sorting applied to this view</h5>
-                <p>Add a column below to sort by</p>
+                <h5>Nenhuma ordenação aplicada a esta visualização</h5>
+                <p>Adicione uma coluna abaixo para ordenar</p>
               </div>
             ) : (
               <Reorder.Group values={sorts} onReorder={setSorts}>
@@ -737,7 +737,7 @@ function PickAColumnToSortBy({
               : false
           }
         >
-          <span>Pick a column to sort by</span>{" "}
+          <span>Escolha uma coluna para ordenar</span>{" "}
           <ChevronRight className="ml-2 inline-block rotate-90" />
         </Button>
       </PopoverTrigger>

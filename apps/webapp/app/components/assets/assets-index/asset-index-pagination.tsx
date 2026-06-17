@@ -59,7 +59,7 @@ export function AssetIndexPagination() {
             type="button"
             onClick={handleScrollToTop}
             variant="secondary"
-            title="Scroll to top"
+            title="Voltar ao topo"
             aria-label="Scroll to top"
             className="h-[34px]"
           >
