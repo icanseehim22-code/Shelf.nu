@@ -96,25 +96,25 @@ export function useSidebarNavItems() {
   const topMenuItems: NavItem[] = [
     {
       type: "child",
-      title: "Admin Dashboard",
+      title: "Painel Admin",
       to: "/admin-dashboard/users",
       Icon: ChartLineIcon,
       hidden: !isAdmin,
     },
     {
       type: "label",
-      title: "Asset management",
+      title: "Gestão de ativos",
     },
     {
       type: "child",
-      title: "Home",
+      title: "Início",
       to: "/home",
       Icon: HomeIcon,
       hidden: isBaseOrSelfService,
     },
     {
       type: "child",
-      title: "Assets",
+      title: "Ativos",
       to: "/assets",
       Icon: PackageOpenIcon,
     },
@@ -126,7 +126,7 @@ export function useSidebarNavItems() {
     },
     {
       type: "child",
-      title: "Categories",
+      title: "Categorias",
       to: "/categories",
       Icon: BoxesIcon,
       hidden: isBaseOrSelfService,
@@ -134,37 +134,37 @@ export function useSidebarNavItems() {
 
     {
       type: "child",
-      title: "Tags",
+      title: "Etiquetas",
       to: "/tags",
       Icon: TagsIcon,
       hidden: isBaseOrSelfService,
     },
     {
       type: "child",
-      title: "Locations",
+      title: "Locais",
       to: "/locations",
       Icon: MapPinIcon,
       hidden: isBaseOrSelfService,
     },
     {
       type: "child",
-      title: "Audits",
+      title: "Auditorias",
       to: "/audits",
       Icon: ClipboardCheckIcon,
     },
     {
       type: "parent",
-      title: "Bookings",
+      title: "Reservas",
       Icon: CalendarRangeIcon,
       disabled: bookingDisabled,
       children: [
         {
-          title: "View Bookings",
+          title: "Ver reservas",
           to: "/bookings",
           disabled: bookingDisabled,
         },
         {
-          title: "Calendar",
+          title: "Calendário",
           to: "/calendar",
           disabled: bookingDisabled,
         },
@@ -172,62 +172,62 @@ export function useSidebarNavItems() {
     },
     {
       type: "child",
-      title: "Reminders",
+      title: "Lembretes",
       Icon: AlarmClockIcon,
       hidden: isBaseOrSelfService,
       to: "/reminders",
     },
     {
       type: "child",
-      title: "Reports",
+      title: "Relatórios",
       Icon: FileBarChartIcon,
       hidden: isBaseOrSelfService,
       to: "/reports",
     },
     {
       type: "label",
-      title: "Organization",
+      title: "Organização",
       hidden: isBaseOrSelfService,
     },
     {
       type: "parent",
-      title: "Team",
+      title: "Equipe",
       Icon: UsersRoundIcon,
       hidden: isBaseOrSelfService,
       children: [
         {
-          title: "Users",
+          title: "Usuários",
           to: "/settings/team/users",
           hidden: isPersonalOrganization,
         },
         {
-          title: "Pending invites",
+          title: "Convites pendentes",
           to: "/settings/team/invites",
           hidden: isPersonalOrganization,
         },
         {
-          title: "Non-registered members",
+          title: "Membros não registrados",
           to: "/settings/team/nrm",
         },
       ],
     },
     {
       type: "parent",
-      title: "Workspace settings",
+      title: "Configurações do workspace",
       Icon: SettingsIcon,
       hidden: isBaseOrSelfService,
       children: [
         {
-          title: "General",
+          title: "Geral",
           to: "/settings/general",
         },
         {
-          title: "Bookings",
+          title: "Reservas",
           to: "/settings/bookings",
           hidden: isPersonalOrganization,
         },
         {
-          title: "Custom fields",
+          title: "Campos personalizados",
           to: "/settings/custom-fields",
         },
       ],
@@ -237,20 +237,20 @@ export function useSidebarNavItems() {
   const bottomMenuItems: NavItem[] = [
     {
       type: "child",
-      title: "Asset labels",
+      title: "Etiquetas de ativos",
       to: `https://store.estoquesoftsystem.com/?ref=shelf_webapp_sidebar`,
       Icon: QrCodeIcon,
       target: "_blank",
     },
     {
       type: "child",
-      title: "QR Scanner",
+      title: "Leitor de QR",
       to: "/scanner",
       Icon: ScanBarcodeIcon,
     },
     {
       type: "button",
-      title: "Updates",
+      title: "Novidades",
       Icon: BellIcon,
       badge: {
         show: (unreadUpdatesCount || 0) > 0,
@@ -262,7 +262,7 @@ export function useSidebarNavItems() {
     },
     {
       type: "button",
-      title: "Questions/Feedback",
+      title: "Dúvidas/Feedback",
       Icon: MessageCircleIcon,
       onClick: () => {
         // Handled by FeedbackNavItem in sidebar-nav.tsx

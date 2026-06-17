@@ -106,20 +106,20 @@ function createOnboardingSchema({
     .object({
       username: z
         .string()
-        .min(4, { message: "Must be at least 4 characters long" }),
-      firstName: z.string().min(1, { message: "First name is required" }),
-      lastName: z.string().min(1, { message: "Last name is required" }),
+        .min(4, { message: "Deve ter pelo menos 4 caracteres" }),
+      firstName: z.string().min(1, { message: "Nome é obrigatório" }),
+      lastName: z.string().min(1, { message: "Sobrenome é obrigatório" }),
       password: userSignedUpWithPassword
         ? z.string().optional()
-        : z.string().min(8, "Password is too short. Minimum 8 characters."),
+        : z.string().min(8, "Senha muito curta. Mínimo de 8 caracteres."),
       confirmPassword: userSignedUpWithPassword
         ? z.string().optional()
-        : z.string().min(8, "Password is too short. Minimum 8 characters."),
+        : z.string().min(8, "Senha muito curta. Mínimo de 8 caracteres."),
       referralSource: shouldCollectBusinessIntel
-        ? z.string().min(5, "Field is required.")
+        ? z.string().min(5, "Campo obrigatório.")
         : z.string().optional().nullable(),
       jobTitle: shouldCollectBusinessIntel
-        ? requiredTrimmedField("Role is required")
+        ? requiredTrimmedField("Cargo é obrigatório")
         : optionalTrimmedField,
       teamSize: optionalTrimmedField,
       companyName: optionalTrimmedField,
@@ -144,7 +144,7 @@ function createOnboardingSchema({
         if (password !== confirmPassword) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Password and confirm password must match",
+            message: "A senha e a confirmação devem ser iguais",
             path: ["confirmPassword"],
           });
         }
@@ -159,7 +159,7 @@ function createOnboardingSchema({
           ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: "Team size is required",
+              message: "Tamanho da equipe é obrigatório",
               path: ["teamSize"],
             });
           }
@@ -170,7 +170,7 @@ function createOnboardingSchema({
           ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: "Company or organization is required",
+              message: "Empresa ou organização é obrigatória",
               path: ["companyName"],
             });
           }
@@ -281,9 +281,9 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
       createdWithInvite,
     });
 
-    const title = "Set up your account";
+    const title = "Configure sua conta";
     const subHeading =
-      "You are almost ready to use EstoqueSoftSystem. We just need some basic information to get you started.";
+      "Você está quase pronto para usar o EstoqueSoftSystem. Precisamos só de algumas informações básicas para começar.";
 
     return payload({
       title,
@@ -378,7 +378,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     });
 
     const payload = parseData(formData, OnboardingFormSchema, {
-      // Expected user-input validation (e.g. "Field is required.") — a 400,
+      // Expected user-input validation (e.g. "Campo obrigatório.") — a 400,
       // not a server error. Don't capture to Sentry (was noise:
       // SHELF-WEBAPP-1KV).
       shouldBeCaptured: false,
@@ -560,23 +560,23 @@ export default function Onboarding() {
 
         <div className="md:flex md:gap-6">
           <Input
-            label="First name"
+            label="Nome"
             autoComplete="given-name"
             required
             data-test-id="firstName"
             type="text"
-            placeholder="Zaans"
+            placeholder="João"
             name={zo.fields.firstName()}
             error={zo.errors.firstName()?.message}
             className="mb-5 md:mb-0 md:flex-1"
           />
           <Input
-            label="Last name"
+            label="Sobrenome"
             autoComplete="family-name"
             required
             data-test-id="lastName"
             type="text"
-            placeholder="Huisje"
+            placeholder="Silva"
             name={zo.fields.lastName()}
             error={zo.errors.lastName()?.message}
             className="md:flex-1"
@@ -584,7 +584,7 @@ export default function Onboarding() {
         </div>
         <div>
           <Input
-            label="Username"
+            label="Nome de usuário"
             addOn="estoquesoftsystem.com/"
             autoComplete="username"
             required
@@ -604,7 +604,7 @@ export default function Onboarding() {
           <>
             <PasswordInput
               required
-              label="Password"
+              label="Senha"
               placeholder="********"
               data-test-id="password"
               name={zo.fields.password()}
@@ -616,7 +616,7 @@ export default function Onboarding() {
 
             <PasswordInput
               required
-              label="Confirm password"
+              label="Confirmar senha"
               data-test-id="confirmPassword"
               placeholder="********"
               name={zo.fields.confirmPassword()}
@@ -631,7 +631,7 @@ export default function Onboarding() {
           <>
             <Input
               required
-              label="How did you hear about us?"
+              label="Como você conheceu a gente?"
               placeholder="Twitter, Reddit, ChatGPT, Google, etc..."
               name={zo.fields.referralSource()}
               defaultValue={referralSourceDefault}
@@ -639,14 +639,14 @@ export default function Onboarding() {
             />
 
             <SelectWithOther
-              label="What's your role?"
+              label="Qual é o seu cargo?"
               name={zo.fields.jobTitle()}
               options={ROLE_OPTIONS}
               required
               error={zo.errors.jobTitle()?.message}
               defaultValue={jobTitleDefault}
-              otherInputLabel="Specify your role"
-              otherInputPlaceholder="Tell us about your role"
+              otherInputLabel="Especifique seu cargo"
+              otherInputPlaceholder="Conte sobre seu cargo"
               onValueChange={(value) => {
                 setIsPersonalUse(value === "Personal use");
               }}
@@ -654,20 +654,20 @@ export default function Onboarding() {
 
             <When truthy={!isPersonalUse && requireCompanyName}>
               <SelectWithOther
-                label="How many people will use this?"
+                label="Quantas pessoas vão usar?"
                 name={zo.fields.teamSize()}
                 options={TEAM_SIZE_OPTIONS}
                 required
                 error={zo.errors.teamSize()?.message}
                 defaultValue={teamSizeDefault}
-                otherInputLabel="Specify team size"
-                otherInputPlaceholder="Enter your team size"
+                otherInputLabel="Especifique o tamanho da equipe"
+                otherInputPlaceholder="Informe o tamanho da equipe"
               />
             </When>
 
             <When truthy={!isPersonalUse && requireCompanyName}>
               <Input
-                label="Company/Organization"
+                label="Empresa/Organização"
                 placeholder="EstoqueSoftSystem Inc."
                 name={zo.fields.companyName()}
                 error={zo.errors.companyName()?.message}
@@ -694,9 +694,9 @@ export default function Onboarding() {
                 className="flex w-full items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-left font-medium text-gray-700 hover:bg-gray-100"
               >
                 <span>
-                  Help us customize EstoqueSoftSystem
+                  Ajude a personalizar o EstoqueSoftSystem
                   <span className="ml-1 text-sm font-normal text-gray-500">
-                    (optional)
+                    (opcional)
                   </span>
                 </span>
                 <ChevronDownIcon
@@ -710,32 +710,32 @@ export default function Onboarding() {
             <CollapsibleContent>
               <div className="mt-4 grid gap-5 md:grid-cols-2">
                 <SelectWithOther
-                  label="What will you primarily track?"
+                  label="O que você vai controlar principalmente?"
                   name={zo.fields.primaryUseCase()}
                   options={PRIMARY_USE_CASE_OPTIONS}
                   defaultValue={businessIntel?.primaryUseCase ?? null}
-                  otherInputLabel="Tell us what you'll track"
-                  otherInputPlaceholder="Describe your use case"
-                  placeholder="Select an option"
+                  otherInputLabel="Conte o que vai controlar"
+                  otherInputPlaceholder="Descreva seu caso de uso"
+                  placeholder="Selecione uma opção"
                 />
                 <SelectWithOther
-                  label="How do you currently track assets?"
+                  label="Como você controla os ativos hoje?"
                   name={zo.fields.currentSolution()}
                   options={CURRENT_SOLUTION_OPTIONS}
                   defaultValue={businessIntel?.currentSolution ?? null}
-                  otherInputLabel="Share your current solution"
-                  otherInputPlaceholder="Let us know what you use today"
-                  placeholder="Select an option"
+                  otherInputLabel="Conte sua solução atual"
+                  otherInputPlaceholder="Diga o que você usa hoje"
+                  placeholder="Selecione uma opção"
                 />
                 <div className="md:col-span-2">
                   <SelectWithOther
-                    label="When do you need this working?"
+                    label="Quando você precisa disso funcionando?"
                     name={zo.fields.timeline()}
                     options={TIMELINE_OPTIONS}
                     defaultValue={businessIntel?.timeline ?? null}
-                    otherInputLabel="Specify your timeline"
-                    otherInputPlaceholder="Tell us about your timeline"
-                    placeholder="Select an option"
+                    otherInputLabel="Especifique seu prazo"
+                    otherInputPlaceholder="Conte sobre seu prazo"
+                    placeholder="Selecione uma opção"
                   />
                 </div>
               </div>
@@ -750,7 +750,7 @@ export default function Onboarding() {
             width="full"
             disabled={disabled}
           >
-            Submit
+            Enviar
           </Button>
         </div>
       </Form>
