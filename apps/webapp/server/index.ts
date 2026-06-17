@@ -36,7 +36,7 @@ initEnv();
 
 const isProduction = process.env.NODE_ENV === "production";
 const clientBuildPath = isProduction
-  ? path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../client")
+  ? path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../client")
   : "";
 
 export const getLoadContext: HonoServerOptions<ServerEnv>["getLoadContext"] = (
