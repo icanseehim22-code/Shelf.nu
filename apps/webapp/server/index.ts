@@ -95,11 +95,10 @@ export default createHonoServer<ServerEnv>({
     app.use("*", securityHeaders());
 
     if (isProduction && clientBuildPath) {
-      const relativeBuildPath = path.relative(process.cwd(), clientBuildPath);
       app.use(
         "*",
         serveStatic({
-          root: relativeBuildPath,
+          root: clientBuildPath,
         })
       );
     }
