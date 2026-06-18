@@ -29,6 +29,7 @@ export default function ChildNavItem({
         <NavLink
           to={route.to}
           target={route.target}
+          reloadDocument={route.reloadDocument}
           className={tw(
             "font-semibold",
             isActive ? "bg-transparent font-bold text-primary" : ""

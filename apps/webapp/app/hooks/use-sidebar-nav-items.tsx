@@ -8,6 +8,7 @@ import {
   ChartLineIcon,
   ClipboardCheckIcon,
   FileBarChartIcon,
+  FuelIcon,
   HomeIcon,
   MapPinIcon,
   MessageCircleIcon,
@@ -43,6 +44,13 @@ export type ChildNavItem = BaseNavItem & {
   type: "child";
   to: string;
   target?: string;
+  /**
+   * Forces a full-page document navigation instead of client-side routing.
+   * Required for links that point outside the Remix app (e.g. the static
+   * `/abastecimento/` app served by the Vercel proxy), which the React Router
+   * client would otherwise try to match as an internal route and 404 on.
+   */
+  reloadDocument?: boolean;
 };
 
 export type ParentNavItem = BaseNavItem & {
@@ -100,6 +108,19 @@ export function useSidebarNavItems() {
       to: "/admin-dashboard/users",
       Icon: ChartLineIcon,
       hidden: !isAdmin,
+    },
+    {
+      type: "label",
+      title: "Sistemas",
+    },
+    {
+      type: "child",
+      title: "Abastecimento",
+      to: "/abastecimento/",
+      Icon: FuelIcon,
+      // Full-page navigation: /abastecimento/ is the separate static app served
+      // by the Vercel proxy, not a Remix route — client-side routing would 404.
+      reloadDocument: true,
     },
     {
       type: "label",

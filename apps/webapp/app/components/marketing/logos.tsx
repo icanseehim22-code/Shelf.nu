@@ -1,4 +1,3 @@
-import { ShelfTypography } from "~/components/icons/library";
 import { config } from "~/config/shelf.config";
 import { tw } from "~/utils/tw";
 import When from "../when/when";
@@ -10,33 +9,19 @@ import When from "../when/when";
 export const ShelfSidebarLogo = ({ minimized }: { minimized: boolean }) => {
   const { logoPath } = config;
 
-  /** If a custom logo is used, we just use that instead of doing the dynamic shelf typograpy */
-  if (logoPath) {
-    return minimized ? (
-      <img
-        src={logoPath.symbol}
-        alt="EstoqueSoftSystem Logo"
-        className="mx-1.5 inline h-[32px] transition duration-150 ease-linear"
-      />
-    ) : (
-      <img
-        src={logoPath.fullLogo}
-        alt="EstoqueSoftSystem Logo"
-        className="mx-1.5 inline h-[32px] transition duration-150 ease-linear"
-      />
-    );
-  }
-
+  // Show the orange symbol icon plus the EstoqueSoftSystem wordmark as text.
+  // The wordmark is rendered as text (not the original "shelf" image/SVG) so
+  // the brand reads correctly without needing a custom logo image asset.
   return (
     <>
       <img
-        src="/static/images/shelf-symbol.png"
+        src={logoPath?.symbol ?? "/static/images/shelf-symbol.png"}
         alt="EstoqueSoftSystem Logo"
-        className="mx-1.5 inline h-[32px]"
+        className="mx-1.5 inline h-[32px] transition duration-150 ease-linear"
       />
       <When truthy={!minimized}>
-        <span className="logo-text transition duration-150 ease-linear">
-          <ShelfTypography />
+        <span className="logo-text whitespace-nowrap text-base font-semibold text-gray-900 transition duration-150 ease-linear">
+          EstoqueSoftSystem
         </span>
       </When>
     </>
