@@ -76,15 +76,15 @@ export function generateWhereClause(
           u."firstName" ILIKE ${`%${term}%`} OR
           u."lastName" ILIKE ${`%${term}%`} OR
           EXISTS (
-            SELECT 1 FROM public."Qr" q 
+            SELECT 1 FROM shelf."Qr" q 
             WHERE q."assetId" = a.id AND q.id ILIKE ${`%${term}%`}
           ) OR
           EXISTS (
-            SELECT 1 FROM public."Barcode" b 
+            SELECT 1 FROM shelf."Barcode" b 
             WHERE b."assetId" = a.id AND b.value ILIKE ${`%${term}%`}
           ) OR
           EXISTS (
-            SELECT 1 FROM public."AssetCustomFieldValue" acfv 
+            SELECT 1 FROM shelf."AssetCustomFieldValue" acfv 
             WHERE acfv."assetId" = a.id AND (
               ${Prisma.join(
                 CUSTOM_FIELD_SEARCH_PATHS.map(
@@ -158,8 +158,8 @@ function addCustomFieldFilter(
   // Create a subquery to get the custom field value
   const subquery = Prisma.sql`(
     SELECT acfv.value->>'raw'
-    FROM public."AssetCustomFieldValue" acfv
-    JOIN public."CustomField" cf ON acfv."customFieldId" = cf.id
+    FROM shelf."AssetCustomFieldValue" acfv
+    JOIN shelf."CustomField" cf ON acfv."customFieldId" = cf.id
     WHERE acfv."assetId" = a.id AND cf.name = ${customFieldName}
   )`;
 
@@ -463,12 +463,12 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
       case "is": {
         const trimmedValue =
           typeof filter.value === "string" ? filter.value.trim() : filter.value;
-        return Prisma.sql`${whereClause} AND a.status = ${trimmedValue}::public."AssetStatus"`;
+        return Prisma.sql`${whereClause} AND a.status = ${trimmedValue}::shelf."AssetStatus"`;
       }
       case "isNot": {
         const trimmedValue =
           typeof filter.value === "string" ? filter.value.trim() : filter.value;
-        return Prisma.sql`${whereClause} AND a.status != ${trimmedValue}::public."AssetStatus"`;
+        return Prisma.sql`${whereClause} AND a.status != ${trimmedValue}::shelf."AssetStatus"`;
       }
       case "containsAny": {
         const values = (filter.value as string).split(",").map((v) => v.trim());
@@ -476,7 +476,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
           values.map((v) => Prisma.sql`${v}`),
           ", "
         );
-        return Prisma.sql`${whereClause} AND a.status = ANY(ARRAY[${valuesArray}]::public."AssetStatus"[])`;
+        return Prisma.sql`${whereClause} AND a.status = ANY(ARRAY[${valuesArray}]::shelf."AssetStatus"[])`;
       }
       default:
         return whereClause;
@@ -497,7 +497,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
         }
         //Reference the category table for name comparison
         return Prisma.sql`${whereClause} AND EXISTS (
-          SELECT 1 FROM public."Category"
+          SELECT 1 FROM shelf."Category"
           WHERE id = a."categoryId" AND id = ${filter.value}
         )`;
 
@@ -507,7 +507,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
         }
         return Prisma.sql`${whereClause} AND (
           NOT EXISTS (
-            SELECT 1 FROM public."Category"
+            SELECT 1 FROM shelf."Category"
             WHERE id = a."categoryId" AND id = ${filter.value}
           ) OR a."categoryId" IS NULL
         )`;
@@ -536,7 +536,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
           return Prisma.sql`${whereClause} AND (
             a."categoryId" IS NULL
             OR EXISTS (
-              SELECT 1 FROM public."Category"
+              SELECT 1 FROM shelf."Category"
               WHERE id = a."categoryId" AND id = ANY(ARRAY[${categoryIdsArray}]::text[])
             )
           )`;
@@ -554,7 +554,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
           ", "
         );
         return Prisma.sql`${whereClause} AND EXISTS (
-          SELECT 1 FROM public."Category"
+          SELECT 1 FROM shelf."Category"
           WHERE id = a."categoryId" AND id = ANY(ARRAY[${categoryIdsArray}]::text[])
         )`;
       }
@@ -576,7 +576,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
         }
         //Reference the Location table for name comparison
         return Prisma.sql`${whereClause} AND EXISTS (
-          SELECT 1 FROM public."Location"
+          SELECT 1 FROM shelf."Location"
           WHERE id = a."locationId" AND id = ${filter.value}
         )`;
 
@@ -589,7 +589,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
         }
         return Prisma.sql`${whereClause} AND (
           NOT EXISTS (
-            SELECT 1 FROM public."Location"
+            SELECT 1 FROM shelf."Location"
             WHERE id = a."locationId" AND id = ${filter.value}
           ) OR a."locationId" IS NULL
         )`;
@@ -631,7 +631,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
           return Prisma.sql`${whereClause} AND (
             a."locationId" IS NULL
             OR EXISTS (
-              SELECT 1 FROM public."Location"
+              SELECT 1 FROM shelf."Location"
               WHERE id = a."locationId" AND id = ANY(ARRAY[${locationIdsArray}]::text[])
             )
           )`;
@@ -651,7 +651,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
           ", "
         );
         return Prisma.sql`${whereClause} AND EXISTS (
-          SELECT 1 FROM public."Location"
+          SELECT 1 FROM shelf."Location"
           WHERE id = a."locationId" AND id = ANY(ARRAY[${locationIdsArray}]::text[])
         )`;
       }
@@ -678,7 +678,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
         }
         //Reference the Kit table for name comparison
         return Prisma.sql`${whereClause} AND EXISTS (
-          SELECT 1 FROM public."Kit"
+          SELECT 1 FROM shelf."Kit"
           WHERE id = a."kitId" AND id = ${filter.value}
         )`;
 
@@ -691,7 +691,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
         }
         return Prisma.sql`${whereClause} AND (
           NOT EXISTS (
-            SELECT 1 FROM public."Kit"
+            SELECT 1 FROM shelf."Kit"
             WHERE id = a."kitId" AND id = ${filter.value}
           ) OR a."kitId" IS NULL
         )`;
@@ -733,7 +733,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
           return Prisma.sql`${whereClause} AND (
             a."kitId" IS NULL
             OR EXISTS (
-              SELECT 1 FROM public."Kit"
+              SELECT 1 FROM shelf."Kit"
               WHERE id = a."kitId" AND id = ANY(ARRAY[${kitIdsArray}]::text[])
             )
           )`;
@@ -750,7 +750,7 @@ function addEnumFilter(whereClause: Prisma.Sql, filter: Filter): Prisma.Sql {
           ", "
         );
         return Prisma.sql`${whereClause} AND EXISTS (
-          SELECT 1 FROM public."Kit"
+          SELECT 1 FROM shelf."Kit"
           WHERE id = a."kitId" AND id = ANY(ARRAY[${kitIdsArray}]::text[])
         )`;
       }
@@ -778,25 +778,25 @@ function addRelationFilter(
   if (filter.name === "qrId") {
     switch (filter.operator) {
       case "is":
-        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM public."Qr" q WHERE q."assetId" = a.id AND q.id = ${filter.value})`;
+        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM shelf."Qr" q WHERE q."assetId" = a.id AND q.id = ${filter.value})`;
       case "isNot":
-        return Prisma.sql`${whereClause} AND NOT EXISTS (SELECT 1 FROM public."Qr" q WHERE q."assetId" = a.id AND q.id = ${filter.value})`;
+        return Prisma.sql`${whereClause} AND NOT EXISTS (SELECT 1 FROM shelf."Qr" q WHERE q."assetId" = a.id AND q.id = ${filter.value})`;
       case "contains":
-        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM public."Qr" q WHERE q."assetId" = a.id AND q.id ILIKE ${`%${filter.value}%`})`;
+        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM shelf."Qr" q WHERE q."assetId" = a.id AND q.id ILIKE ${`%${filter.value}%`})`;
       case "matchesAny": {
         const values = (filter.value as string).split(",").map((v) => v.trim());
         const valuesArray = Prisma.join(
           values.map((v) => Prisma.sql`${v}`),
           ", "
         );
-        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM public."Qr" q WHERE q."assetId" = a.id AND q.id = ANY(ARRAY[${valuesArray}]::text[]))`;
+        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM shelf."Qr" q WHERE q."assetId" = a.id AND q.id = ANY(ARRAY[${valuesArray}]::text[]))`;
       }
       case "containsAny": {
         const values = (filter.value as string).split(",").map((v) => v.trim());
         const likeConditions = values.map(
           (value) => Prisma.sql`q.id ILIKE ${`%${value}%`}`
         );
-        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM public."Qr" q WHERE q."assetId" = a.id AND (${Prisma.join(
+        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM shelf."Qr" q WHERE q."assetId" = a.id AND (${Prisma.join(
           likeConditions,
           " OR "
         )}))`;
@@ -827,11 +827,11 @@ function addRelationFilter(
 
     switch (filter.operator) {
       case "is":
-        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM public."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND b.value = ${normalizedValue})`;
+        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM shelf."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND b.value = ${normalizedValue})`;
       case "isNot":
-        return Prisma.sql`${whereClause} AND NOT EXISTS (SELECT 1 FROM public."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND b.value = ${normalizedValue})`;
+        return Prisma.sql`${whereClause} AND NOT EXISTS (SELECT 1 FROM shelf."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND b.value = ${normalizedValue})`;
       case "contains":
-        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM public."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND b.value ILIKE ${`%${normalizedValue}%`})`;
+        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM shelf."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND b.value ILIKE ${`%${normalizedValue}%`})`;
       case "matchesAny": {
         const values = (filter.value as string)
           .split(",")
@@ -840,7 +840,7 @@ function addRelationFilter(
           values.map((v) => Prisma.sql`${v}`),
           ", "
         );
-        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM public."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND b.value = ANY(ARRAY[${valuesArray}]::text[]))`;
+        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM shelf."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND b.value = ANY(ARRAY[${valuesArray}]::text[]))`;
       }
       case "containsAny": {
         const values = (filter.value as string)
@@ -849,7 +849,7 @@ function addRelationFilter(
         const likeConditions = values.map(
           (value) => Prisma.sql`b.value ILIKE ${`%${value}%`}`
         );
-        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM public."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND (${Prisma.join(
+        return Prisma.sql`${whereClause} AND EXISTS (SELECT 1 FROM shelf."Barcode" b WHERE b."assetId" = a.id AND b.type::text = ${barcodeType} AND (${Prisma.join(
           likeConditions,
           " OR "
         )}))`;
@@ -1111,8 +1111,8 @@ function addUpcomingBookingsFilter(
   filter: Filter
 ): Prisma.Sql {
   const bookingExistsSubquery = Prisma.sql`EXISTS (
-    SELECT 1 FROM public."_AssetToBooking" atb
-    JOIN public."Booking" bk ON atb."B" = bk.id
+    SELECT 1 FROM shelf."_AssetToBooking" atb
+    JOIN shelf."Booking" bk ON atb."B" = bk.id
     WHERE atb."A" = a.id
     AND bk.status IN ('RESERVED', 'ONGOING', 'OVERDUE')
   )`;
@@ -1126,8 +1126,8 @@ function addUpcomingBookingsFilter(
         return Prisma.sql`${whereClause} AND NOT ${bookingExistsSubquery}`;
       }
       return Prisma.sql`${whereClause} AND EXISTS (
-        SELECT 1 FROM public."_AssetToBooking" atb
-        JOIN public."Booking" bk ON atb."B" = bk.id
+        SELECT 1 FROM shelf."_AssetToBooking" atb
+        JOIN shelf."Booking" bk ON atb."B" = bk.id
         WHERE atb."A" = a.id
         AND bk.id = ${filter.value}
         AND bk.status IN ('RESERVED', 'ONGOING', 'OVERDUE')
@@ -1141,8 +1141,8 @@ function addUpcomingBookingsFilter(
         return Prisma.sql`${whereClause} AND ${bookingExistsSubquery}`;
       }
       return Prisma.sql`${whereClause} AND NOT EXISTS (
-        SELECT 1 FROM public."_AssetToBooking" atb
-        JOIN public."Booking" bk ON atb."B" = bk.id
+        SELECT 1 FROM shelf."_AssetToBooking" atb
+        JOIN shelf."Booking" bk ON atb."B" = bk.id
         WHERE atb."A" = a.id
         AND bk.id = ${filter.value}
         AND bk.status IN ('RESERVED', 'ONGOING', 'OVERDUE')
@@ -1185,8 +1185,8 @@ function addUpcomingBookingsFilter(
         return Prisma.sql`${whereClause} AND (
           NOT ${bookingExistsSubquery}
           OR EXISTS (
-            SELECT 1 FROM public."_AssetToBooking" atb
-            JOIN public."Booking" bk ON atb."B" = bk.id
+            SELECT 1 FROM shelf."_AssetToBooking" atb
+            JOIN shelf."Booking" bk ON atb."B" = bk.id
             WHERE atb."A" = a.id
             AND bk.id = ANY(ARRAY[${bookingIdsArray}]::text[])
             AND bk.status IN ('RESERVED', 'ONGOING', 'OVERDUE')
@@ -1205,8 +1205,8 @@ function addUpcomingBookingsFilter(
         ", "
       );
       return Prisma.sql`${whereClause} AND EXISTS (
-        SELECT 1 FROM public."_AssetToBooking" atb
-        JOIN public."Booking" bk ON atb."B" = bk.id
+        SELECT 1 FROM shelf."_AssetToBooking" atb
+        JOIN shelf."Booking" bk ON atb."B" = bk.id
         WHERE atb."A" = a.id
         AND bk.id = ANY(ARRAY[${bookingIdsArray}]::text[])
         AND bk.status IN ('RESERVED', 'ONGOING', 'OVERDUE')
@@ -1667,8 +1667,8 @@ export function generateCustomFieldSelect(
           ELSE
             acfv.value->>'raw'
         END
-      FROM public."AssetCustomFieldValue" acfv
-      JOIN public."CustomField" cf ON acfv."customFieldId" = cf.id
+      FROM shelf."AssetCustomFieldValue" acfv
+      JOIN shelf."CustomField" cf ON acfv."customFieldId" = cf.id
       WHERE acfv."assetId" = a.id AND cf.name = ${cf.name}
     ) AS ${Prisma.raw(cf.alias)}`
     )
@@ -1726,8 +1726,8 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
                 ),
                 '[]'::jsonb
               )
-              FROM public."_BookingToTag" btt
-              JOIN public."Tag" t ON btt."B" = t.id
+              FROM shelf."_BookingToTag" btt
+              JOIN shelf."Tag" t ON btt."B" = t.id
               WHERE btt."A" = bk.id
             ),
             'custodianTeamMember', CASE 
@@ -1774,12 +1774,12 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
         ),
         '[]'::jsonb
       )
-      FROM public."_AssetToBooking" atb
-      JOIN public."Booking" bk ON atb."B" = bk.id
-      LEFT JOIN public."TeamMember" ctm ON bk."custodianTeamMemberId" = ctm.id
-      LEFT JOIN public."User" ctmu ON ctm."userId" = ctmu.id
-      LEFT JOIN public."User" cu ON bk."custodianUserId" = cu.id
-      LEFT JOIN public."User" cr ON bk."creatorId" = cr.id
+      FROM shelf."_AssetToBooking" atb
+      JOIN shelf."Booking" bk ON atb."B" = bk.id
+      LEFT JOIN shelf."TeamMember" ctm ON bk."custodianTeamMemberId" = ctm.id
+      LEFT JOIN shelf."User" ctmu ON ctm."userId" = ctmu.id
+      LEFT JOIN shelf."User" cu ON bk."custodianUserId" = cu.id
+      LEFT JOIN shelf."User" cr ON bk."creatorId" = cr.id
       WHERE 
         atb."A" = a.id 
         AND bk.status IN ('RESERVED', 'ONGOING', 'OVERDUE')
@@ -1799,36 +1799,36 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
         ),
         '[]'::jsonb
       )
-      FROM public."Barcode" b
+      FROM shelf."Barcode" b
       WHERE b."assetId" = a.id
     ) AS barcodes,
     (
       SELECT b.value
-      FROM public."Barcode" b
+      FROM shelf."Barcode" b
       WHERE b."assetId" = a.id AND b.type = 'Code128'
       LIMIT 1
     ) AS barcode_Code128,
     (
       SELECT b.value
-      FROM public."Barcode" b
+      FROM shelf."Barcode" b
       WHERE b."assetId" = a.id AND b.type = 'Code39'
       LIMIT 1
     ) AS barcode_Code39,
     (
       SELECT b.value
-      FROM public."Barcode" b
+      FROM shelf."Barcode" b
       WHERE b."assetId" = a.id AND b.type = 'DataMatrix'
       LIMIT 1
     ) AS barcode_DataMatrix,
     (
       SELECT b.value
-      FROM public."Barcode" b
+      FROM shelf."Barcode" b
       WHERE b."assetId" = a.id AND b.type = 'ExternalQR'
       LIMIT 1
     ) AS barcode_ExternalQR,
     (
       SELECT b.value
-      FROM public."Barcode" b
+      FROM shelf."Barcode" b
       WHERE b."assetId" = a.id AND b.type = 'EAN13'
       LIMIT 1
     ) AS barcode_EAN13`
@@ -1839,7 +1839,7 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
       a.id AS "assetId",
       (
         SELECT q.id
-        FROM public."Qr" q
+        FROM shelf."Qr" q
         WHERE q."assetId" = a.id
         LIMIT 1
       ) AS "qrId",
@@ -1869,7 +1869,7 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
       CASE
         WHEN l.id IS NOT NULL THEN (
           SELECT COUNT(*)::integer
-          FROM public."Location" lc
+          FROM shelf."Location" lc
           WHERE lc."parentId" = l.id
         )
         ELSE 0
@@ -1942,8 +1942,8 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
               'options', cf.options,
               'categories', (
                 SELECT jsonb_agg(jsonb_build_object('id', cat.id, 'name', cat.name))
-                FROM public."_CategoryToCustomField" ccf
-                JOIN public."Category" cat ON ccf."A" = cat.id
+                FROM shelf."_CategoryToCustomField" ccf
+                JOIN shelf."Category" cat ON ccf."A" = cat.id
                 WHERE ccf."B" = cf.id
               )
             )`
@@ -1955,8 +1955,8 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
             }
           )
         )
-        FROM public."AssetCustomFieldValue" acfv
-        JOIN public."CustomField" cf ON acfv."customFieldId" = cf.id
+        FROM shelf."AssetCustomFieldValue" acfv
+        JOIN shelf."CustomField" cf ON acfv."customFieldId" = cf.id
         WHERE acfv."assetId" = a.id AND cf.active = true
       ) AS "customFields",
       (
@@ -1966,7 +1966,7 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
           'message', ar.message,
           'alertDateTime', ar."alertDateTime"
         )
-        FROM public."AssetReminder" ar
+        FROM shelf."AssetReminder" ar
         WHERE 
           ar."assetId" = a.id 
           AND ar."alertDateTime" >= NOW() AT TIME ZONE 'UTC'
@@ -1978,24 +1978,24 @@ export const assetQueryFragment = (options: AssetQueryOptions = {}) => {
 };
 
 export const assetQueryJoins = Prisma.sql`
-  FROM public."Asset" a
-  LEFT JOIN public."Kit" k ON a."kitId" = k.id
-  LEFT JOIN public."Category" c ON a."categoryId" = c.id
-  LEFT JOIN public."Location" l ON a."locationId" = l.id
-  LEFT JOIN public."_AssetToTag" att ON a.id = att."A"
-  LEFT JOIN public."Tag" t ON att."B" = t.id
-  LEFT JOIN public."Custody" cu ON cu."assetId" = a.id
-  LEFT JOIN public."TeamMember" tm ON cu."teamMemberId" = tm.id
-  LEFT JOIN public."User" u ON tm."userId" = u.id
+  FROM shelf."Asset" a
+  LEFT JOIN shelf."Kit" k ON a."kitId" = k.id
+  LEFT JOIN shelf."Category" c ON a."categoryId" = c.id
+  LEFT JOIN shelf."Location" l ON a."locationId" = l.id
+  LEFT JOIN shelf."_AssetToTag" att ON a.id = att."A"
+  LEFT JOIN shelf."Tag" t ON att."B" = t.id
+  LEFT JOIN shelf."Custody" cu ON cu."assetId" = a.id
+  LEFT JOIN shelf."TeamMember" tm ON cu."teamMemberId" = tm.id
+  LEFT JOIN shelf."User" u ON tm."userId" = u.id
   LEFT JOIN LATERAL (
     SELECT b.*
-    FROM public."Booking" b
-    JOIN public."_AssetToBooking" atb ON b.id = atb."B" AND a.id = atb."A"
+    FROM shelf."Booking" b
+    JOIN shelf."_AssetToBooking" atb ON b.id = atb."B" AND a.id = atb."A"
     WHERE b.status IN ('ONGOING', 'OVERDUE')
     LIMIT 1
   ) b ON TRUE
-  LEFT JOIN public."User" bu ON b."custodianUserId" = bu.id
-  LEFT JOIN public."TeamMember" btm ON b."custodianTeamMemberId" = btm.id
+  LEFT JOIN shelf."User" bu ON b."custodianUserId" = bu.id
+  LEFT JOIN shelf."TeamMember" btm ON b."custodianTeamMemberId" = btm.id
 `;
 
 /**

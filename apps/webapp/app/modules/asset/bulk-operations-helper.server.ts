@@ -60,14 +60,14 @@ async function getAdvancedFilteredAssetIds({
     // Joins are needed because WHERE clause may reference: c.name, l.name, t.id, tm.name, etc.
     const query = Prisma.sql`
       SELECT DISTINCT a.id
-      FROM public."Asset" a
-      LEFT JOIN public."Category" c ON a."categoryId" = c.id
-      LEFT JOIN public."Location" l ON a."locationId" = l.id
-      LEFT JOIN public."_AssetToTag" att ON a.id = att."A"
-      LEFT JOIN public."Tag" t ON att."B" = t.id
-      LEFT JOIN public."Custody" cu ON cu."assetId" = a.id
-      LEFT JOIN public."TeamMember" tm ON cu."teamMemberId" = tm.id
-      LEFT JOIN public."User" u ON tm."userId" = u.id
+      FROM shelf."Asset" a
+      LEFT JOIN shelf."Category" c ON a."categoryId" = c.id
+      LEFT JOIN shelf."Location" l ON a."locationId" = l.id
+      LEFT JOIN shelf."_AssetToTag" att ON a.id = att."A"
+      LEFT JOIN shelf."Tag" t ON att."B" = t.id
+      LEFT JOIN shelf."Custody" cu ON cu."assetId" = a.id
+      LEFT JOIN shelf."TeamMember" tm ON cu."teamMemberId" = tm.id
+      LEFT JOIN shelf."User" u ON tm."userId" = u.id
       ${whereClause}
     `;
 
